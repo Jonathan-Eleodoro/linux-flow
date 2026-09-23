@@ -1,0 +1,14 @@
+{
+  "name": "linux-flow",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Quiz e laboratório didático de Linux — Jonathan Eleodoro",
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "test": "node --test tests/domain.test.cjs",
+    "start": "python -m http.server 4173"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

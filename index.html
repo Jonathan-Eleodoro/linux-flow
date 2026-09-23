@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Linux_Flow: quiz, trilhas de estudo e terminal simulado de Linux. Projeto acadêmico de Jonathan Eleodoro."
+    />
+    <meta name="color-scheme" content="dark light" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Linux_Flow — Laboratório de aprendizagem</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23181d21'/%3E%3Cpath d='m7 9 7 7-7 7m12 0h7' fill='none' stroke='%23b3ef70' stroke-width='3'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <script defer src="js/config.js"></script>
+    <script defer src="js/data.js"></script>
+    <script defer src="js/core.js"></script>
+    <script defer src="js/storage.js"></script>
+    <script defer src="js/terminal.js"></script>
+    <script defer src="js/app.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Pular para o conteúdo</a>
+    <header class="topbar">
+      <a class="brand" href="#trilhas" aria-label="Linux Flow, início"
+        ><span class="brand-mark" aria-hidden="true">&gt;_</span
+        ><span>Linux<span class="brand-accent">_Flow</span></span></a
+      >
+      <span class="edition">Laboratório de aprendizagem / 2026</span>
+      <div class="tools">
+        <button
+          id="sound"
+          class="icon-button"
+          aria-pressed="false"
+          title="Ativar som"
+        >
+          Som: não</button
+        ><button id="theme" class="icon-button" title="Alternar tema">
+          Tema claro</button
+        ><button id="profile" class="profile-button">Criar perfil</button>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar">
+        <p class="nav-label">Seu espaço de prática</p>
+        <nav aria-label="Menu principal">
+          <a href="#trilhas" data-view="trilhas"
+            ><span aria-hidden="true">◈</span> Trilhas</a
+          >
+          <a href="#quiz" data-view="quiz"
+            ><span aria-hidden="true">▷</span> Quiz</a
+          >
+          <a href="#terminal" data-view="terminal"
+            ><span aria-hidden="true">&gt;_</span> Terminal</a
+          >
+          <a href="#ranking" data-view="ranking"
+            ><span aria-hidden="true">≡</span> Ranking</a
+          >
+          <a href="#manual" data-view="manual"
+            ><span aria-hidden="true">▤</span> Manual</a
+          >
+          <a href="#conquistas" data-view="conquistas"
+            ><span aria-hidden="true">◇</span> Conquistas</a
+          >
+        </nav>
+        <div class="sidebar-note">
+          <span class="tiny">Projeto acadêmico</span>
+          <p>Aprender Linux.<br />Um comando por vez.</p>
+          <span class="muted">Jonathan Eleodoro</span>
+        </div>
+        <a class="about-link" href="#sobre">Sobre e privacidade ↗</a>
+      </aside>
+      <main id="main" tabindex="-1"></main>
+    </div>
+    <footer>
+      <span>Linux_Flow · Jonathan Eleodoro · 2026</span
+      ><a href="#sobre">Colégio Sinodal Progresso · Sobre o projeto</a>
+    </footer>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <dialog id="profile-dialog" aria-labelledby="profile-title">
+      <form id="profile-form">
+        <div class="dialog-head">
+          <h2 id="profile-title">Seu espaço no laboratório</h2>
+          <button type="button" id="close-profile" aria-label="Fechar">
+            ×
+          </button>
+        </div>
+        <p>
+          Use um nome ou apelido. Não há senha: este perfil existe somente neste
+          navegador.
+        </p>
+        <label for="nickname">Como você quer aparecer?</label
+        ><input
+          id="nickname"
+          name="nickname"
+          autocomplete="nickname"
+          minlength="2"
+          maxlength="32"
+          required
+          placeholder="Seu nome ou apelido"
+        />
+        <label class="check"
+          ><input type="checkbox" id="remember" /> Guardar perfil, resultados e
+          preferências neste dispositivo</label
+        >
+        <p class="small muted">
+          Sem marcar, os dados duram apenas nesta página aberta. Em um
+          computador compartilhado, prefira a sessão temporária.
+        </p>
+        <button class="primary" type="submit">Entrar no laboratório</button>
+        <p id="profile-error" role="alert"></p>
+        <div id="existing-profiles"></div>
+      </form>
+    </dialog>
+    <noscript
+      >Ative JavaScript para executar o quiz e o terminal simulado. Os manuais
+      também estão na pasta docs do projeto.</noscript
+    >
+  </body>
+</html>
