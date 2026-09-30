@@ -1,6 +1,6 @@
 # Publicar Linux Flow na Cloudflare Pages com D1
 
-O site estático é publicado pela **Pages**. As rotas em `functions/api/` são **Pages Functions** e usam o banco **D1**, que oferece SQL compatível com SQLite. Não se trata de colocar um arquivo `.sqlite` dentro de `dist/`: o banco fica no serviço D1 e a função o acessa por um binding. Esta é a publicação principal desta versão; os arquivos da Vercel e MySQL continuam no projeto apenas como referência da implantação anterior.
+O site estático é publicado pela **Pages**. As rotas em `functions/api/` são **Pages Functions** e usam o banco **D1**, que oferece SQL compatível com SQLite. Não se trata de colocar um arquivo `.sqlite` dentro de `dist/`: o banco fica no serviço D1 e a função o acessa por um binding. O plano anterior com Vercel/MySQL está documentado apenas no histórico Git e nas [notas de manutenção](../.github/PROJECT_NOTES.md).
 
 ## Antes de publicar
 
@@ -49,7 +49,7 @@ No plano gratuito, a Pages tem até 500 builds por mês. Requisições estática
 
 Exporte o D1 antes de alterações importantes com `npx wrangler d1 export linux-flow --remote --output=backup.sql` e mantenha o arquivo fora do repositório, pois contém dados pessoais. O pedido de exclusão de sugestões recebidas por e-mail ainda é manual: pesquise e remova as linhas correspondentes no Console D1 após verificar o solicitante.
 
-Depois que o domínio Pages estiver testado e o tráfego apontar para ele, **Vercel e Aiven não serão necessários** para esta implantação. Evite cancelar serviços anteriores até confirmar o novo endereço e os fluxos de dados. A Cloudflare passa a hospedar o frontend, a API e o banco.
+Depois que o domínio Pages estiver testado, **Vercel e Aiven não serão necessários** para esta implantação. Como nenhum dado foi cadastrado no Aiven, basta validar os fluxos no D1. A Cloudflare passa a hospedar o frontend, a API e o banco.
 
 ## Limites pedagógicos da comunidade
 

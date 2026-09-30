@@ -1,6 +1,7 @@
 /* Laboratório em memória: nenhum comando chega ao sistema operacional. */
 (function (root) {
   "use strict";
+  // Cada missão descreve a meta; a conclusão depende do estado, não da dica.
   const missions = [
     { title: "Localize seu ponto de partida", story: "Você recebeu uma estação nova. Descubra o caminho absoluto do diretório atual.", goal: "Consultar o diretório de trabalho.", hints: ["O comando deve apenas mostrar uma informação; não altere arquivos.", "Digite pwd e observe o caminho retornado."], choices: ["pwd", "whoami", "ls"], answer: "pwd" },
     { title: "Prepare a entrega", story: "Crie a pasta projeto dentro de sua pasta pessoal. Entre nela e crie aula.txt.", goal: "Ter /home/aluno/projeto/aula.txt no cenário.", hints: ["Crie a pasta antes de entrar nela.", "Execute, um por vez: mkdir projeto, cd projeto, touch aula.txt."], choices: ["mkdir projeto", "cd projeto", "touch aula.txt", "cat aula.txt"], answer: "mkdir projeto → cd projeto → touch aula.txt" },
@@ -15,6 +16,7 @@
     { title: "Observe processos", story: "Um serviço parece lento. Antes de qualquer intervenção, liste os processos deste cenário.", goal: "Consultar a tabela de processos simulados.", hints: ["Investigue antes de encerrar qualquer processo.", "Digite ps. A saída é fictícia e nenhuma tarefa real será afetada."], choices: ["ps", "whoami", "chmod 640 relatorio.txt"], answer: "ps" },
     { title: "Confira serviços de rede", story: "Verifique quais portas TCP e UDP aparecem como abertas ou em escuta.", goal: "Consultar os sockets simulados.", hints: ["Endereço da interface e rota não mostram portas de serviços.", "Digite ss -tuln. A saída é uma simulação local."], choices: ["ss -tuln", "ip addr", "ip route"], answer: "ss -tuln" },
   ];
+  // As referências acompanham a ordem das missões para consulta posterior.
   const references = [
     [{ label: "GNU Coreutils · pwd", url: "https://www.gnu.org/software/coreutils/manual/html_node/pwd-invocation.html" }],
     [
@@ -40,6 +42,7 @@
   function create(index = 0) {
     if (!Number.isInteger(index) || index < 0 || index >= missions.length) throw new Error("Missão inválida.");
     let cwd = "/home/aluno";
+    // Esta árvore fictícia é recriada a cada missão.
     const fs = new Map([
       ["/", { dir: true }], ["/home", { dir: true }], ["/home/aluno", { dir: true }],
       ["/home/aluno/notas.txt", { text: "Linux é prática.\nLeia, experimente e revise.\n", mode: "644" }],
@@ -49,6 +52,7 @@
     ]);
     const flags = new Set();
     function path(raw = ".") {
+      // Normaliza caminhos apenas dentro do cenário em memória.
       const parts = [];
       for (const segment of (raw.startsWith("/") ? raw : cwd + "/" + raw).split("/")) {
         if (!segment || segment === ".") continue;
@@ -58,6 +62,7 @@
       return "/" + parts.join("/");
     }
     function done() {
+      // O objetivo exige alteração ou observação verificável no cenário.
       return [
         flags.has("pwd"), fs.has("/home/aluno/projeto/aula.txt"), flags.has("cat"),
         fs.get("/home/aluno/relatorio.txt").mode === "640",
@@ -71,6 +76,7 @@
       if (typeof raw !== "string" || raw.length > 180) return { output: "Comando muito longo.", done: done(), cwd };
       const input = raw.trim().replace(/\s+/g, " ");
       if (!input) return { output: "Digite um comando ou help.", done: done(), cwd };
+      // Operadores de shell não são interpretados nem encaminhados ao sistema.
       if (/[;&|<>`$]/.test(input)) return { output: "Digite um comando simples por vez. Operadores não fazem parte deste simulador.", done: done(), cwd };
       const [cmd, ...args] = input.split(" ");
       let output = "";

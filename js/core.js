@@ -50,6 +50,7 @@
     });
   }
   function result(answers) {
+    // A correção usa o texto canônico após o embaralhamento das alternativas.
     const correct = answers.filter(
       (a) => a.selected === a.question.answer,
     ).length;
@@ -92,6 +93,7 @@
    * Uma melhor tentativa por perfil; empates favorecem a conclusão mais antiga.
    * Não há relógio competitivo, para não penalizar leitura e acessibilidade. */
   function ranking(records) {
+    // Retém a melhor tentativa por pessoa para não premiar volume de envios.
     const ordered = [...records].sort(
       (a, b) =>
         b.correct / b.total - a.correct / a.total ||

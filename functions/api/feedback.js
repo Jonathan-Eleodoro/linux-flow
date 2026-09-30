@@ -1,6 +1,7 @@
 import feedbackCore from "../../server/feedback-core.cjs";
 import { database, first, json, prepared, publicError, readJson } from "../../cloudflare/common.mjs";
 
+// Sugestões identificadas ficam privadas e têm limite diário por e-mail.
 export async function onRequestPost(context) {
   let feedback;
   try { feedback = feedbackCore.validateFeedback(await readJson(context.request, 5000)); }

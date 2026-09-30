@@ -1,13 +1,16 @@
 "use strict";
+// Monta o BR Code Pix sem executar pagamento nem conferir crédito bancário.
 const { randomBytes } = require("node:crypto");
 
 function field(id, value) {
+  // O tamanho de cada campo é medido em bytes UTF-8, conforme o formato TLV.
   const text = String(value);
   const length = Buffer.byteLength(text, "utf8");
   if (!/^\d{2}$/.test(id) || length > 99) throw new Error("Campo Pix inválido.");
   return id + String(length).padStart(2, "0") + text;
 }
 function crc16(payload) {
+  // O CRC cobre todo o conteúdo anterior aos quatro caracteres finais.
   let crc = 0xffff;
   for (const byte of Buffer.from(payload, "utf8")) {
     crc ^= byte << 8;
@@ -21,6 +24,7 @@ function normalizeLabel(value, max) {
     .toUpperCase().replace(/[^A-Z0-9 .-]/g, "").trim().slice(0, max);
 }
 function amountCents(value) {
+  // Valor mínimo e teto evitam pedidos fora do intervalo aceito pela interface.
   const amount = Number(value);
   if (!Number.isInteger(amount) || amount < 990 || amount > 100000)
     throw new Error("Contribuição mínima de R$ 9,90; informe o valor em centavos.");

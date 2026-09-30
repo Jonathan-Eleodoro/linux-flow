@@ -3,6 +3,7 @@ dist/
 node_modules/
 .vercel/
 .wrangler/
+.npm-cache/
 backup.sql
 .env
 .env.*

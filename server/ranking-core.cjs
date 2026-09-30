@@ -1,4 +1,5 @@
 "use strict";
+// O servidor recalcula acertos a partir das respostas, ignorando notas do cliente.
 const { FlowData } = require("../js/data.js");
 const { questions: proQuestions } = require("./pro-data.cjs");
 const questions = new Map([...FlowData.questions, ...proQuestions].map((question) => [question.id, question]));
@@ -17,6 +18,7 @@ function validateAttempt(body, { allowPro = false } = {}) {
   let correct = 0;
   const outcomes = [];
   for (const answer of body.answers) {
+    // Cada ID precisa existir no nível e assunto declarados para a rodada.
     if (!answer || typeof answer.id !== "string" || seen.has(answer.id))
       throw new Error("Perguntas repetidas ou inválidas.");
     const question = questions.get(answer.id);
@@ -42,6 +44,7 @@ function validateAttempt(body, { allowPro = false } = {}) {
 }
 
 function validateFilter(params) {
+  // Comparações públicas usam sempre o mesmo assunto, nível e total de questões.
   const category = params.get("category") || "all";
   const level = Number(params.get("level") || 1);
   const total = Number(params.get("total") || 10);

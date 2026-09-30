@@ -1,4 +1,4 @@
-/* Prévia local dos arquivos públicos. A API da Vercel não roda aqui. */
+/* Prévia local do frontend. Pages Functions e D1 não rodam neste servidor. */
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -10,6 +10,7 @@ http.createServer((request, response) => {
   let pathname;
   try { pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname); }
   catch { response.writeHead(400).end(); return; }
+  // A resolução e a checagem seguinte bloqueiam caminhos fora do projeto.
   const file = path.resolve(root, `.${pathname === "/" ? "/index.html" : pathname}`);
   if (!file.startsWith(root + path.sep)) { response.writeHead(403).end(); return; }
   fs.stat(file, (error, stat) => {

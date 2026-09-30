@@ -8,7 +8,7 @@ Cada questão e entrada de manual informa o PDF de base. As perguntas são elabo
 
 O mapa de objetivos associa as trilhas existentes aos 19 objetivos em cinco tópicos. A associação é aproximada; um objetivo ainda não tem trilha relacionada e mesmo os demais podem estar parcialmente cobertos. As 18 perguntas novas de licenças, compactação e scripts são elaboração própria referenciada no material LPI; nenhuma questão antiga recebeu uma nova atribuição de fonte sem revisão do conteúdo. Os documentos locais de planejamento `01_potencial_de_mercado.pdf` a `07_prompts_visuais.pdf` foram considerados como contexto de desenvolvimento; não são citados como fonte técnica das perguntas.
 
-As 20 perguntas adicionais das etapas PRO são cenários autorais de prática em automação e arquitetura operacional. Elas ampliam o projeto além do escopo do exame Linux Essentials e não são apresentadas como questões oficiais do LPI.
+As 20 perguntas adicionais das etapas Premium são cenários autorais de prática em automação e arquitetura operacional. Elas ampliam o projeto além do escopo do exame Linux Essentials e não são apresentadas como questões oficiais do LPI.
 
 As missões do terminal são cenários autorais simulados. Para consulta dos comandos reais, cada missão aponta diretamente para a documentação do GNU Coreutils, GNU Bash, GNU grep, iproute2, procps-ng ou The Tcpdump Group, conforme o comando. Esses links substituem rótulos genéricos de exercícios na interface do terminal; a documentação não é apresentada como fonte das saídas fictícias.
 
@@ -37,7 +37,7 @@ Outros materiais do ZIP, incluindo apresentações de instalação com várias p
 
 ## Recorte e ressalvas
 
-- O banco contém **135 questões**, **101 entradas de manual**, **14 categorias** e **12 missões**. As três etapas FREE existentes aceitam até 100 perguntas por rodada, conforme o tamanho do recorte escolhido.
+- O banco contém **135 questões**, **101 entradas de manual**, **14 categorias** e **12 missões**. As três etapas Free existentes aceitam até 100 perguntas por rodada, conforme o tamanho do recorte escolhido.
 - A trilha histórica usa o material Linux Essentials do LPI e a [história do projeto GNU](https://www.gnu.org/gnu/gnu-history.en.html) para distinguir Unix, GNU, kernel Linux e distribuição. A trilha de instalação usa o [guia oficial de instalação do Debian](https://www.debian.org/releases/stable/amd64/install.en.pdf) e o [tutorial de instalação do Ubuntu](https://ubuntu.com/tutorials/install-ubuntu-desktop) como referências para backup, ISO, mídia, teste e conferência do destino. A simulação é didática e não executa instalações nem substitui o guia específico da distribuição e do computador.
 - O plano anual inclui assuntos futuros. Processos e DNS são identificados como conteúdos do plano; o aluno/professor deve decidir se entram na avaliação da etapa atual.
 - `less`, `more` e `wget` aparecem como exemplos no pedido, mas não receberam questões sem apoio textual suficiente nos anexos. Não foram adicionadas referências externas para preencher a lacuna.

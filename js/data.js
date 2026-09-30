@@ -1,6 +1,5 @@
-/* Conteúdo editorial derivado exclusivamente dos PDFs anexados.
- * Cada questão mantém sua fonte para revisão humana e manutenção independente da interface.
- * Níveis: 1 reconhecimento, 2 aplicação, 3 diagnóstico e detalhes. */
+/* Conteúdo editorial autoral com fontes registradas por questão.
+ * Níveis 1–3 são Free; o acervo Premium permanece no servidor. */
 (typeof window === "undefined" ? module.exports : window).FlowData = {
   categories: [
     {
@@ -114,6 +113,7 @@
       { id: "5.4", title: "Arquivos e diretórios especiais", categories: ["permissoes"] },
     ] },
   ],
+  // Jornadas guiadas contam uma história; perguntas continuam no acervo comum.
   learningModules: {
     historia: {
       label: "Linha do tempo · 5 marcos",
@@ -143,6 +143,7 @@
       ],
     },
   },
+  // IDs estáveis preservam histórico e estatísticas entre versões.
   questions: [
     ...[
       [1, "Qual projeto foi anunciado por Richard Stallman em 1983?", "GNU", ["GNU", "APT", "systemd", "Wayland"], "GNU buscava um sistema operacional livre compatível com Unix."],
@@ -1816,6 +1817,7 @@
     { id: "lpi-sh-5", category: "scripts", level: 3, prompt: "Em um script Bash chamado com um argumento, como se acessa o primeiro argumento posicional?", code: "", answer: "$1", options: ["$1", "$0", "$?", "$$"], explanation: "$1 contém o primeiro argumento; $0 costuma representar o nome usado para invocar o script.", source: "LPI-Learning-Material-010-160-pt.pdf" },
     { id: "lpi-sh-6", category: "scripts", level: 3, prompt: "Após executar um comando, que variável especial contém seu status de saída no Bash?", code: "", answer: "$?", options: ["$?", "$1", "$HOME", "$PATH"], explanation: "$? guarda o status da última execução; zero geralmente indica sucesso.", source: "LPI-Learning-Material-010-160-pt.pdf" },
   ],
+  // O manual complementa as respostas sem executar exemplos no dispositivo.
   manual: [
     { category: "historia", command: "Unix → GNU → Linux", action: "Distinguir origens", explanation: "Unix antecede o projeto GNU, anunciado em 1983; Linus Torvalds desenvolveu o kernel Linux em 1991.", example: "Unix (inspiração) → GNU (ferramentas e sistema) → Linux (kernel)", source: "LPI-Learning-Material-010-160-pt.pdf" },
     { category: "historia", command: "Kernel ≠ distribuição", action: "Reconhecer camadas", explanation: "Uma distribuição combina o kernel com ferramentas, bibliotecas, instalador, pacotes e políticas de suporte.", example: "Comparar kernel, shell e gerenciador de pacotes", source: "LPI-Learning-Material-010-160-pt.pdf" },

@@ -3,6 +3,7 @@ import { database, first, json, prepared, publicError, readJson, rows } from "..
 
 const { validateAttempt, validateFilter } = rankingCore;
 
+// Cada participante ocupa no máximo uma posição por filtro: sua melhor nota.
 export async function onRequestGet(context) {
   let filter;
   try { filter = validateFilter(new URL(context.request.url).searchParams); }
@@ -27,6 +28,7 @@ export async function onRequestPost(context) {
   catch (error) { return json({ error: error.message }, error.status || 400); }
   try {
     const db = database(context);
+    // Perfis sincronizados publicam pela rota de perfil para vincular a tentativa à chave.
     const synced = await first(db, "SELECT id FROM synced_profiles WHERE id = ?", attempt.participantId);
     if (synced) return json({ error: "Use o perfil sincronizado para publicar." }, 403);
     const prior = await first(db, "SELECT participant_id FROM ranking_attempts WHERE id = ?", attempt.id);

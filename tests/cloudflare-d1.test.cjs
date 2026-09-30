@@ -1,3 +1,4 @@
+// Exercita as Pages Functions sobre SQLite local com o esquema D1.
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");

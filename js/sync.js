@@ -3,11 +3,13 @@
   "use strict";
   const validKey = (value) => typeof value === "string" && /^[0-9a-f]{64}$/.test(value);
   function newKey() {
+    // A chave usa aleatoriedade criptográfica; não deriva do apelido.
     const bytes = new Uint8Array(32);
     crypto.getRandomValues(bytes);
     return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
   }
   async function request(method, key, body) {
+    // A chave só vai no cabeçalho para a API de mesma origem.
     const response = await fetch("/api/profile", {
       method,
       headers: { ...(key ? { Authorization: `Bearer ${key}` } : {}),
@@ -30,6 +32,7 @@
     return result;
   }
   window.FlowSync = Object.freeze({
+    // Esta fachada mantém o restante da interface independente de fetch.
     validKey,
     newKey,
     create: (profile, key) => request("POST", null, {

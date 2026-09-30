@@ -8,6 +8,7 @@ import {
 const { safeId, safeKey, safeName, validateResults, validateLabs } = profileCore;
 const { validateAttempt } = rankingCore;
 
+// O snapshot junta progresso persistido sem expor o hash do código de acesso.
 async function snapshot(db, profile) {
   const [entitlement, results, labs, questionProgress] = await Promise.all([
     first(db, "SELECT profile_id FROM pro_entitlements WHERE profile_id = ?", profile.id),
@@ -27,6 +28,7 @@ async function snapshot(db, profile) {
   };
 }
 
+// Lotes pequenos respeitam o limite de parâmetros por consulta do D1.
 function importedResultStatements(db, profileId, results) {
   const statements = [];
   for (let offset = 0; offset < results.length; offset += 14) {
@@ -43,6 +45,7 @@ function importedResultStatements(db, profileId, results) {
   return statements;
 }
 
+// A tentativa verificada grava nota, respostas por questão e ranking em um batch.
 function verifiedAttemptStatements(db, profile, attempt, shareRanking) {
   const statements = [
     prepared(db, "UPDATE synced_profiles SET share_ranking = ? WHERE id = ?",
@@ -118,6 +121,7 @@ export async function onRequestPost(context) {
     const profile = await authorized(context);
     if (!profile) return json({ error: "Código de acesso inválido." }, 401);
     if (body.action === "sync") {
+      // A importação de histórico local não comprova nota e não publica ranking.
       if (!safeName(body.name) || typeof body.shareRanking !== "boolean")
         return json({ error: "Perfil inválido." }, 400);
       const results = validateResults(body.results);
@@ -165,6 +169,7 @@ export async function onRequestDelete(context) {
     const profile = await authorized(context);
     if (!profile) return json({ error: "Código de acesso inválido." }, 401);
     const db = database(context);
+    // A chave estrangeira remove progresso e salas; o ranking é removido à parte.
     await db.batch([
       prepared(db, "DELETE FROM ranking_attempts WHERE participant_id = ?", profile.id),
       prepared(db, "DELETE FROM synced_profiles WHERE id = ?", profile.id),

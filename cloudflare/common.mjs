@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 
+// Respostas da API não devem ser armazenadas pelo navegador ou por caches intermediários.
 export function json(value, status = 200) {
   return Response.json(value, { status, headers: {
     "Cache-Control": "no-store",
@@ -13,6 +14,7 @@ export function database(context) {
   return context.env.DB;
 }
 
+// O limite evita que uma requisição grande consuma a cota de CPU das Functions.
 export async function readJson(request, maxLength) {
   const raw = await request.text();
   if (raw.length > maxLength) {
@@ -38,6 +40,7 @@ export function accessKeyHash(key) {
   return createHash("sha256").update(Buffer.from(key, "hex")).digest("hex");
 }
 
+// O código de acesso é um segredo de posse; só seu hash é consultado no D1.
 export async function authorized(context) {
   const match = /^Bearer ([0-9a-f]{64})$/.exec(context.request.headers.get("authorization") || "");
   if (!match) return null;
@@ -46,6 +49,7 @@ export async function authorized(context) {
     accessKeyHash(match[1]));
 }
 
+// Falhas internas ficam nos logs do servidor; a resposta pública não expõe SQL.
 export function publicError(error, fallback) {
   if (error.status) return json({ error: error.message }, error.status);
   if (/UNIQUE constraint failed/i.test(error.message || ""))

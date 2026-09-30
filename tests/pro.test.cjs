@@ -1,3 +1,4 @@
+// Valida o BR Code Pix e o isolamento das perguntas Premium.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { payload, crc16, amountCents, newTxid } = require("../server/pix-core.cjs");

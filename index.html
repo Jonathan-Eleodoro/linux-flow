@@ -19,6 +19,7 @@
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23181d21'/%3E%3Cpath d='m7 9 7 7-7 7m12 0h7' fill='none' stroke='%23b3ef70' stroke-width='3'/%3E%3C/svg%3E"
     />
     <link rel="stylesheet" href="css/style.css" />
+    <!-- A ordem dos scripts fornece os namespaces Flow* antes do controlador. -->
     <script defer src="js/config.js"></script>
     <script defer src="js/data.js"></script>
     <script defer src="js/core.js"></script>
@@ -31,12 +32,13 @@
   </head>
   <body>
     <a class="skip" href="#main">Pular para o conteúdo</a>
+    <!-- Cabeçalho, menu e abas pertencem à navegação, não ao conteúdo da rota. -->
     <header class="topbar">
       <div class="brand-group">
-      <a class="brand" href="#inicio" aria-label="Linux Flow, início"
-        ><span class="brand-mark" aria-hidden="true">&gt;_</span
-        ><span>Linux<span class="brand-accent">_Flow</span></span></a
-      >
+        <a class="brand" href="#inicio" aria-label="Linux Flow, início">
+          <span class="brand-mark" aria-hidden="true">&gt;_</span>
+          <span>Linux<span class="brand-accent">_Flow</span></span>
+        </a>
       </div>
       <span class="edition">Laboratório de aprendizagem / 2026</span>
       <form id="header-search-form" class="header-search" role="search">
@@ -86,6 +88,7 @@
         <main id="main" tabindex="-1"></main>
       </div>
     </div>
+    <!-- Contato e privacidade ficam acessíveis em todas as telas. -->
     <footer>
       <div><strong>Endereço</strong><address id="institution-address"></address></div>
       <div><strong>Contato</strong><a id="project-contact"></a></div>
@@ -102,6 +105,7 @@
       <p><strong>Guia:</strong> sua escolha entre ajuda sob demanda, permanente ou dispensada fica neste navegador e pode ser alterada em Configurações.</p>
       <div class="actions"><button id="cookie-go-policy" type="button">Ver política completa</button><button id="cookie-ok" type="button" class="primary">Entendi</button></div>
     </dialog>
+    <!-- O diálogo separa acesso local, sincronizado e visitante. -->
     <dialog id="profile-dialog" aria-labelledby="profile-title">
       <div class="dialog-head">
         <h2 id="profile-title">Como deseja continuar?</h2>

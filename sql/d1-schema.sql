@@ -1,6 +1,7 @@
 -- Cloudflare D1 / SQLite. Aplique uma vez antes de ativar as Pages Functions.
 PRAGMA foreign_keys = ON;
 
+-- Perfis usam hash de chave; o código original nunca é persistido aqui.
 CREATE TABLE IF NOT EXISTS synced_profiles (
   id TEXT PRIMARY KEY,
   access_key_hash TEXT NOT NULL UNIQUE,
@@ -22,6 +23,7 @@ CREATE TABLE IF NOT EXISTS ranking_attempts (
 CREATE INDEX IF NOT EXISTS ranking_filter ON ranking_attempts(category, level, total, correct DESC, created_at);
 CREATE INDEX IF NOT EXISTS ranking_participant ON ranking_attempts(participant_id);
 
+-- Resultados importados podem ser locais; verified marca rodadas recalculadas pela API.
 CREATE TABLE IF NOT EXISTS profile_results (
   id TEXT PRIMARY KEY,
   profile_id TEXT NOT NULL REFERENCES synced_profiles(id) ON DELETE CASCADE,
@@ -49,6 +51,7 @@ CREATE TABLE IF NOT EXISTS profile_attempt_answers (
 );
 CREATE INDEX IF NOT EXISTS profile_attempt_answers_stats ON profile_attempt_answers(profile_id, question_id);
 
+-- Resumo por questão evita recalcular todo o histórico a cada abertura.
 CREATE TABLE IF NOT EXISTS profile_question_stats (
   profile_id TEXT NOT NULL REFERENCES synced_profiles(id) ON DELETE CASCADE,
   question_id TEXT NOT NULL,
@@ -69,6 +72,7 @@ CREATE TABLE IF NOT EXISTS pro_requests (
   approved_at TEXT
 );
 CREATE INDEX IF NOT EXISTS pro_requests_owner ON pro_requests(profile_id, created_at DESC);
+-- Um perfil não pode abrir dois pedidos pendentes ao mesmo tempo.
 CREATE UNIQUE INDEX IF NOT EXISTS pro_requests_one_open ON pro_requests(profile_id) WHERE status IN ('pending', 'claimed');
 
 CREATE TABLE IF NOT EXISTS pro_entitlements (
@@ -119,6 +123,7 @@ CREATE TABLE IF NOT EXISTS game_members (
   PRIMARY KEY (room_id, profile_id)
 );
 
+-- Respostas têm chave por pessoa e questão para impedir pontuação duplicada.
 CREATE TABLE IF NOT EXISTS game_answers (
   room_id TEXT NOT NULL REFERENCES game_rooms(id) ON DELETE CASCADE,
   profile_id TEXT NOT NULL REFERENCES synced_profiles(id) ON DELETE CASCADE,

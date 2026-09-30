@@ -19,10 +19,15 @@ A atribuição de autoria em uma rodada usa o perfil escolhido no início. Troca
 | Seleção e respostas da rodada atual | Correção e revisão imediata | Apenas memória |
 | Apelido, identificador aleatório do perfil, assunto, nível, total, acertos e data de rodadas publicadas | Ranking compartilhado opcional | D1 da Cloudflare |
 | E-mail informado e comentário de sugestão | Analisar sugestões e eventualmente responder | D1 da Cloudflare; não exibidos publicamente |
+| Mascote, cor e faixa etária opcional | Personalizar o perfil; a faixa não aparece em placares | D1 da Cloudflare |
+| Participação, respostas, placar e eventos da sala | Conduzir partidas e permitir revisão pelo criador | D1 da Cloudflare; membros veem placar, criador vê eventos |
+| Participação, sugestões e indicadores do grupo | Acompanhar estudo coletivo | D1 da Cloudflare; criador vê indicadores individuais |
 
 O quiz não solicita senha, CPF, e-mail ou telefone do participante. O formulário opcional de sugestões solicita e-mail e comentário, com ciência explícita; o endereço é informado pelo remetente e não é verificado. O contato em `config.js` é dado público do autor.
 
 O aplicativo não cria cookies próprios nem integra analytics ou anúncios. O aviso de armazenamento é lembrado apenas na aba atual por `sessionStorage`. A sincronização envia apelido, resultados e missões à Pages Functions. Novas rodadas enviam respostas para recálculo dos acertos; a opção de ranking controla a publicação da pontuação. Compartilhar um resultado abre um serviço externo somente após ação do usuário e transmite apenas o resumo escolhido, sem respostas nem código de acesso. A hospedagem pode manter logs de acesso fora do controle do JavaScript. Consulte suas próprias configurações e políticas antes de uso institucional. Este texto descreve a implementação e não é uma certificação de conformidade jurídica.
+
+Salas e grupos exigem perfil sincronizado. Quem cria uma sala pode consultar os eventos da sessão; quem cria um grupo vê os indicadores individuais dos membros. A indicação de faixa etária é opcional e não verifica a idade. O uso com menores exige regras institucionais de autorização, moderação e retenção antes da aplicação em turma real.
 
 ## Consentimento funcional
 
@@ -43,7 +48,7 @@ Limites locais: 30 perfis e 300 resultados recentes. O navegador pode limpar os 
 - O binding D1 fica apenas nas Pages Functions. A chave Pix é configurada como secret na Cloudflare.
 - A marca institucional e os certificados indicam o caráter acadêmico, sem afirmar chancela oficial.
 
-Os cabeçalhos estáticos da Cloudflare são definidos em `_headers`; as Functions definem seus próprios cabeçalhos. O servidor Python local não replica esses cabeçalhos HTTP; a CSP de meta protege o que pode ser aplicado por HTML. A diretiva `frame-ancestors` depende de cabeçalho HTTP.
+Os cabeçalhos estáticos da Cloudflare são definidos em `_headers`; as Functions definem seus próprios cabeçalhos. A prévia Node local não replica esses cabeçalhos HTTP; a CSP de meta protege o que pode ser aplicado por HTML. A diretiva `frame-ancestors` depende de cabeçalho HTTP.
 
 ## O que a versão estática não pode garantir
 

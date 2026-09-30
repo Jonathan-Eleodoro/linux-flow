@@ -1,5 +1,5 @@
 "use strict";
-/* Conteúdo exclusivo entregue pela API após verificar direito Premium no MySQL. */
+/* Conteúdo Premium entregue apenas após verificar o direito no D1. */
 const source = "Linux_Flow · extensão prática Premium";
 const questions = [
   { id: "pro-auto-01", category: "scripts", level: 4, prompt: "Um script precisa parar se um comando obrigatório falhar. Qual estrutura testa o status imediatamente?", code: "comando", answer: "if ! comando; then exit 1; fi", options: ["if ! comando; then exit 1; fi", "comando; exit 0", "echo comando; continue", "touch comando; exit 0"], explanation: "A condição invertida identifica a falha e encerra com status diferente de zero." },

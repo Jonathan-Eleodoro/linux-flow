@@ -5,6 +5,7 @@ import { authorized, database, first, json, prepared, publicError, readJson } fr
 
 const { payload, amountCents, newTxid } = pixCore;
 
+// Sem as três variáveis, a interface não oferece uma cobrança incompleta.
 function pixSettings(env) {
   const { PIX_KEY: key, PIX_RECEIVER_NAME: name, PIX_RECEIVER_CITY: city } = env;
   return key && name && city ? { key, name, city } : null;
@@ -25,6 +26,7 @@ async function present(context, profileId) {
   const settings = pixSettings(context.env);
   if (!current.request || current.pro || current.request.status !== "pending" || !settings)
     return { ...current, paymentReady: Boolean(settings) };
+  // O QR mostra um pedido; nunca libera Premium por si só.
   const copyPaste = payload({ ...settings, cents: current.request.amountCents,
     txid: current.request.txid });
   const qr = await QRCode.toDataURL(copyPaste,
@@ -83,6 +85,7 @@ export async function onRequestPost(context) {
       return json(await present(context, profile.id), 201);
     }
     if (body.action === "claim") {
+      // A declaração do pagador apenas encaminha o pedido para conferência manual.
       if (typeof body.requestId !== "string" || !/^[0-9a-f-]{36}$/.test(body.requestId))
         return json({ error: "Pedido inválido." }, 400);
       const reference = typeof body.payerReference === "string" ? body.payerReference.trim() : "";

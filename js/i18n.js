@@ -11,7 +11,7 @@
   } catch {}
   document.documentElement.lang = locale;
 
-  // Cada linha: texto original, português europeu, espanhol, francês, italiano, alemão.
+  // Cada linha guarda o texto original e as traduções; apenas pt-BR e es estão ativos.
   const rows = [
     ["Comunidade", "Comunidade", "Comunidad"],
     ["JOGAR E APRENDER JUNTO", "JOGAR E APRENDER JUNTO", "JUGAR Y APRENDER JUNTOS"],
@@ -302,6 +302,7 @@
     return template.replace(/\{([a-z]+)\}/g, (_, name) => String(values[name] ?? ""));
   };
   function translateText(node) {
+    // Só textos exatos são trocados; exemplos técnicos mantêm sua escrita.
     const original = node.nodeValue;
     const trimmed = original.trim();
     const translated = dictionary.get(trimmed);
@@ -314,6 +315,7 @@
       return;
     }
     if (root.nodeType !== Node.ELEMENT_NODE) return;
+    // Código, scripts e campos editáveis não passam pelo tradutor de interface.
     if (root.matches("script, style, code, pre, textarea, [data-no-translate]")) return;
     for (const attribute of ["aria-label", "title", "placeholder"]) {
       const value = root.getAttribute(attribute);

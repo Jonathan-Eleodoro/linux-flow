@@ -79,6 +79,7 @@
   $("#project-contact").textContent = cfg.email;
   $("#project-contact").href = `mailto:${cfg.email}`;
   const GUIDE_KEY = "linux_flow.guide.v1";
+  // O guia usa uma preferência separada para não alterar perfis de estudo.
   let guideMode = "ask", guideOpen = false, tourRoot = null, tourIndex = 0, tourTargets = [];
   const tourSteps = [
     { selector: ".brand", title: "Início", body: "Volte à apresentação inicial por aqui." },
@@ -164,6 +165,7 @@
   window.addEventListener("scroll", () => { if (tourRoot) drawTour(false); }, { passive: true });
   $("#guide-settings").onclick = () => { $("#settings").open = false; guideMode = "ask"; guideOpen = false; guide(); };
   function localProgress(profile) {
+    // Resultados locais são limitados antes de subir para a nuvem.
     return {
       results: store.state.results.filter((record) => record.userId === profile.id),
       labs: [...new Set(store.state.labs.filter((lab) => lab.userId === profile.id)
@@ -171,6 +173,7 @@
     };
   }
   function mergeProgress(profile, snapshot) {
+    // A cópia remota e a local se unem por ID para não duplicar rodadas.
     profile.pro = snapshot.profile?.pro === true;
     const known = new Set(store.state.results.map((record) => record.id));
     for (const record of snapshot.results) {
@@ -231,6 +234,7 @@
     $("#landing-policy").onclick = () => navigate("privacidade");
   }
   function privacyView() {
+    // Este texto descreve exatamente os dados enviados pelas rotas atuais.
     main.innerHTML = heading("Transparência / LGPD", "Privacidade e controle dos seus dados.", "Saiba o que fica nesta sessão, neste dispositivo e na nuvem; escolha o que deseja publicar.") + `<div class="privacy-grid"><section class="panel"><h2>Quais dados usamos</h2><p>O quiz pode ser usado com um apelido, sem e-mail, CPF ou senha. Durante a sessão, guardamos em memória o perfil, respostas, resultados e missões. Ao escolher salvar neste dispositivo, esses dados, as preferências de tema e som e eventual código de acesso passam ao localStorage.</p><p>Ao ativar a sincronização, apelido, resultados, missões e progresso são enviados à API e guardados no banco D1 da Cloudflare. A API guarda apenas o hash do código de acesso. Quem possui o código pode abrir e alterar o perfil. Em Comunidade, o banco também guarda salas, respostas, placares, grupos, sugestões e uma faixa etária opcional. A faixa etária não é exibida aos demais.</p></section><section class="panel"><h2>Cookies e serviços externos</h2><p>Este aplicativo não cria cookies próprios, nem usa anúncios, rastreadores ou análise de uso. O aviso de armazenamento é lembrado somente nesta aba pelo sessionStorage. A hospedagem pode manter registros técnicos conforme suas políticas.</p><p>Compartilhar um resultado pelo sistema do aparelho ou por um link de rede social só acontece após seu clique; essa ação abre o serviço escolhido, sujeito à política dele.</p></section><section class="panel"><h2>Ranking e Premium</h2><p>O ranking compartilhado é opcional e publica apelido, assunto, nível, número de questões, acertos e data. Desativá-lo afeta novas rodadas; para remover as antigas da nuvem, apague o perfil sincronizado.</p><p>O Premium requer sincronização, pedido Pix e liberação manual. O site não coleta dados bancários nem confirma pagamentos automaticamente. Os resultados e certificados Premium são locais ou sincronizados; não entram no ranking público.</p></section><section class="panel"><h2>Suas escolhas</h2><p>Você pode usar uma sessão temporária, ativar ou desligar o armazenamento local, optar pelo ranking e apagar o perfil na nuvem. A tela Sobre reúne esses controles. A cópia local dura até você apagá-la ou limpar o navegador; apagar só a cópia local não remove a nuvem.</p><p>Para solicitações sobre dados, use ${cfg.email ? `<a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>` : "o contato do responsável pelo projeto informado na apresentação institucional"}. Consulte também a <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> e o <a href="https://www.gov.br/anpd/pt-br/centrais-de-conteudo/materiais-educativos-e-publicacoes/guia_orientativo_cookies_e_protecao_de_dados_pessoais" target="_blank" rel="noopener noreferrer">guia de cookies da ANPD</a>.</p><button id="privacy-controls" class="primary">Gerenciar meus dados →</button></section></div>`;
     main.querySelector(".privacy-grid").insertAdjacentHTML("beforeend", `<section class="panel"><h2>Sugestões identificadas</h2><p>O formulário solicita e-mail e comentário para análise e eventual resposta. Esses dados ficam privados no banco D1 da Cloudflare. Para solicitar acesso ou exclusão, escreva para <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>, informando o e-mail usado no envio.</p></section>`);
     $("#privacy-controls").onclick = () => navigate("sobre");
@@ -617,6 +621,7 @@
     renderStep();
   }
   function quizSetup() {
+    // O recorte escolhido determina quantas perguntas existem nesta rodada.
     main.innerHTML =
       heading(
         "Avaliação / escolha sua sessão",
@@ -698,6 +703,7 @@
     };
   }
   function quizQuestion() {
+    // A renderização pode ocorrer várias vezes sem recontar respostas confirmadas.
     if (!round) return quizSetup();
     const q = round.questions[round.index];
     main.innerHTML = `<div class="quiz-shell"><div class="page-head"><div><p class="eyebrow">${esc(tr(categoryName(q.category)))} / ${esc(tr(levels[round.settings.level]))}</p><h1>${esc(tr("Leia. Pense. Experimente."))}</h1></div><button id="quit">${esc(tr("Encerrar"))}</button></div><div class="quiz-meta"><span>${esc(tr("Pergunta {index} de {total}", { index: round.index + 1, total: round.questions.length }))}</span><span>${esc(tr("{count} acertos", { count: round.answers.filter((a) => a.selected === a.question.answer).length }))}</span></div><progress value="${round.index}" max="${round.questions.length}" aria-label="${esc(tr("Progresso do quiz"))}"></progress><section class="panel question-panel"><h2 id="question-title" tabindex="-1">${esc(tr(q.prompt))}</h2>${q.code ? `<div class="code-block"><code>$ ${esc(q.code)}</code></div>` : ""}<div class="answers" role="group" aria-labelledby="question-title">${q.options.map((o, i) => `<button class="answer" data-answer="${i}" aria-pressed="false"><span class="letter" aria-hidden="true">${"ABCD"[i]}</span><span>${esc(tr(o))}</span></button>`).join("")}</div><div id="feedback" aria-live="polite"></div><button id="confirm-answer" class="primary" disabled>${esc(tr("Confirmar resposta"))}</button></section></div>`;
@@ -903,6 +909,7 @@
     );
   }
   function ranking() {
+    // Filtros locais e compartilhados devem representar rodadas comparáveis.
     main.innerHTML =
       heading(
         "Melhores resultados",
@@ -989,6 +996,7 @@
     counts();
   }
   function terminalView() {
+    // Comandos do laboratório só alteram o cenário simulado em memória.
     terminal = FlowTerminal.create(missionIndex);
     labCompleted = false;
     const mission = terminal.mission;
@@ -1190,6 +1198,7 @@
     $("#mascot-achievements").onclick = () => navigate("conquistas");
   }
   function proView() {
+    // A interface consulta a situação; apenas a conferência manual concede acesso.
     main.innerHTML = heading("Linux_Flow Premium", "Apoie e continue estudando.",
       "Contribuição voluntária a partir de R$ 9,90 via Pix. Acesso liberado manualmente após conferência do recebimento.") +
       `<section class="panel pro-panel"><h2>Automação e Arquitetura</h2><p>O Premium inclui duas etapas adicionais, com perguntas próprias, explicações e certificados didáticos. O pagamento não é detectado automaticamente; acompanhe o estado do pedido aqui.</p><div id="pro-content" aria-live="polite">Consultando seu perfil…</div></section>`;
@@ -1285,6 +1294,7 @@
     $("#print-cert").onclick = () => window.print();
   }
   function about() {
+    // Dados locais e dados no D1 têm controles de exclusão distintos.
     main.innerHTML =
       heading(
         "Projeto / acesso e privacidade",

@@ -29,19 +29,19 @@ As alternativas mudam de posição. Perguntas podem reaparecer em rodadas difere
 | Aplicação | Interpretar opções e operações | Coruja analista |
 | Diagnóstico | Avaliar cenários e detalhes | Raposa administradora |
 
-As três etapas FREE estão abertas. Abra **Mascotes** para ver as ilustrações originais, o papel de cada personagem e como conquistar o certificado didático do nível. Automação e Arquitetura são etapas PRO para perfis sincronizados liberados pelo responsável após conferir a contribuição Pix. Se o recebedor ainda não configurou o Pix, a tela PRO informa que o pedido está indisponível. Os mascotes não representam certificações oficiais.
+As três etapas Free estão abertas. Abra **Mascotes** para ver as ilustrações originais, o papel de cada personagem e como conquistar o certificado didático do nível. Automação e Arquitetura são etapas Premium para perfis sincronizados liberados pelo responsável após conferir a contribuição Pix. Se o recebedor ainda não configurou o Pix, a tela Premium informa que o pedido está indisponível. Os mascotes não representam certificações oficiais.
 
-Para pedir acesso PRO, abra **PRO**, escolha a contribuição de no mínimo R$ 9,90 e confira recebedor e valor no aplicativo bancário antes de pagar pelo QR Code ou Pix Copia e Cola. Depois clique em **Já paguei**. Esse botão somente solicita conferência; a liberação depende de o responsável localizar o crédito no próprio banco. Use **Atualizar situação** para acompanhar. Não informe senha, dados bancários ou comprovante no perfil.
+Para pedir acesso Premium, abra **Premium**, escolha a contribuição de no mínimo R$ 9,90 e confira recebedor e valor no aplicativo bancário antes de pagar pelo QR Code ou Pix Copia e Cola. Depois clique em **Já paguei**. Esse botão somente solicita conferência; a liberação depende de o responsável localizar o crédito no próprio banco. Use **Atualizar situação** para acompanhar. Não informe senha, dados bancários ou comprovante no perfil.
 
 ## Mapa de objetivos LPI
 
-A aba **Objetivos LPI** organiza os cinco tópicos e 19 objetivos do exame Linux Essentials 010-160 (versão 1.6). Cada objetivo mostra se há alguma trilha relacionada no Linux_Flow. Essa relação é editorial e não significa que o objetivo esteja inteiramente coberto ou que o projeto prepare sozinho para o exame. Em perfis sincronizados, o mapa também indica questões praticadas em novas rodadas verificadas. Consulte os [objetivos oficiais do LPI](https://www.lpi.org/pt-br/exam-010-objectives/) para o programa completo.
+A aba **Objetivos** organiza os cinco tópicos e 19 objetivos do exame Linux Essentials 010-160 (versão 1.6). Cada objetivo mostra se há alguma trilha relacionada no Linux_Flow. Essa relação é editorial e não significa que o objetivo esteja inteiramente coberto ou que o projeto prepare sozinho para o exame. Em perfis sincronizados, o mapa também indica questões praticadas em novas rodadas verificadas. Consulte os [objetivos oficiais do LPI](https://www.lpi.org/pt-br/exam-010-objectives/) para o programa completo.
 
 ## Ranking
 
 Cada rodada concluída atualiza o ranking no navegador atual. Selecione o mesmo assunto, nível e quantidade para comparar resultados equivalentes. Só a melhor tentativa de cada perfil aparece. Em empate, a conclusão mais antiga vem primeiro.
 
-Na versão hospedada com a Aiven configurada, a aba **Compartilhado** mostra rodadas publicadas por opção de cada perfil. O ranking é didático: o gabarito é público e apelidos não comprovam identidade. O histórico local guarda no máximo 300 resultados; registros antigos podem sair dele, inclusive os que sustentam uma conquista antiga.
+Na versão hospedada com o D1 configurado, a aba **Compartilhado** mostra rodadas publicadas por opção de cada perfil. O ranking é didático: o gabarito é público e apelidos não comprovam identidade. O histórico local guarda no máximo 300 resultados; registros antigos podem sair dele, inclusive os que sustentam uma conquista antiga.
 
 ## Certificados
 

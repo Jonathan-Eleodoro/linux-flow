@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const out = path.join(root, "dist");
+// dist é regenerado; nunca edite a saída nem copie código de servidor para ela.
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 for (const name of ["index.html", "css", "js", "assets", "_headers", "_routes.json"]) {

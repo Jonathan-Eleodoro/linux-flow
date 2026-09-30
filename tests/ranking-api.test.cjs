@@ -1,3 +1,4 @@
+// Confere recálculo de notas e filtros do ranking.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { FlowData } = require("../js/data.js");

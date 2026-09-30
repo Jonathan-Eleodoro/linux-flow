@@ -1,69 +1,45 @@
-# Manual técnico e escolhas de implementação
+# Arquitetura e manutenção
 
-## Por que HTML, CSS e JavaScript nativos
+## Mapa do código
 
-A entrega acadêmica deve ser fácil de abrir, ler, modificar e hospedar. O aplicativo não precisa de biblioteca visual, framework, banco externo ou chave de API para cumprir seu fluxo local. O JavaScript é dividido por responsabilidade, em vez de ficar inteiro em um HTML monolítico.
+| Área | Responsabilidade |
+|---|---|
+| `index.html`, `css/style.css` | Estrutura, navegação, temas e layout mobile first. |
+| `js/config.js`, `js/data.js` | Contato institucional e conteúdo editorial. |
+| `js/core.js`, `js/terminal.js` | Sorteio, avaliação e simulação isolada do terminal. |
+| `js/storage.js`, `js/sync.js` | Estado local e comunicação com perfis sincronizados. |
+| `js/app.js`, `js/community.js`, `js/i18n.js` | Interface principal, comunidade e textos da interface. |
+| `functions/api/` | Rotas ativas da Cloudflare Pages. |
+| `cloudflare/common.mjs`, `server/*.cjs` | Acesso ao D1, autenticação e validações compartilhadas. |
+| `sql/d1-schema.sql` | Esquema inicial do banco D1. |
 
-Os scripts usam `defer` e carregam em ordem explícita: configuração, conteúdo, regras, armazenamento, terminal e interface. Pequenos namespaces globais (`FlowData`, `FlowCore`, `FlowStore`, `FlowTerminal`) conectam os módulos. Essa escolha permite abrir por `file://`, sem as restrições de módulos ES nesse protocolo. Em uma evolução com bundler, a migração para `import/export` é recomendada.
+Os scripts do navegador carregam com `defer` na ordem declarada em `index.html`. Usam namespaces `Flow*` para que o quiz individual também funcione ao abrir o HTML localmente. As Pages Functions usam módulos no servidor e nunca são copiadas para `dist/`.
 
-## Fluxo da aplicação
+## Fluxos e invariantes
 
-A navegação usa fragmentos de URL (`#trilhas`, `#quiz`, etc.). Isso dispensa regras de reescrita no servidor e mantém links internos reproduzíveis.
+O frontend navega com fragmentos de URL (`#quiz`, `#comunidade`). Uma rodada guarda perguntas, posição, alternativa e confirmações em memória. Só resultados concluídos são persistidos. O gabarito é público: ranking e relatórios são didáticos, não prova de identidade ou nota oficial.
 
-Uma rodada registra configurações, questões sorteadas, índice atual, alternativa selecionada, confirmação e respostas. Uma resposta só entra na contagem depois da confirmação. Botões são desabilitados para evitar nova resposta à mesma pergunta. O resultado só é persistido no fim da rodada.
+`js/core.js` embaralha sem modificar `js/data.js`. A avaliação compara o texto selecionado com a resposta canônica, independentemente da letra exibida. O certificado requer quiz geral com ao menos dez perguntas e proporção real de acertos de 80% ou mais.
 
-A fonte de verdade da nota é a comparação entre `selected` e `question.answer`. Não há dependência do índice da alternativa, porque as alternativas são embaralhadas. Ao voltar do manual, a interface reconstitui a seleção ou correção sem somar pontos novamente.
+O terminal interpreta apenas comandos previstos em uma árvore de arquivos em memória. Nunca chama shell, disco ou rede reais. Ao alterar comandos, mantenha essa fronteira e amplie os testes de domínio.
 
-## Algoritmos e regras
+Um perfil sincronizado usa um código aleatório guardado no navegador; o D1 guarda seu hash. Quem obtiver o código pode acessar o perfil. As rotas recebem JSON com tamanho limitado, usam consultas preparadas e verificam o dono antes de expor salas ou grupos. O criador controla a sessão como mestre; não há verificação de vínculo docente.
 
-**Fisher–Yates:** percorre o vetor de trás para frente e troca cada posição por um índice sorteado no trecho ainda disponível. Tempo O(n), cópia O(n); não altera o banco. `Math.random` é suficiente para variedade didática, mas não para sorteios auditáveis ou segurança.
+Salas são consultadas periodicamente pelo navegador. O servidor valida prazo, questão ativa, participação e resposta única. O relatório individual do grupo é visto pelo criador; cada participante consulta apenas o próprio desempenho. A faixa etária opcional não é retornada em placares ou relatórios.
 
-**Resultado:** acertos / total × 100. A interface arredonda a porcentagem para exibição. O certificado compara a fração real com 0,8, sem usar a porcentagem arredondada.
+## Alterar conteúdo
 
-**Ranking:** filtra assunto, nível e quantidade; ordena por proporção de acertos e data; seleciona a primeira ocorrência de cada usuário. Mantém no máximo 20 posições exibidas e 300 resultados recentes persistidos. Não soma tentativas para premiar repetição indiscriminada.
+Edite categorias, perguntas e explicações em `js/data.js`. Cada pergunta precisa de ID estável, categoria existente, nível, quatro alternativas distintas, resposta presente nas alternativas e fonte editorial. As perguntas Premium ficam em `server/pro-data.cjs`. Rode `npm test` após editar conteúdo.
 
-**Recomendação:** conta erros por categoria na última rodada e sugere até três assuntos com mais erros. É uma regra explicável, não um modelo de IA ou diagnóstico pedagógico validado.
+Para ampliar o D1 em uma publicação existente, crie uma migração numerada. `sql/d1-schema.sql` é o esquema inicial e não substitui uma migração de dados em produção.
 
-**Certificados:** um resultado geral com 10+ questões e 80%+ dá acesso ao nível correspondente. Não exige liberar níveis em ordem. O ID é somente um identificador de registro local, sem verificador online.
+## Executar e publicar
 
-## Alterar o conteúdo
-
-Edite `js/data.js`. Cada questão contém:
-
-```javascript
-{
-  id: 'arquivos-1',            // Único, estável e sem dados pessoais
-  category: 'arquivos',        // ID existente em categories
-  level: 1,                   // 1, 2 ou 3
-  prompt: 'Qual é a finalidade de pwd?',
-  code: 'pwd',                // Exemplo opcional; não é executado
-  answer: 'Mostrar o caminho completo do diretório atual',
-  options: [/* exatamente quatro textos distintos, incluindo answer */],
-  explanation: 'Mostra o diretório de trabalho atual.',
-  source: 'Jonathan Eleodoro - Exercícios.pdf'
-}
+```bash
+npm ci
+npm test
+npm run build
+npm start
 ```
 
-O manual tem suas próprias entradas editoriais no mesmo arquivo. Ao alterar explicações, mantenha questões e manual consistentes. Adicionar um assunto exige também uma entrada em `categories`. A quantidade disponível é calculada automaticamente. Faça revisão pedagógica dos distratores, não apenas teste de sintaxe.
-
-## Estilo e acessibilidade
-
-O CSS começa pelo celular. Media queries de 600 e 1000 px expandem colunas e navegação. Tokens em `:root` concentram cores e temas; não há fontes remotas. O fundo quadriculado sutil e os cards seguem a inspiração enviada.
-
-Há títulos hierárquicos, labels, botões reais, região de status, foco visível, link de salto, feedback escrito e respeito a `prefers-reduced-motion`. A navegação móvel usa uma faixa horizontal rolável. Tabelas podem rolar dentro do próprio contêiner. Isso não constitui auditoria completa de conformidade WCAG.
-
-## Segurança e persistência
-
-Consulte `seguranca.md`. O código escapa conteúdo variável antes de inserir templates e usa `textContent` no terminal. Não confie em localStorage para proteção: ele é controlado pelo cliente. A leitura valida o formato dos registros e limita tamanho e quantidade, mas não autentica notas.
-
-O terminal tem uma árvore em `Map`, caminhos normalizados e comandos explicitamente reconhecidos. Não chama shell, sistema de arquivos do host ou rede. Arquivos de simulação desaparecem ao trocar/reiniciar missão.
-
-O Web Audio usa osciladores curtos, sem downloads. A preferência não inicia reprodução automática ao carregar a página.
-
-Existe um pequeno adaptador opcional de leitura para WebMCP, quando `document.modelContext` estiver disponível. Ele retorna apenas nomes de trilhas e contagem por nível; não lê perfis ou responde questões. Ausência ou falha da API não afeta a aplicação. Não é necessário ao projeto.
-
-## Build e publicação
-
-`node scripts/build.cjs` copia somente `index.html`, `css`, `js` e `assets` para `dist/`. Assim, a Vercel não serve arquivos de desenvolvimento nem manuais internos. `vercel.json` define diretório de saída e cabeçalhos de segurança.
-
-Não há dependências NPM ou lockfile: nenhum pacote precisa ser resolvido. Execute `npm test` para verificar o domínio e `npm run build` para preparar a distribuição. O script `npm start` é apenas um atalho para o servidor Python quando `python` está disponível.
+O build copia `index.html`, `css/`, `js/`, `assets/`, `_headers` e `_routes.json` para `dist/`. O servidor de prévia em `npm start` serve apenas os arquivos do frontend e não executa a API. Para publicar Pages Functions e ligar o banco, siga [cloudflare-d1.md](cloudflare-d1.md). Decisões e próximos passos ficam em [PROJECT_NOTES.md](../.github/PROJECT_NOTES.md).

@@ -1,8 +1,10 @@
 "use strict";
+// A validação normaliza o e-mail e exige ciência explícita do aviso de dados.
 
 function validateFeedback(body) {
   if (!body || typeof body !== "object" || Array.isArray(body))
     throw new Error("Dados inválidos.");
+  // Campo invisível preenchido costuma indicar envio automatizado.
   if (body.website) throw new Error("Envio inválido.");
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const comment = typeof body.comment === "string" ? body.comment.trim() : "";

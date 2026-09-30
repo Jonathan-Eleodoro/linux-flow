@@ -38,6 +38,7 @@
       Number.isFinite(Date.parse(r.date))
     );
   }
+  // Dados persistidos podem vir de uma versão antiga ou ter sido alterados.
   try {
     const raw = localStorage.getItem(KEY);
     if (raw && raw.length < 500000) {
@@ -78,6 +79,7 @@
     /* Um registro corrompido não deve impedir o carregamento da página. */
   }
   function save() {
+    // Sem permissão, o estado permanece apenas na sessão atual.
     if (!persistent) return true;
     try {
       const kept = state.profiles.filter((profile) => !profile.temporary);
@@ -97,6 +99,7 @@
     }
   }
   function permission(value) {
+    // Desligar a persistência apaga a cópia local, sem apagar a nuvem.
     persistent = value;
     if (value) return save();
     try {

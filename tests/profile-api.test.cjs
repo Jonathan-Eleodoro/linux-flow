@@ -1,3 +1,4 @@
+// Confere os limites de dados importados para um perfil sincronizado.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { validateResults, validateLabs, safeKey } = require("../server/profile-core.cjs");

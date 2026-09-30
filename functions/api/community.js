@@ -7,6 +7,7 @@ const categories = new Set(["all", ...data.FlowData.categories.map((item) => ite
 const avatars = new Set(["penguin", "owl", "fox", "beaver", "lynx"]);
 const accents = new Set(["lime", "blue", "amber", "violet", "coral"]);
 const ageBands = new Set(["unspecified", "under13", "13-15", "16-17", "18plus"]);
+// Doze caracteres hexadecimais tornam códigos de convite difíceis de adivinhar.
 const code = () => Array.from(crypto.getRandomValues(new Uint8Array(6)),
   (byte) => byte.toString(16).padStart(2, "0")).join("").toUpperCase();
 const label = (value, max = 60) => typeof value === "string" &&
@@ -19,6 +20,7 @@ const log = (db, room, actor, event, detail = "") => prepared(db,
   crypto.randomUUID(), room, actor, event, detail);
 
 async function roomState(db, room, profile) {
+  // O código sozinho não concede acesso a placar ou logs: exige participação.
   const member = await first(db,
     "SELECT 1 AS ok FROM game_members WHERE room_id = ? AND profile_id = ?", room.id, profile.id);
   if (!member) return fail("Entre na sala com o código recebido.", 403);
@@ -35,6 +37,7 @@ async function roomState(db, room, profile) {
   const ownAnswer = question ? await first(db,
     "SELECT correct FROM game_answers WHERE room_id = ? AND profile_id = ? AND question_index = ?",
     room.id, profile.id, room.current_index) : null;
+  // Eventos individuais são visíveis apenas para quem criou a sala.
   const events = room.owner_id === profile.id ? await rows(db,
     `SELECT e.event_type AS type, e.detail, e.created_at AS date,
       COALESCE(p.nickname, 'Participante removido') AS actor
@@ -64,6 +67,7 @@ async function groupState(db, group, profile) {
     p.nickname AS author FROM study_suggestions s
     JOIN synced_profiles p ON p.id = s.profile_id
     WHERE s.group_id = ? ORDER BY s.created_at DESC LIMIT 50`, group.id);
+  // Integrantes veem seus próprios resultados; o criador vê o grupo inteiro.
   return json({ group: { code: group.code, title: group.title,
     owner: group.owner_id === profile.id },
   people: group.owner_id === profile.id ? people : people.filter((person) => person.id === profile.id),
@@ -120,6 +124,7 @@ export async function onRequestPost(context) {
       return json({ saved: true });
     }
     if (body.action === "createRoom") {
+      // A sala fixa perguntas e duração antes da entrada dos participantes.
       const title = label(body.title);
       const mode = body.mode;
       const category = body.category;
@@ -134,6 +139,7 @@ export async function onRequestPost(context) {
       const pool = bank.filter((question) => question.level <= 3 &&
         (category === "all" || question.category === category));
       if (pool.length < count) return fail(`Este assunto oferece no máximo ${pool.length} questões.`);
+      // Fisher–Yates evita o viés de ordenar com um comparador aleatório.
       const selected = pool.map((question) => question.id);
       for (let index = selected.length - 1; index > 0; index--) {
         const other = crypto.getRandomValues(new Uint32Array(1))[0] % (index + 1);
@@ -209,6 +215,7 @@ export async function onRequestPost(context) {
     const room = await first(db, "SELECT * FROM game_rooms WHERE code = ?", joinCode);
     if (!room) return fail("Sala não encontrada.", 404);
     if (body.action === "start" || body.action === "next" || body.action === "finish") {
+      // Só o criador avança a sessão; alunos não controlam o relógio da turma.
       if (room.owner_id !== profile.id) return fail("Somente o mestre controla a rodada.", 403);
       const total = JSON.parse(room.question_ids).length;
       if (body.action === "start") {
@@ -231,6 +238,7 @@ export async function onRequestPost(context) {
       return json({ updated: true });
     }
     if (body.action === "answer") {
+      // Prazo e questão ativa são checados no servidor, não no relógio do aluno.
       if (room.status !== "active") return fail("A partida não está ativa.", 409);
       const member = await first(db,
         "SELECT 1 AS ok FROM game_members WHERE room_id = ? AND profile_id = ?", room.id, profile.id);

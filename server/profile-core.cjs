@@ -1,4 +1,5 @@
 "use strict";
+// Valida dados recuperados do navegador antes de gravá-los no perfil sincronizado.
 const { FlowData } = require("../js/data.js");
 const categories = new Set(["all", ...FlowData.categories.map((category) => category.id)]);
 const safeId = (value) => typeof value === "string" && /^[a-zA-Z0-9_-]{1,80}$/.test(value);
@@ -7,6 +8,7 @@ const safeName = (value) => typeof value === "string" &&
   value.trim().length >= 2 && value.length <= 32;
 
 function validateResults(results) {
+  // IDs repetidos e notas impossíveis não entram no histórico compartilhado.
   if (!Array.isArray(results) || results.length > 300)
     throw new Error("Histórico inválido.");
   const ids = new Set();
@@ -24,6 +26,7 @@ function validateResults(results) {
 }
 
 function validateLabs(labs) {
+  // Só as doze missões conhecidas podem compor o progresso persistido.
   if (!Array.isArray(labs) || labs.length > 12 ||
       labs.some((mission) => !Number.isInteger(mission) || mission < 0 || mission >= 12) ||
       new Set(labs).size !== labs.length)

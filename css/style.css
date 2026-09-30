@@ -23,6 +23,7 @@
   --shadow: 0 14px 50px #0003;
 }
 :root[data-theme="light"] {
+  /* O tema claro reutiliza as mesmas classes e altera apenas os tokens. */
   color-scheme: light;
   --bg: #f1f3f0;
   --panel: #fff;
@@ -152,6 +153,7 @@ input[type="checkbox"] {
 .skip:focus {
   top: 0.5rem;
 }
+/* O cabeçalho mantém busca e controles acessíveis antes da navegação lateral. */
 .topbar {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -275,6 +277,7 @@ html[data-theme="light"] #theme .icon-moon { display: none; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* No celular, a navegação passa para a base; no desktop, expande ao focar. */
 .sidebar {
   padding: 0.6rem 1rem;
   border-bottom: 1px solid var(--line);
@@ -584,6 +587,7 @@ progress::-webkit-progress-value {
   color: var(--muted);
   font-size: 0.9rem;
 }
+/* O quiz conserva leitura e alternativas em uma coluna estreita. */
 .quiz-shell {
   max-width: 850px;
   margin: auto;

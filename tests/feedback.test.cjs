@@ -1,3 +1,4 @@
+// Exercita validação de sugestões antes de gravar dados pessoais.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { validateFeedback } = require("../server/feedback-core.cjs");

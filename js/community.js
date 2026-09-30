@@ -6,6 +6,7 @@
   let activeCode = "", activeKind = "", timer = null, selected = "";
   let root, profile, quick;
   const key = () => profile?.syncKey;
+  // Todas as ações coletivas enviam a chave do perfil para a mesma origem.
   async function api(method, body, query = "") {
     const response = await fetch(`/api/community${query}`, {
       method, headers: { Authorization: `Bearer ${key()}`,
@@ -32,6 +33,7 @@
       <div id="community-content"></div>`;
   }
   function landing() {
+    // Sem sincronização, a partida individual continua disponível.
     const area = root.querySelector("#community-content");
     area.innerHTML = `<div class="community-grid">
       <section class="panel"><span class="eyebrow">PARTIDA RÁPIDA</span><h2>Seu ritmo</h2>
@@ -47,6 +49,7 @@
   const options = (items, current) => items.map(([value, name]) =>
     `<option value="${esc(value)}" ${value === current ? "selected" : ""}>${esc(name)}</option>`).join("");
   function dashboard(value) {
+    // Os formulários preservam a mesma API para criação e entrada por código.
     const area = root.querySelector("#community-content");
     area.innerHTML = `<div class="community-grid">
       <section class="panel"><h2>Partida rápida</h2><p>Jogue sozinho, sem precisar esperar a turma.</p>
@@ -97,6 +100,7 @@
       activeKind = "group"; activeCode = button.dataset.group; refresh(); });
   }
   function showRoom(value) {
+    // O servidor define o estado; a tela não calcula acertos nem controla avanços.
     const { room, question, members, events } = value;
     const area = root.querySelector("#community-content");
     area.innerHTML = `<div class="community-top"><button id="community-back">← Comunidade</button>
@@ -165,6 +169,7 @@
     catch (error) { status(error.message, true); }
   }
   async function refresh() {
+    // A consulta periódica substitui tempo real enquanto não há canal persistente.
     if (!root || location.hash !== "#comunidade" || !activeCode) return;
     try {
       const value = await api("GET", null,
@@ -174,6 +179,7 @@
     } catch (error) { status(error.message, true); }
   }
   function mount(target, currentProfile, quickGame) {
+    // Ao sair da aba, o intervalo anterior é encerrado para poupar requisições.
     clearInterval(timer);
     root = target; profile = currentProfile; quick = quickGame;
     shell();
