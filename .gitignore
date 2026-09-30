@@ -1,0 +1,12 @@
+# Artefatos locais e dados de ferramentas nunca entram no repositório.
+dist/
+node_modules/
+.vercel/
+.wrangler/
+backup.sql
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+*.log

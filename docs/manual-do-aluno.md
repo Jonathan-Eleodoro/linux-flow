@@ -2,11 +2,13 @@
 
 ## Perfil e privacidade
 
-Clique em **Criar perfil**, informe um nome ou apelido entre 2 e 32 caracteres e entre no laboratório. Não informe senha, documento, telefone ou informações sensíveis nesse campo.
+Clique em **Entrar**. Escolha **Já tenho conta** para usar um perfil deste dispositivo ou seu código de acesso da nuvem; escolha **Criar perfil** para informar um nome ou apelido entre 2 e 32 caracteres. **Seguir livre** abre uma sessão visitante para testar quiz e terminal sem salvar esse perfil após recarregar. Não informe senha, documento, telefone ou informações sensíveis no apelido.
 
 Marque a opção de guardar dados somente se quiser mantê-los neste dispositivo. Sem ela, o perfil dura enquanto a página estiver aberta. Não há cookies da aplicação. O armazenamento, quando escolhido, usa localStorage.
 
-Em um laboratório compartilhado, use perfil temporário ou apague os dados ao terminar. O perfil não é protegido por senha. A tela Sobre permite revogar o salvamento e apagar os dados. Revogar o salvamento remove a cópia persistente, mas mantém a sessão atual em memória até fechar/recarregar a página.
+Em um laboratório compartilhado, use perfil temporário ou apague os dados ao terminar. A tela Sobre permite revogar o salvamento e apagar os dados locais. Revogar o salvamento remove a cópia persistente, mas mantém a sessão atual em memória até fechar/recarregar a página.
+
+No site hospedado, a tela **Sobre** também permite sincronizar o perfil. Guarde o código de acesso exibido: com ele, você pode abrir o perfil e recuperar resultados e missões em outro aparelho. Quem souber o código poderá acessar o perfil. Use **Entrar → Já tenho conta → Entrar com código** para recuperá-lo. Apagar dados locais não apaga a cópia na nuvem; a tela Sobre tem uma ação separada para isso. A opção **Conectar conta** informa o estado de Google, GitHub e Apple; esses provedores ainda não estão configurados.
 
 ## Quiz
 
@@ -27,13 +29,19 @@ As alternativas mudam de posição. Perguntas podem reaparecer em rodadas difere
 | Aplicação | Interpretar opções e operações | Coruja analista |
 | Diagnóstico | Avaliar cenários e detalhes | Raposa administradora |
 
-Todos os níveis estão abertos. Os mascotes são representados por emojis; a aparência depende do sistema operacional.
+As três etapas FREE estão abertas. Abra **Mascotes** para ver as ilustrações originais, o papel de cada personagem e como conquistar o certificado didático do nível. Automação e Arquitetura são etapas PRO para perfis sincronizados liberados pelo responsável após conferir a contribuição Pix. Se o recebedor ainda não configurou o Pix, a tela PRO informa que o pedido está indisponível. Os mascotes não representam certificações oficiais.
+
+Para pedir acesso PRO, abra **PRO**, escolha a contribuição de no mínimo R$ 9,90 e confira recebedor e valor no aplicativo bancário antes de pagar pelo QR Code ou Pix Copia e Cola. Depois clique em **Já paguei**. Esse botão somente solicita conferência; a liberação depende de o responsável localizar o crédito no próprio banco. Use **Atualizar situação** para acompanhar. Não informe senha, dados bancários ou comprovante no perfil.
+
+## Mapa de objetivos LPI
+
+A aba **Objetivos LPI** organiza os cinco tópicos e 19 objetivos do exame Linux Essentials 010-160 (versão 1.6). Cada objetivo mostra se há alguma trilha relacionada no Linux_Flow. Essa relação é editorial e não significa que o objetivo esteja inteiramente coberto ou que o projeto prepare sozinho para o exame. Em perfis sincronizados, o mapa também indica questões praticadas em novas rodadas verificadas. Consulte os [objetivos oficiais do LPI](https://www.lpi.org/pt-br/exam-010-objectives/) para o programa completo.
 
 ## Ranking
 
 Cada rodada concluída atualiza o ranking no navegador atual. Selecione o mesmo assunto, nível e quantidade para comparar resultados equivalentes. Só a melhor tentativa de cada perfil aparece. Em empate, a conclusão mais antiga vem primeiro.
 
-O ranking não é global, não se comunica com outras máquinas e não impede adulteração pelo dono do navegador. O limite é de 300 resultados recentes; registros antigos podem sair do histórico, inclusive os que sustentam uma conquista antiga.
+Na versão hospedada com a Aiven configurada, a aba **Compartilhado** mostra rodadas publicadas por opção de cada perfil. O ranking é didático: o gabarito é público e apelidos não comprovam identidade. O histórico local guarda no máximo 300 resultados; registros antigos podem sair dele, inclusive os que sustentam uma conquista antiga.
 
 ## Certificados
 
@@ -45,7 +53,7 @@ O documento é um comprovante didático local, sem assinatura, validade profissi
 
 ## Terminal
 
-As seis missões são independentes. Selecionar uma missão reinicia o cenário; a conclusão já registrada permanece como conquista local. O terminal não é Bash nem Linux de verdade.
+As doze missões são independentes. Selecionar uma missão reinicia o cenário; a conclusão já registrada permanece como conquista local. Cada missão apresenta objetivo verificável, duas pistas progressivas, comandos para explorar e links diretos à documentação técnica dos comandos. Clicar em uma opção preenche a linha; é preciso executar o comando e conferir a saída. O terminal não é Bash nem Linux de verdade, e as saídas simuladas podem diferir das saídas reais.
 
 | Missão | Ação principal |
 |---|---|
@@ -55,6 +63,12 @@ As seis missões são independentes. Selecionar uma missão reinicia o cenário;
 | Ajuste o acesso | `chmod 640 relatorio.txt` |
 | Inspecione a rede | `ip addr` e `ip route` |
 | Observe o tráfego | `tcpdump -i eth0 icmp` |
+| Encontre arquivos ocultos | `ls -a` |
+| Crie uma cópia segura | `cp notas.txt notas-backup.txt` |
+| Organize os nomes | `mv rascunho.txt entrega.txt` |
+| Localize uma linha | `grep Linux notas.txt` |
+| Observe processos | `ps` |
+| Confira serviços de rede | `ss -tuln` |
 
 Digite um comando por vez. `help` mostra o escopo e `clear` limpa a saída. Setas para cima/baixo percorrem o histórico desta missão. Não há pipes, aspas, variáveis, globbing, execução remota ou captura real de pacotes.
 

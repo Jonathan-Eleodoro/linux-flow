@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title id="title">Lince arquiteta</title>
+  <rect width="120" height="120" rx="28" fill="#30324e"/>
+  <circle cx="60" cy="61" r="45" fill="#4c527a"/>
+  <path d="m28 47 6-27 19 16h14l19-16 6 27c5 23-8 46-32 50-24-4-37-27-32-50Z" fill="#d2a070"/>
+  <path d="m31 31 3-19 11 20m44-1-3-19-11 20" fill="#30324e"/>
+  <path d="m38 30 10 10-15 5Zm44 0L72 40l15 5Z" fill="#f0d3b1"/>
+  <path d="M34 69c11 0 19 7 26 16 7-9 15-16 26-16-4 16-13 27-26 29-13-2-22-13-26-29Z" fill="#f6e7d2"/>
+  <path d="m43 58 10 3m24-3-10 3" stroke="#282b3b" stroke-width="4" stroke-linecap="round"/>
+  <path d="m55 76 5 4 5-4Z" fill="#282b3b"/>
+  <circle cx="96" cy="25" r="6" fill="none" stroke="#dbbfef" stroke-width="2"/>
+</svg>

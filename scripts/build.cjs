@@ -6,7 +6,7 @@ const root = path.resolve(__dirname, "..");
 const out = path.join(root, "dist");
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
-for (const name of ["index.html", "css", "js", "assets"]) {
+for (const name of ["index.html", "css", "js", "assets", "_headers", "_routes.json"]) {
   fs.cpSync(path.join(root, name), path.join(out, name), { recursive: true });
 }
-console.log("Build concluído em dist. Sem dependências externas.");
+console.log("Build estático concluído em dist.");

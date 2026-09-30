@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title id="title">Castor engenheiro</title>
+  <rect width="120" height="120" rx="28" fill="#243d46"/>
+  <circle cx="60" cy="61" r="45" fill="#37606a"/>
+  <path d="M32 59c0-24 12-36 28-36s28 12 28 36v22c-7 11-17 17-28 17S39 92 32 81Z" fill="#ad6b46"/>
+  <circle cx="35" cy="43" r="11" fill="#8b5237"/><circle cx="85" cy="43" r="11" fill="#8b5237"/>
+  <path d="M40 69c8-9 32-9 40 0v18c-5 8-13 12-20 12s-15-4-20-12Z" fill="#e8b894"/>
+  <circle cx="49" cy="57" r="3" fill="#27333a"/><circle cx="71" cy="57" r="3" fill="#27333a"/>
+  <path d="m55 70 5 4 5-4Z" fill="#27333a"/><path d="M53 79h14v10H53z" fill="#fff4de"/>
+  <path d="M60 79v10" stroke="#b48b6d" stroke-width="2"/>
+  <path d="M91 23h11m-6-6v12" stroke="#a8eddb" stroke-width="3" stroke-linecap="round"/>
+</svg>

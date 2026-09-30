@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title id="title">Coruja analista</title>
+  <rect width="120" height="120" rx="28" fill="#273753"/>
+  <circle cx="60" cy="60" r="44" fill="#354b70"/>
+  <path d="m30 45 2-23 18 10a40 40 0 0 1 20 0l18-10 2 23c3 8 4 16 2 25-3 20-16 31-32 31S31 90 28 70c-2-9-1-17 2-25Z" fill="#172941"/>
+  <path d="M35 48c5-11 15-15 25-8 10-7 20-3 25 8 2 11-4 22-15 24-5 1-8-1-10-5-2 4-5 6-10 5-11-2-17-13-15-24Z" fill="#eef0dd"/>
+  <circle cx="48" cy="54" r="9" fill="#fff"/>
+  <circle cx="72" cy="54" r="9" fill="#fff"/>
+  <circle cx="49" cy="54" r="4" fill="#172941"/>
+  <circle cx="71" cy="54" r="4" fill="#172941"/>
+  <path d="m54 70 6 8 6-8-6-4Z" fill="#e8a651"/>
+  <path d="M43 82c9 7 25 7 34 0" fill="none" stroke="#657ca2" stroke-width="4" stroke-linecap="round"/>
+  <path d="M43 97h12m10 0h12" stroke="#e8a651" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="94" cy="25" r="5" fill="#c5f27c"/>
+</svg>

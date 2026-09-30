@@ -12,7 +12,7 @@ Verificações realizadas durante a preparação da entrega em 23/09/2026.
 | Sorteio | Sem reposição na rodada, sem mutação do banco e com gabarito preservado |
 | Certificação | Exige quiz geral, 10+ questões e fração real de acerto >= 0,8 |
 | Ranking | Melhor tentativa por usuário e desempate por data |
-| Terminal | Todas as seis missões atingem o estado esperado |
+| Terminal | Todas as doze missões atingem o estado esperado |
 | Segurança do terminal | Comandos arbitrários, pipes e operações fora do escopo recusados |
 | Fluxo DOM | Cadastro, quiz, correção, retomada, ranking, certificado, manual e preferências exercitados |
 | Persistência | Resultados e missões reidratados; revogação e exclusão verificadas |
@@ -27,7 +27,7 @@ Além dos seis testes de domínio entregues em `tests/domain.test.cjs`, uma sess
 - Rodada geral de dez perguntas com dez acertos.
 - Saída para o manual e retorno após confirmar uma resposta, sem duplicar nota.
 - Abertura do certificado e consulta ao ranking atualizado.
-- Conclusão das seis missões de terminal.
+- Conclusão das doze missões de terminal.
 - Busca por chmod e troca de tema.
 - Reabertura com dados persistidos.
 - Rodada curta com erro, sem certificação.

@@ -12,6 +12,7 @@
       current: null,
       results: [],
       labs: [],
+      questionProgress: [],
       theme: "dark",
       sound: false,
     };
@@ -25,7 +26,7 @@
       r &&
       safeId(r.id) &&
       ids.has(r.userId) &&
-      [1, 2, 3].includes(r.level) &&
+      [1, 2, 3, 4, 5].includes(r.level) &&
       ["all", ...FlowData.categories.map((c) => c.id)].includes(r.category) &&
       Number.isInteger(r.total) &&
       r.total >= 1 &&
@@ -43,6 +44,10 @@
       const saved = JSON.parse(raw);
       state.profiles = (Array.isArray(saved.profiles) ? saved.profiles : [])
         .filter((p) => p && safeId(p.id) && safeName(p.name))
+        .map((p) => ({ id: p.id, name: p.name, shareRanking: p.shareRanking === true,
+          pro: p.pro === true,
+          syncKey: typeof p.syncKey === "string" && /^[0-9a-f]{64}$/.test(p.syncKey)
+            ? p.syncKey : null }))
         .slice(0, 30);
       const ids = new Set(state.profiles.map((p) => p.id));
       state.current = ids.has(saved.current) ? saved.current : null;
@@ -56,9 +61,15 @@
             ids.has(l.userId) &&
             Number.isInteger(l.mission) &&
             l.mission >= 0 &&
-            l.mission < 6,
+            l.mission < 12,
         )
         .slice(-180);
+      const questionIds = new Set(FlowData.questions.map((question) => question.id));
+      state.questionProgress = (Array.isArray(saved.questionProgress) ? saved.questionProgress : [])
+        .filter((item) => item && ids.has(item.userId) && questionIds.has(item.questionId) &&
+          Number.isInteger(item.attempts) && item.attempts >= 0 &&
+          Number.isInteger(item.correct) && item.correct >= 0 && item.correct <= item.attempts)
+        .slice(0, 3000);
       state.theme = saved.theme === "light" ? "light" : "dark";
       state.sound = saved.sound === true;
       persistent = true;
@@ -69,7 +80,16 @@
   function save() {
     if (!persistent) return true;
     try {
-      localStorage.setItem(KEY, JSON.stringify(state));
+      const kept = state.profiles.filter((profile) => !profile.temporary);
+      const ids = new Set(kept.map((profile) => profile.id));
+      localStorage.setItem(KEY, JSON.stringify({
+        ...state,
+        profiles: kept,
+        current: ids.has(state.current) ? state.current : null,
+        results: state.results.filter((record) => ids.has(record.userId)),
+        labs: state.labs.filter((lab) => ids.has(lab.userId)),
+        questionProgress: state.questionProgress.filter((item) => ids.has(item.userId)),
+      }));
       return true;
     } catch {
       persistent = false;

@@ -5,10 +5,11 @@ window.FlowConfig = Object.freeze({
   author: "Jonathan Eleodoro",
   year: 2026,
   institution: "Colégio Sinodal Progresso",
+  institutionAddress: "Rua Fernando Ferrari, 1450 · Montenegro/RS",
   course: "Técnico em Informática",
   subject: "Sistemas operacionais Linux",
   teacher: "Cristiano Forte",
   purpose: "Projeto acadêmico de gamificação dos comandos estudados em aula.",
   phone: "",
-  email: "",
+  email: "linuxflow2026@gmail.com",
 });

@@ -1,4 +1,6 @@
-# Do projeto ao GitHub público e à Vercel
+# Implantação anterior: GitHub e Vercel
+
+O caminho atual usa Cloudflare Pages e D1. Siga [cloudflare-d1.md](cloudflare-d1.md); este guia permanece apenas como histórico da alternativa anterior.
 
 Este guia usa as contas que você já possui. O projeto não foi publicado nem conectado às suas contas durante a criação. Os nomes de telas podem variar; nenhuma documentação externa foi consultada, respeitando o pedido de trabalhar somente com os anexos.
 
@@ -33,7 +35,7 @@ No [GitHub](https://github.com):
 5. Mensagem do commit: `Adiciona Linux_Flow com quiz, trilhas e laboratório`.
 6. Confirme o envio.
 
-A interface pode ocultar arquivos iniciados por ponto. O `.gitignore` é útil para desenvolvimento, mas sua ausência não impede a aplicação de funcionar. Não envie `dist/`, `node_modules/` ou `.env`.
+A interface pode ocultar arquivos iniciados por ponto. Inclua o `.gitignore` no repositório; ele não contém segredos e ajuda a evitar o envio acidental de `dist/`, `node_modules/` e `.env`.
 
 ### Opção B — Enviar com Git
 
@@ -71,8 +73,8 @@ No [painel da Vercel](https://vercel.com/dashboard):
 | Root directory | Raiz do repositório |
 | Build command | `node scripts/build.cjs` |
 | Output directory | `dist` |
-| Dependências | Nenhuma dependência externa |
-| Variáveis de ambiente | Nenhuma necessária |
+| Dependências | `mysql2`, instalado por `npm install` no deploy |
+| Variáveis de ambiente | Necessárias para perfis, progresso e ranking; veja `docs/aiven.md` |
 
 O `vercel.json` já contém build e saída. Não escolha Next.js ou React para este projeto.
 
@@ -89,7 +91,7 @@ O `vercel.json` já contém build e saída. Não escolha Next.js ou React para e
 - Se marcou persistência, recarregue para conferir o perfil.
 - Na tela Sobre, apague seus dados de teste.
 
-O ranking seguirá local após a publicação. Publicar na Vercel não cria automaticamente um banco de dados ou ranking global.
+O ranking compartilhado requer configurar o MySQL e as variáveis de ambiente conforme [o guia da Aiven](aiven.md). Sem elas, o quiz e o ranking local continuam disponíveis.
 
 ## 5. Atualize depois
 
@@ -112,7 +114,7 @@ Não edite a pasta `dist` para manter mudanças: ela é recriada pelo build.
 | Perfil não aparece em outro aparelho | Esperado: os dados são locais por navegador e origem. |
 | Resultados sumiram ao mudar de URL | Domínios e endereços locais diferentes têm armazenamentos separados. |
 | Certificado bloqueado | Use quiz geral, 10+ questões e 80%+ de acerto. |
-| Site abre, mas o ranking da turma está vazio | Esta versão não possui ranking centralizado. |
+| Site abre, mas perfil ou ranking compartilhado não funciona | Confira as duas tabelas SQL, variáveis de ambiente e logs das Functions na Vercel. |
 | Print inclui menu do navegador | Ajuste cabeçalhos e rodapés no diálogo de impressão. |
 
 ## Entrega ao professor

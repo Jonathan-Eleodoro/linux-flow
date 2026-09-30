@@ -1,7 +1,7 @@
 /* Conteúdo editorial derivado exclusivamente dos PDFs anexados.
  * Cada questão mantém sua fonte para revisão humana e manutenção independente da interface.
  * Níveis: 1 reconhecimento, 2 aplicação, 3 diagnóstico e detalhes. */
-window.FlowData = {
+(typeof window === "undefined" ? module.exports : window).FlowData = {
   categories: [
     {
       id: "arquivos",
@@ -75,8 +75,97 @@ window.FlowData = {
       description: "Reconheça famílias e seus gerenciadores de pacotes.",
       source: "_Aula 2 Comandos iniciais.pdf",
     },
+    { id: "licencas", name: "Software livre e licenças", number: "10", title: "Entenda as liberdades", description: "Reconheça acesso ao código e condições de redistribuição.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "arquivos_compactados", name: "Arquivos compactados", number: "11", title: "Empacote e extraia", description: "Diferencie arquivos tar e compressão gzip.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "scripts", name: "Introdução a scripts", number: "12", title: "Automatize com cuidado", description: "Leia a estrutura de um script simples de shell.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "historia", name: "História e fundamentos do Linux", number: "13", title: "Reconstrua a origem", description: "Ordene as ideias que ligam Unix, GNU, kernel Linux e distribuições.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "instalacao", name: "Instalação consciente", number: "14", title: "Planeje uma instalação", description: "Tome decisões sobre backup, imagem, mídia, teste e destino do disco em uma simulação.", source: "Debian GNU/Linux Installation Guide.pdf" },
   ],
+  // Correspondência editorial aproximada com os objetivos oficiais 010-160 v1.6.
+  // Uma trilha relacionada não significa cobertura completa do objetivo.
+  lpiTopics: [
+    { id: "1", title: "Comunidade Linux e código aberto", objectives: [
+      { id: "1.1", title: "Evolução do Linux e sistemas operacionais", categories: ["distros", "historia"] },
+      { id: "1.2", title: "Aplicações de código aberto", categories: ["distros"] },
+      { id: "1.3", title: "Software livre e licenças", categories: ["licencas"] },
+      { id: "1.4", title: "Habilidades de TIC e Linux", categories: [] },
+    ] },
+    { id: "2", title: "Encontrando o caminho no Linux", objectives: [
+      { id: "2.1", title: "Fundamentos da linha de comando", categories: ["arquivos"] },
+      { id: "2.2", title: "Ajuda na linha de comando", categories: ["arquivos"] },
+      { id: "2.3", title: "Diretórios e listagem de arquivos", categories: ["arquivos"] },
+      { id: "2.4", title: "Criar, mover e remover arquivos", categories: ["arquivos"] },
+    ] },
+    { id: "3", title: "O poder da linha de comando", objectives: [
+      { id: "3.1", title: "Arquivos compactados e pacotes", categories: ["arquivos_compactados"] },
+      { id: "3.2", title: "Pesquisa e extração de dados", categories: ["texto"] },
+      { id: "3.3", title: "Introdução a scripts", categories: ["scripts"] },
+    ] },
+    { id: "4", title: "O sistema operacional Linux", objectives: [
+      { id: "4.1", title: "Escolha de um sistema operacional", categories: ["distros", "instalacao"] },
+      { id: "4.2", title: "Hardware do computador", categories: ["sistema"] },
+      { id: "4.3", title: "Onde os dados são armazenados", categories: ["sistema", "processos"] },
+      { id: "4.4", title: "Computador na rede", categories: ["redes"] },
+    ] },
+    { id: "5", title: "Segurança e permissões", objectives: [
+      { id: "5.1", title: "Tipos de usuários", categories: ["usuarios"] },
+      { id: "5.2", title: "Usuários e grupos", categories: ["usuarios"] },
+      { id: "5.3", title: "Permissões e proprietários", categories: ["permissoes"] },
+      { id: "5.4", title: "Arquivos e diretórios especiais", categories: ["permissoes"] },
+    ] },
+  ],
+  learningModules: {
+    historia: {
+      label: "Linha do tempo · 5 marcos",
+      intro: "Reconstitua a história por decisões. Cada erro revela uma distinção importante; acerte para avançar.",
+      sourceUrl: "https://learning.lpi.org/pdfstore/LPI-Learning-Material-010-160-pt.pdf",
+      extraUrl: "https://www.gnu.org/gnu/gnu-history.en.html",
+      steps: [
+        { title: "Uma inspiração, não o mesmo sistema", context: "Antes do Linux, sistemas do tipo Unix influenciaram a arquitetura e as ferramentas que viriam depois.", prompt: "Qual relação descreve melhor Unix e Linux?", choices: ["Linux é o nome original do Unix", "Linux é um kernel do tipo Unix, desenvolvido depois e separadamente", "Unix é uma distribuição do Linux"], correct: 1, feedback: "A distinção de origem ajuda a entender por que 'compatível com Unix' não significa 'o mesmo produto'." },
+        { title: "1983 · O projeto GNU", context: "Richard Stallman anunciou o projeto GNU em 1983 para desenvolver um sistema operacional livre compatível com Unix.", prompt: "O que GNU buscava construir?", choices: ["Apenas uma interface gráfica", "Um sistema operacional livre com ferramentas e outros componentes", "Uma marca comercial de computadores"], correct: 1, feedback: "GNU reuniu ferramentas essenciais; o projeto não nasceu como distribuição do kernel Linux." },
+        { title: "1991 · O kernel Linux", context: "Linus Torvalds desenvolveu o kernel Linux em 1991. Kernel é a parte que gerencia recursos e faz a ponte com o hardware.", prompt: "O que exatamente surgiu como Linux em 1991?", choices: ["Um kernel", "Um pacote de escritório", "Todas as distribuições atuais"], correct: 0, feedback: "Separar kernel de sistema completo evita uma confusão muito comum." },
+        { title: "O sistema ganha forma", context: "A combinação do kernel Linux com ferramentas GNU e outros componentes permitiu sistemas utilizáveis.", prompt: "Por que uma distribuição precisa de mais do que um kernel?", choices: ["Porque o kernel já inclui todo aplicativo de usuário", "Porque também precisa de bibliotecas, ferramentas, instalador e pacotes", "Porque precisa obrigatoriamente de um único ambiente gráfico"], correct: 1, feedback: "Uma distribuição organiza componentes para instalar, operar e manter o sistema." },
+        { title: "Hoje · Escolhas", context: "Distribuições compartilham o kernel Linux, mas diferem em gerenciamento de pacotes, suporte e escolhas de configuração.", prompt: "Qual critério faz sentido ao escolher uma distribuição?", choices: ["Somente o nome ou mascote", "Hardware, finalidade, suporte e documentação", "A ideia de que todas são idênticas"], correct: 1, feedback: "A história explica a diversidade: o mesmo kernel pode compor experiências distintas." },
+      ],
+    },
+    instalacao: {
+      label: "Simulação · 6 decisões",
+      intro: "Planeje a instalação de uma distribuição em um computador fictício. Nenhuma escolha aqui altera seu dispositivo.",
+      sourceUrl: "https://www.debian.org/releases/stable/amd64/install.en.pdf",
+      extraUrl: "https://ubuntu.com/tutorials/install-ubuntu-desktop",
+      steps: [
+        { title: "1 · Preparação", context: "O computador fictício contém arquivos pessoais e outro sistema operacional.", prompt: "Qual é a primeira ação responsável?", choices: ["Apagar o disco para ganhar espaço", "Fazer backup verificável e conferir os requisitos de hardware", "Desligar atualizações permanentemente"], correct: 1, feedback: "Uma instalação pode sobrescrever dados; o backup deve existir antes de mexer em partições." },
+        { title: "2 · Imagem confiável", context: "Você escolheu uma distribuição adequada ao hardware.", prompt: "Como obter e conferir a imagem de instalação?", choices: ["Baixar a ISO da fonte oficial e conferir a soma de verificação publicada", "Usar qualquer arquivo recebido por mensagem", "Renomear um ZIP para .iso"], correct: 0, feedback: "A verificação de integridade detecta downloads corrompidos; siga também as orientações de autenticidade da distribuição." },
+        { title: "3 · Mídia inicializável", context: "A imagem ISO está pronta. Há um pendrive com documentos importantes.", prompt: "Como preparar a mídia?", choices: ["Copiar a ISO como arquivo comum para o pendrive", "Salvar os documentos e gravar a imagem com ferramenta própria, conferindo o dispositivo alvo", "Formatar todos os discos do computador"], correct: 1, feedback: "A gravação da mídia costuma apagar o pendrive; selecionar o dispositivo correto é essencial." },
+        { title: "4 · Teste ao vivo", context: "O computador inicia pela mídia USB, antes de instalar.", prompt: "O que a sessão de teste ajuda a conferir?", choices: ["Wi-Fi, vídeo, teclado e outros componentes sem iniciar a instalação", "Que os dados do disco já foram apagados", "Que a ISO dispensa qualquer instalação"], correct: 0, feedback: "Uma sessão live permite avaliar compatibilidade antes de confirmar mudanças no armazenamento." },
+        { title: "5 · Destino e partições", context: "O instalador oferece apagar o disco ou instalar junto com o sistema existente.", prompt: "Qual decisão evita uma perda inesperada?", choices: ["Escolher apagar o disco sem ler o resumo", "Conferir disco, modo de instalação, partições e resumo antes de confirmar", "Aceitar automaticamente qualquer destino"], correct: 1, feedback: "A etapa de particionamento pode ser destrutiva. O cenário não substitui o guia da distribuição e do equipamento." },
+        { title: "6 · Primeiro início", context: "A instalação fictícia terminou e o sistema reiniciou.", prompt: "Qual rotina conclui melhor a preparação?", choices: ["Conferir inicialização, rede e atualizações disponíveis", "Ignorar erros de inicialização", "Apagar o backup imediatamente, sem validar arquivos"], correct: 0, feedback: "Depois de instalar, verifique o funcionamento e mantenha o backup até ter certeza de que os dados estão íntegros." },
+      ],
+    },
+  },
   questions: [
+    ...[
+      [1, "Qual projeto foi anunciado por Richard Stallman em 1983?", "GNU", ["GNU", "APT", "systemd", "Wayland"], "GNU buscava um sistema operacional livre compatível com Unix."],
+      [1, "O Linux criado por Linus Torvalds em 1991 era inicialmente o quê?", "Um kernel", ["Um kernel", "Uma distribuição completa", "Um navegador", "Um gerenciador de pacotes"], "Linux nomeia o kernel; sistemas utilizáveis reúnem outros componentes."],
+      [1, "Qual sistema influenciou o desenho de GNU e Linux?", "Unix", ["Unix", "Android", "ChromeOS", "MS-DOS"], "GNU foi projetado para ser compatível com Unix e Linux é um kernel do tipo Unix."],
+      [2, "Uma distribuição inclui kernel Linux, utilitários e gerenciador de pacotes. O que isso indica?", "O sistema combina componentes de diferentes projetos", ["O sistema combina componentes de diferentes projetos", "O kernel sozinho oferece todos os aplicativos", "Todo software veio de um único autor", "Distribuições dispensam manutenção"], "Distribuições integram kernel e ferramentas para entregar um sistema utilizável."],
+      [2, "Duas distribuições usam Linux, mas oferecem ferramentas de pacotes diferentes. Isso é possível porque:", "O kernel não define sozinho todas as escolhas da distribuição", ["O kernel não define sozinho todas as escolhas da distribuição", "Uma delas não pode usar Linux", "Pacotes fazem parte do hardware", "Todas as distribuições são idênticas"], "O mesmo kernel pode ser combinado com políticas e ferramentas diferentes."],
+      [2, "Por que é impreciso dizer que o projeto GNU começou como uma distribuição Linux?", "GNU foi anunciado antes do desenvolvimento do kernel Linux", ["GNU foi anunciado antes do desenvolvimento do kernel Linux", "GNU nunca incluiu ferramentas de sistema", "Linux surgiu antes do Unix", "Distribuições não usam ferramentas GNU"], "GNU foi anunciado em 1983; o kernel Linux surgiu em 1991."],
+      [3, "Um colega diz que Linux, Unix e GNU são nomes da mesma obra. Qual correção é melhor?", "Unix inspirou; GNU desenvolveu componentes; Linux é um kernel posterior", ["Unix inspirou; GNU desenvolveu componentes; Linux é um kernel posterior", "Os três são distribuições idênticas", "GNU é o firmware do Unix", "Unix foi criado a partir do Linux"], "Distinguir origem, projeto de sistema e kernel esclarece a formação das distribuições."],
+      [3, "Se uma distribuição troca o ambiente gráfico, o kernel Linux necessariamente muda?", "Não; são componentes distintos", ["Não; são componentes distintos", "Sim; o ambiente gráfico é o kernel", "Sim; toda interface exige outro sistema", "Não; porque o kernel é um navegador"], "Kernel e interface de usuário são camadas diferentes."],
+      [3, "Qual sequência histórica está correta?", "Unix → anúncio do GNU → desenvolvimento do kernel Linux", ["Unix → anúncio do GNU → desenvolvimento do kernel Linux", "Linux → Unix → GNU", "GNU → Linux → Unix", "Linux → GNU → Unix"], "Unix antecede o anúncio de GNU (1983) e o desenvolvimento do kernel Linux (1991)."],
+    ].map(([level, prompt, answer, options, explanation], index) => ({ id: `historia-${index + 1}`, category: "historia", level, prompt, answer, options, explanation, source: "LPI-Learning-Material-010-160-pt.pdf" })),
+    ...[
+      [1, "Antes de instalar em um computador com arquivos pessoais, qual cuidado vem primeiro?", "Criar e conferir um backup", ["Criar e conferir um backup", "Apagar partições", "Remover a senha do firmware", "Desativar o disco"], "Uma instalação pode alterar o armazenamento; proteja os dados antes de começar."],
+      [1, "O que é uma imagem ISO de instalação?", "Um arquivo que representa uma mídia de instalação", ["Um arquivo que representa uma mídia de instalação", "Uma senha de administrador", "Uma partição de troca", "Um gerenciador de janelas"], "A imagem precisa ser obtida de fonte confiável e gravada corretamente em uma mídia."],
+      [1, "O que a opção de testar o sistema pela mídia USB permite fazer?", "Avaliar parte da compatibilidade antes de instalar", ["Avaliar parte da compatibilidade antes de instalar", "Garantir que nenhuma partição será necessária", "Apagar automaticamente o disco", "Substituir o backup"], "A sessão live ajuda a observar hardware e interface antes de confirmar a instalação."],
+      [2, "Como preparar um pendrive inicializável a partir de uma ISO?", "Usar uma ferramenta de gravação de imagem e conferir o destino", ["Usar uma ferramenta de gravação de imagem e conferir o destino", "Apenas copiar o arquivo ISO para qualquer pasta", "Renomear ISO para EXE", "Apagar a partição do sistema atual"], "Gravar a imagem normalmente substitui o conteúdo do pendrive escolhido."],
+      [2, "Para que serve comparar o checksum da ISO baixada com o valor oficial?", "Detectar alteração ou corrupção do arquivo", ["Detectar alteração ou corrupção do arquivo", "Criar a conta do usuário", "Escolher o idioma do teclado", "Aumentar o espaço em disco"], "A conferência de integridade evita usar um download corrompido; autenticidade exige seguir as orientações da fonte."],
+      [2, "Antes de confirmar o particionamento, o que deve ser conferido?", "Disco de destino, modo escolhido e efeito sobre as partições", ["Disco de destino, modo escolhido e efeito sobre as partições", "Somente a cor da interface", "Apenas o nome do pendrive", "Somente o fuso horário"], "Um destino incorreto pode apagar o sistema e arquivos existentes."],
+      [3, "O instalador oferece apagar o disco ou instalar ao lado de outro sistema. Qual é a decisão responsável?", "Conferir backup e resumo das alterações antes de escolher", ["Conferir backup e resumo das alterações antes de escolher", "Escolher apagar o disco sempre", "Escolher aleatoriamente porque são equivalentes", "Desligar o computador durante a gravação"], "Os modos têm efeitos distintos; confirme partições e destino com base no seu objetivo."],
+      [3, "Após inicializar o sistema instalado, qual verificação tem mais valor?", "Testar rede, dispositivos, arquivos e atualizações", ["Testar rede, dispositivos, arquivos e atualizações", "Eliminar imediatamente todos os backups", "Ignorar mensagens de erro", "Reinstalar sem necessidade"], "Validar o funcionamento e manter uma cópia dos dados permite corrigir problemas."],
+      [3, "Uma ISO não coincide com a soma publicada pelo projeto. O que fazer?", "Não usá-la; baixar novamente da fonte oficial e verificar", ["Não usá-la; baixar novamente da fonte oficial e verificar", "Instalar assim mesmo", "Editar o checksum até coincidir", "Ignorar porque toda ISO diverge"], "Uma divergência de integridade impede confiar no arquivo baixado."],
+    ].map(([level, prompt, answer, options, explanation], index) => ({ id: `instalacao-${index + 1}`, category: "instalacao", level, prompt, answer, options, explanation, source: "Debian GNU/Linux Installation Guide.pdf" })),
     {
       id: "arquivos-1",
       category: "arquivos",
@@ -1708,8 +1797,31 @@ window.FlowData = {
         "rmdir falha quando há conteúdo, em vez de removê-lo recursivamente.",
       source: "_Aula 2 Comandos iniciais.pdf",
     },
+    { id: "lpi-lic-1", category: "licencas", level: 1, prompt: "O que normalmente permite estudar como um programa funciona?", code: "", answer: "Acesso ao código-fonte", options: ["Acesso ao código-fonte", "Somente acesso ao executável", "Uma assinatura de internet", "Um formato de arquivo proprietário"], explanation: "O código-fonte permite inspecionar e compreender a implementação.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-lic-2", category: "licencas", level: 1, prompt: "Uma licença de software estabelece principalmente o quê?", code: "", answer: "As condições de uso, modificação e distribuição", options: ["As condições de uso, modificação e distribuição", "A velocidade do processador", "O endereço IP do servidor", "O tamanho do instalador"], explanation: "A licença define permissões e obrigações associadas ao software.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-lic-3", category: "licencas", level: 2, prompt: "Um programa é gratuito para baixar. O que ainda precisa ser verificado antes de redistribuí-lo?", code: "", answer: "Os termos da licença", options: ["Os termos da licença", "A cor do ícone", "A quantidade de usuários online", "O nome do arquivo ZIP"], explanation: "Preço zero não implica permissão irrestrita de redistribuição.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-lic-4", category: "licencas", level: 2, prompt: "Qual prática respeita melhor um projeto de código aberto ao publicar uma versão modificada?", code: "", answer: "Conferir e cumprir as obrigações da licença", options: ["Conferir e cumprir as obrigações da licença", "Apagar todos os avisos de autoria", "Presumir que não há condições", "Atribuir uma licença incompatível sem conferir"], explanation: "As obrigações variam conforme a licença específica do projeto.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-lic-5", category: "licencas", level: 3, prompt: "Você encontra código sem arquivo de licença. Qual conclusão é mais segura?", code: "", answer: "Não presumir autorização para redistribuir", options: ["Não presumir autorização para redistribuir", "Tratar automaticamente como domínio público", "Publicar com qualquer licença", "Remover o nome do autor"], explanation: "Disponibilidade do código não equivale, por si só, a autorização ampla de uso e distribuição.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-lic-6", category: "licencas", level: 3, prompt: "Por que 'código aberto' e 'sem custo' não são sinônimos?", code: "", answer: "Acesso ao código e preço descrevem aspectos diferentes", options: ["Acesso ao código e preço descrevem aspectos diferentes", "Todo código aberto exige pagamento", "Todo programa gratuito revela seu código", "Preço define automaticamente os direitos de modificação"], explanation: "Licenciamento e modelo de cobrança são dimensões distintas.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-tar-1", category: "arquivos_compactados", level: 1, prompt: "Qual é a função principal do formato tar?", code: "", answer: "Reunir arquivos e diretórios em um arquivo", options: ["Reunir arquivos e diretórios em um arquivo", "Editar texto interativamente", "Gerenciar usuários", "Consultar portas de rede"], explanation: "tar cria um arquivo de arquivamento; a compressão pode ser aplicada separadamente.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-tar-2", category: "arquivos_compactados", level: 1, prompt: "Qual extensão costuma indicar um tar comprimido com gzip?", code: "", answer: ".tar.gz", options: [".tar.gz", ".txt", ".sh", ".log"], explanation: "A combinação tar com gzip costuma usar .tar.gz ou .tgz.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-tar-3", category: "arquivos_compactados", level: 2, prompt: "Qual comando cria pacote.tar a partir da pasta projeto?", code: "", answer: "tar -cf pacote.tar projeto", options: ["tar -cf pacote.tar projeto", "tar -xf pacote.tar projeto", "gzip -d projeto", "cat pacote.tar projeto"], explanation: "Em tar, -c cria e -f indica o nome do arquivo de saída.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-tar-4", category: "arquivos_compactados", level: 2, prompt: "Antes de extrair um pacote desconhecido, como listar seu conteúdo?", code: "", answer: "tar -tf pacote.tar", options: ["tar -tf pacote.tar", "tar -cf pacote.tar", "rm pacote.tar", "chmod 777 pacote.tar"], explanation: "A opção -t lista entradas e ajuda a inspecionar caminhos antes da extração.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-tar-5", category: "arquivos_compactados", level: 3, prompt: "O arquivo backup.tar.gz precisa ser extraído. Qual comando corresponde ao formato?", code: "", answer: "tar -xzf backup.tar.gz", options: ["tar -xzf backup.tar.gz", "tar -czf backup.tar.gz", "gzip backup.tar.gz", "touch backup.tar.gz"], explanation: "-x extrai, -z usa gzip e -f recebe o arquivo.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-tar-6", category: "arquivos_compactados", level: 3, prompt: "Qual diferença é correta entre pacote.tar e pacote.tar.gz?", code: "", answer: "O segundo inclui compressão gzip", options: ["O segundo inclui compressão gzip", "O primeiro sempre é executável", "O segundo é obrigatoriamente criptografado", "O primeiro só contém um arquivo"], explanation: "gzip comprime, mas não fornece criptografia por si só.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-sh-1", category: "scripts", level: 1, prompt: "O que é um script de shell?", code: "", answer: "Um arquivo com comandos para execução pelo shell", options: ["Um arquivo com comandos para execução pelo shell", "Um novo tipo de processador", "Uma partição de inicialização", "Uma interface de rede física"], explanation: "O shell interpreta a sequência de comandos contida no arquivo.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-sh-2", category: "scripts", level: 1, prompt: "Qual linha inicial indica Bash como interpretador de um script executável?", code: "", answer: "#!/bin/bash", options: ["#!/bin/bash", "#bash/bin!", "bash=kernel", "<bash>"], explanation: "A linha shebang indica o interpretador quando o script é executado diretamente.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-sh-3", category: "scripts", level: 2, prompt: "Em um script Bash, qual atribuição simples está correta?", code: "", answer: "nome=aluno", options: ["nome=aluno", "nome = aluno", "set nome aluno =", "$nome=aluno"], explanation: "Na atribuição do shell, não há espaços em torno de = e o nome da variável não recebe $.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-sh-4", category: "scripts", level: 2, prompt: "Qual comando permite executar diretamente um script chamado tarefa.sh?", code: "", answer: "chmod +x tarefa.sh", options: ["chmod +x tarefa.sh", "ls -a tarefa.sh", "cat tarefa.sh", "touch tarefa.sh"], explanation: "A permissão de execução permite chamar diretamente um script com interpretador indicado.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-sh-5", category: "scripts", level: 3, prompt: "Em um script Bash chamado com um argumento, como se acessa o primeiro argumento posicional?", code: "", answer: "$1", options: ["$1", "$0", "$?", "$$"], explanation: "$1 contém o primeiro argumento; $0 costuma representar o nome usado para invocar o script.", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { id: "lpi-sh-6", category: "scripts", level: 3, prompt: "Após executar um comando, que variável especial contém seu status de saída no Bash?", code: "", answer: "$?", options: ["$?", "$1", "$HOME", "$PATH"], explanation: "$? guarda o status da última execução; zero geralmente indica sucesso.", source: "LPI-Learning-Material-010-160-pt.pdf" },
   ],
   manual: [
+    { category: "historia", command: "Unix → GNU → Linux", action: "Distinguir origens", explanation: "Unix antecede o projeto GNU, anunciado em 1983; Linus Torvalds desenvolveu o kernel Linux em 1991.", example: "Unix (inspiração) → GNU (ferramentas e sistema) → Linux (kernel)", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { category: "historia", command: "Kernel ≠ distribuição", action: "Reconhecer camadas", explanation: "Uma distribuição combina o kernel com ferramentas, bibliotecas, instalador, pacotes e políticas de suporte.", example: "Comparar kernel, shell e gerenciador de pacotes", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { category: "instalacao", command: "Backup antes de instalar", action: "Proteger os dados", explanation: "Antes de alterar partições, crie e confira uma cópia dos arquivos importantes em outro local.", example: "Conferir arquivos da cópia antes de iniciar", source: "Debian GNU/Linux Installation Guide.pdf" },
+    { category: "instalacao", command: "ISO e checksum", action: "Conferir a imagem", explanation: "Baixe da fonte oficial e compare a soma de verificação publicada; uma divergência exige novo download.", example: "Comparar a soma SHA256 da ISO ao valor oficial", source: "Debian GNU/Linux Installation Guide.pdf" },
+    { category: "instalacao", command: "Mídia e destino", action: "Evitar apagar o dispositivo errado", explanation: "Gravar a imagem substitui o conteúdo da mídia escolhida. No instalador, confira o disco e o resumo das alterações antes de confirmar.", example: "Revisar dispositivo USB e depois o disco de instalação", source: "Debian GNU/Linux Installation Guide.pdf" },
     {
       category: "arquivos",
       command: "pwd",
@@ -2466,5 +2578,11 @@ window.FlowData = {
       example: "apt upgrade",
       source: "_Aula 2 Comandos iniciais.pdf",
     },
+    { category: "licencas", command: "Licença de software", action: "Definir direitos e obrigações", explanation: "Antes de usar, modificar ou redistribuir um programa, leia os termos da licença específica. Gratuidade não substitui essa verificação.", example: "Consultar LICENSE ou COPYING do projeto", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { category: "licencas", command: "Código-fonte", action: "Permitir estudo da implementação", explanation: "Acesso ao código e preço são aspectos diferentes; consulte a licença para saber quais usos são autorizados.", example: "Inspecionar os arquivos-fonte disponibilizados", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { category: "arquivos_compactados", command: "tar -cf", action: "Criar arquivo tar", explanation: "Agrupa arquivos e diretórios. Use -f para indicar o nome do arquivo de saída; tar puro não implica compressão.", example: "tar -cf pacote.tar projeto", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { category: "arquivos_compactados", command: "tar -xzf", action: "Extrair tar comprimido com gzip", explanation: "As opções -x, -z e -f indicam extração, gzip e arquivo. Inspecione pacotes desconhecidos antes de extrair.", example: "tar -xzf pacote.tar.gz", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { category: "scripts", command: "#!/bin/bash", action: "Indicar o interpretador", explanation: "Essa primeira linha, chamada shebang, identifica o programa que interpreta o script quando executado diretamente.", example: "#!/bin/bash", source: "LPI-Learning-Material-010-160-pt.pdf" },
+    { category: "scripts", command: "chmod +x", action: "Permitir execução direta de um script", explanation: "A permissão de execução é necessária para executar o arquivo diretamente, junto de um interpretador indicado ou apropriado.", example: "chmod +x tarefa.sh", source: "LPI-Learning-Material-010-160-pt.pdf" },
   ],
 };

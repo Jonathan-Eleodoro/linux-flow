@@ -5,7 +5,7 @@ As funcionalidades abaixo são propostas de evolução e não são apresentadas 
 | Prioridade | Evolução | Motivo e dependências |
 |---|---|---|
 | 1 | Revisão pedagógica pelo professor | Validar recorte já ministrado, fontes e dificuldade de cada questão. |
-| 1 | Ranking compartilhado com backend | Permitir comparação entre aparelhos, com regras de acesso e validação no servidor. |
+| 1 | Moderação e proteção do ranking compartilhado | Adicionar limites de envio, remoção de registros e controle de abuso. O ranking didático básico já usa API e MySQL. |
 | 1 | Autenticação real | Distinguir participantes em uso institucional; definir recuperação, retenção e autorização. |
 | 2 | Mais cenários de terminal | Acrescentar pipes e manipulação de texto com parser próprio seguro e testes sem shell real. |
 | 2 | Novos materiais para less, more e wget | Ampliar o banco mantendo rastreabilidade aos conteúdos da turma. |

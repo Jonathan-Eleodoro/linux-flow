@@ -6,6 +6,20 @@ require("../js/data.js");
 require("../js/core.js");
 require("../js/terminal.js");
 const { questions } = FlowData;
+test("Jornadas guiadas têm decisões válidas e quiz associado", () => {
+  for (const id of ["historia", "instalacao"]) {
+    const module = FlowData.learningModules[id];
+    assert(module.steps.length >= 5);
+    assert(FlowData.categories.some((category) => category.id === id));
+    assert.equal(questions.filter((question) => question.category === id).length, 9);
+    for (const step of module.steps) {
+      assert.equal(new Set(step.choices).size, step.choices.length);
+      assert(step.choices.length >= 3);
+      assert(Number.isInteger(step.correct) && step.correct >= 0 && step.correct < step.choices.length);
+      assert(step.feedback.trim());
+    }
+  }
+});
 test("Integridade editorial: IDs únicos, fontes e quatro alternativas diferentes", () => {
   assert.equal(new Set(questions.map((q) => q.id)).size, questions.length);
   questions.forEach((q) => {
@@ -26,6 +40,41 @@ test("Sorteio sem reposição, sem alterar o banco e sem corromper gabaritos", (
   assert.equal(JSON.stringify(questions), before);
   assert.throws(() => FlowCore.session(questions, "arquivos", 3, 100));
 });
+test("Rodadas FREE respeitam o limite de 100 mesmo com acervo maior", () => {
+  const expanded = Array.from({ length: 101 }, (_, index) => ({ ...questions[0], id: `extra-${index}` }));
+  assert.equal(FlowCore.session(expanded, "all", questions[0].level, 100).length, 100);
+  assert.throws(() => FlowCore.session(expanded, "all", questions[0].level, 101));
+});
+test("novas rodadas mudam a ordem e a sequência de letras corretas", () => {
+  const bank = FlowCore.pool(questions, "all", 1);
+  let previous = [];
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const current = FlowCore.session(bank, "all", 1, 10, previous);
+    const summary = current.map((question) => ({
+      id: question.id,
+      answerIndex: question.options.indexOf(question.answer),
+    }));
+    assert(summary.every((item) => item.answerIndex >= 0));
+    assert(summary.every((item, index) => index === 0 || item.answerIndex !== summary[index - 1].answerIndex));
+    if (previous.length) {
+      assert.notDeepEqual(summary.map((item) => item.id), previous.map((item) => item.id));
+      assert.notDeepEqual(summary.map((item) => item.answerIndex), previous.map((item) => item.answerIndex));
+      for (const item of summary) {
+        const prior = previous.find((before) => before.id === item.id);
+        if (prior) assert.notEqual(item.answerIndex, prior.answerIndex);
+      }
+    }
+    previous = summary;
+  }
+});
+test("rodadas de uma pergunta alternam quando há mais de uma disponível", () => {
+  const bank = FlowCore.pool(questions, "all", 1).slice(0, 2);
+  const first = FlowCore.session(bank, "all", 1, 1);
+  const prior = [{ id: first[0].id, answerIndex: first[0].options.indexOf(first[0].answer) }];
+  const second = FlowCore.session(bank, "all", 1, 1, prior);
+  assert.notEqual(second[0].id, first[0].id);
+  assert.deepEqual(new Set(second[0].options), new Set(bank.find((q) => q.id === second[0].id).options));
+});
 test("Certificação usa proporção real e exige prova geral com dez questões", () => {
   assert(FlowCore.qualifies({ category: "all", total: 10, correct: 8 }));
   assert(!FlowCore.qualifies({ category: "all", total: 9, correct: 9 }));
@@ -44,7 +93,7 @@ test("Ranking mantém somente melhor tentativa por usuário e desempata pela dat
   );
   assert.equal(list[1].correct, 10);
 });
-test("As seis missões exigem a alteração ou consulta correspondente", () => {
+test("As doze missões exigem a alteração ou consulta correspondente", () => {
   const commands = [
     ["pwd"],
     ["mkdir projeto", "cd projeto", "touch aula.txt"],
@@ -52,7 +101,21 @@ test("As seis missões exigem a alteração ou consulta correspondente", () => {
     ["chmod 640 relatorio.txt"],
     ["ip addr", "ip route"],
     ["tcpdump -i eth0 icmp"],
+    ["ls -a"],
+    ["cp notas.txt notas-backup.txt"],
+    ["mv rascunho.txt entrega.txt"],
+    ["grep Linux notas.txt"],
+    ["ps"],
+    ["ss -tuln"],
   ];
+  assert.equal(FlowTerminal.missions.length, commands.length);
+  FlowTerminal.missions.forEach((mission) => {
+    assert(mission.references.length > 0, mission.title);
+    mission.references.forEach((reference) => {
+      assert(reference.label.trim(), mission.title);
+      assert(["www.gnu.org", "man7.org", "github.com"].includes(new URL(reference.url).hostname), mission.title);
+    });
+  });
   commands.forEach((seq, index) => {
     const terminal = FlowTerminal.create(index);
     assert(!terminal.run("help").done);

@@ -20,15 +20,34 @@
         q.level === Number(level),
     );
   }
-  /** Sorteia sem reposição e embaralha alternativas independentemente.
-   * O acerto é comparado ao texto canônico, nunca à posição na tela. */
-  function session(questions, category, level, count) {
+  /** Sorteia sem reposição, distribui as letras corretas e evita repetir a
+   * rodada anterior quando há mais de uma combinação possível. O acerto segue
+   * comparado ao texto canônico, nunca à posição na tela. */
+  function session(questions, category, level, count, previous = []) {
     const available = pool(questions, category, level);
-    if (!Number.isInteger(count) || count < 1 || count > available.length)
+    if (!Number.isInteger(count) || count < 1 || count > 100 || count > available.length)
       throw new Error("Quantidade indisponível.");
-    return shuffle(available)
-      .slice(0, count)
-      .map((q) => ({ ...q, options: shuffle(q.options) }));
+    const selected = shuffle(available).slice(0, count);
+    if (previous.length === count && selected.every((q, i) => q.id === previous[i].id)) {
+      if (count > 1) [selected[0], selected[1]] = [selected[1], selected[0]];
+      else if (available.length > 1) selected[0] = available.find((q) => q.id !== previous[0].id);
+    }
+    const priorPosition = new Map(previous.map((q) =>
+      [q.id, q.answerIndex ?? q.options?.indexOf(q.answer)]));
+    const uses = [0, 0, 0, 0];
+    let lastPosition = -1;
+    return selected.map((q, index) => {
+      const candidates = shuffle([0, 1, 2, 3]).filter((position) =>
+        position !== lastPosition && position !== priorPosition.get(q.id)
+        && position !== previous[index]?.answerIndex);
+      const fewest = Math.min(...candidates.map((position) => uses[position]));
+      const answerIndex = candidates.find((position) => uses[position] === fewest);
+      const options = shuffle(q.options.filter((option) => option !== q.answer));
+      options.splice(answerIndex, 0, q.answer);
+      uses[answerIndex]++;
+      lastPosition = answerIndex;
+      return { ...q, options };
+    });
   }
   function result(answers) {
     const correct = answers.filter(
@@ -55,10 +74,18 @@
     return (
       [
         null,
-        { name: "Pinguim explorador", icon: "🐧" },
-        { name: "Coruja analista", icon: "🦉" },
-        { name: "Raposa administradora", icon: "🦊" },
-      ][level] || { name: "Pinguim explorador", icon: "🐧" }
+        { name: "Pinguim explorador", src: "assets/mascots/penguin.svg",
+          focus: "Reconhecer", description: "Identifica comandos, caminhos e conceitos essenciais antes de avançar." },
+        { name: "Coruja analista", src: "assets/mascots/owl.svg",
+          focus: "Interpretar", description: "Lê saídas e opções com atenção para entender o que o sistema está mostrando." },
+        { name: "Raposa administradora", src: "assets/mascots/fox.svg",
+          focus: "Diagnosticar", description: "Escolhe uma ação segura para resolver cenários de administração e rede." },
+        { name: "Castor engenheiro", src: "assets/mascots/beaver.svg",
+          focus: "Automatizar", description: "Planeja rotinas reproduzíveis, testa scripts e organiza tarefas recorrentes." },
+        { name: "Lince arquiteta", src: "assets/mascots/lynx.svg",
+          focus: "Projetar", description: "Relaciona serviços, segurança e observabilidade em ambientes mais complexos." },
+      ][level] || { name: "Pinguim explorador", src: "assets/mascots/penguin.svg",
+        focus: "Reconhecer", description: "Identifica comandos e conceitos essenciais." }
     );
   }
   /** Classificação comparável: a tela aplica nível/quantidade antes desta função.
