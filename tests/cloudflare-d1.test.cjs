@@ -110,9 +110,11 @@ test("sala coletiva, duelo, cronômetro, registros e grupo respeitam membros e m
     assert.ok(room.room.deadlineAt);
     assert.equal(room.events, undefined);
     response = await post(secondKey, { action: "answer", code: roomCode,
+      questionId: room.question.id,
       selected: room.question.options[0] });
     assert.equal(response.status, 200);
     response = await post(secondKey, { action: "answer", code: roomCode,
+      questionId: room.question.id,
       selected: room.question.options[0] });
     assert.equal(response.status, 409);
     response = await community.onRequestGet(context(db, "GET",

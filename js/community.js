@@ -128,7 +128,8 @@
       area.querySelector("#room-answer").disabled = false;
     });
     const answer = area.querySelector("#room-answer");
-    if (answer) answer.onclick = () => act({ action: "answer", code: room.code, selected });
+    if (answer) answer.onclick = () => act({ action: "answer", code: room.code,
+      questionId: question.id, selected });
     const clock = area.querySelector("#room-clock");
     if (clock && room.deadlineAt) {
       const remaining = Math.max(0, Math.ceil((Date.parse(room.deadlineAt) - Date.now()) / 1000));

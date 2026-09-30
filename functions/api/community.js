@@ -238,7 +238,8 @@ export async function onRequestPost(context) {
       if (room.deadline_at && Date.now() > Date.parse(room.deadline_at))
         return fail("O tempo desta questão terminou.", 409);
       const question = byId.get(JSON.parse(room.question_ids)[room.current_index]);
-      if (!question || !question.options.includes(body.selected)) return fail("Resposta inválida.");
+      if (!question || body.questionId !== question.id || !question.options.includes(body.selected))
+        return fail("Questão encerrada ou resposta inválida.", 409);
       const correct = Number(body.selected === question.answer);
       const result = await prepared(db, `INSERT OR IGNORE INTO game_answers
         (room_id, profile_id, question_index, selected, correct) VALUES (?, ?, ?, ?, ?)`,
