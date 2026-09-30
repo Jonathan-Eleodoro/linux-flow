@@ -1,5 +1,7 @@
 # Publicar Linux Flow na Cloudflare Pages com D1
 
+Para seguir a configuração em telas curtas, com comandos copiáveis e uma revisão de segurança, abra [o guia HTML local](../guias-cloudflare/index.html). A pasta não entra no build público `dist/`.
+
 O site estático é publicado pela **Pages**. As rotas em `functions/api/` são **Pages Functions** e usam o banco **D1**, que oferece SQL compatível com SQLite. Não se trata de colocar um arquivo `.sqlite` dentro de `dist/`: o banco fica no serviço D1 e a função o acessa por um binding. O plano anterior com Vercel/MySQL está documentado apenas no histórico Git e nas [notas de manutenção](../.github/PROJECT_NOTES.md).
 
 ## Antes de publicar

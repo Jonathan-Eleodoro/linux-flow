@@ -4,6 +4,8 @@ Este arquivo concentra decisões, mudanças de plano e trabalho pendente. Ele é
 
 ## Caminho atual — 30/09/2026
 
+- A revisão antes da conta Cloudflare e os comandos copiáveis estão em `guias-cloudflare/index.html`. A pasta é pública no GitHub, mas não é copiada para `dist/`.
+- A CSP agora também é enviada por `_headers` para os ativos estáticos, inclusive `frame-ancestors`; verificar o cabeçalho no domínio Pages após publicar.
 - Publicação planejada: Cloudflare Pages + Pages Functions + D1. O frontend e as rotas `/api/*` compartilham a origem.
 - O GitHub pessoal de Jonathan contém o código na raiz. A conta Cloudflare deve pertencer ao projeto e receber membros individuais; nunca compartilhar senha ou 2FA.
 - Nada foi cadastrado no Aiven. A alternativa Vercel/MySQL foi retirada dos arquivos ativos; seu histórico permanece nos commits anteriores.
@@ -28,6 +30,9 @@ Este arquivo concentra decisões, mudanças de plano e trabalho pendente. Ele é
 | Alta | Papel docente verificado | A escola define quem concede e revoga acesso de mestre. |
 | Alta | Uso com menores | A escola define base legal, responsáveis, retenção, moderação e política de acesso. |
 | Média | Proteção contra abuso | Limites por origem, moderação de nomes/sugestões e revisão de logs. |
+| Média | Operação Premium | Substituir as duas instruções SQL manuais por aprovação transacional auditável. |
+| Média | Retenção de dados | Definir e automatizar descarte de salas, eventos, grupos e sugestões conforme política institucional. |
+| Média | Manutenibilidade da interface | Separar `js/app.js`, `js/data.js` e blocos finais repetidos de `css/style.css` em unidades menores. |
 | Média | Relatórios pedagógicos | Métricas por objetivo, tendências e exportação sem expor dados a outros alunos. |
 | Média | Tempo real | Avaliar infraestrutura própria para atualização instantânea; hoje a sala consulta a API periodicamente. |
 | Média | Conteúdo e acessibilidade | Mais cenários, revisão de espanhol, teste com leitores de tela e celulares reais. |
