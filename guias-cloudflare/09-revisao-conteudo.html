@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Inventário e critérios para revisão pedagógica e direitos de uso do Linux Flow.">
+  <title>Revisão pedagógica · Linux Flow</title>
+  <link rel="stylesheet" href="guia.css">
+  <script defer src="guia.js"></script>
+  <script defer src="../js/data.js"></script>
+  <script defer src="pedagogia.js"></script>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+  <header class="top"><div class="shell"><a class="brand" href="index.html">Linux<span>_Flow</span> / Guia</a><small>Revisão docente · 01/10/2026</small></div></header>
+  <div class="shell layout">
+    <nav class="nav" aria-label="Guia">
+      <p>Etapas</p>
+      <a href="index.html">Painel</a><a href="01-revisao.html">Revisão técnica</a><a href="02-conta.html">Conta e acesso</a><a href="03-publicacao.html">Publicação</a><a href="04-validacao.html">Validação</a><a href="05-manutencao.html">Manutenção</a><a href="06-diagnostico.html">Diagnóstico</a><a href="07-prioridades.html">Prioridades</a><a href="08-plano-testes.html">Plano e testes</a><a href="09-revisao-conteudo.html" aria-current="page">Revisão pedagógica</a>
+    </nav>
+    <main id="conteudo">
+      <div class="eyebrow">Antes de oferecer a escolas</div>
+      <h1>Conteúdo implementado precisa de revisão docente.</h1>
+      <p class="lead">Este inventário lê o acervo Free atual. Quantidade de perguntas e trilhas relacionadas não mede aprendizagem nem comprova cobertura de um objetivo LPI. O professor deve avaliar clareza, precisão, dificuldade e utilidade de cada cenário.</p>
+      <div class="metric-grid" aria-label="Indicadores editoriais">
+        <div class="metric"><strong id="audit-tracks">—</strong><span>trilhas Free no código</span></div>
+        <div class="metric"><strong id="audit-questions">—</strong><span>perguntas Free</span></div>
+        <div class="metric"><strong id="audit-objectives">—</strong><span>objetivos no mapa</span></div>
+        <div class="metric"><strong id="audit-gaps">—</strong><span>sem trilha relacionada</span></div>
+      </div>
+      <p class="note warn"><strong>Direitos de uso:</strong> os objetivos públicos do LPI servem de referência curricular. O livro didático oficial consultado informa licença <strong>CC BY-NC-ND 4.0</strong>; não presuma que ele, seus exercícios ou imagens possam integrar um produto pago. As questões do Linux Flow devem permanecer autorais, e o uso comercial de materiais e marca da escola exige autorização dos titulares. O projeto não é afiliado nem certificado pelo LPI.</p>
+
+      <h2>Mapa de revisão por trilha</h2>
+      <p>Abra uma trilha para conferir enunciado, resposta, explicação e fonte registrada. Anote os IDs que precisam de correção; não edite o gabarito sem repetir os testes.</p>
+      <div id="audit-categories" class="audit-grid"><p>Carregando inventário local…</p></div>
+
+      <h2>Objetivos LPI relacionados</h2>
+      <p>Uma associação editorial indica tema próximo; ela não equivale a cobertura completa nem a preparação para o exame. O objetivo sem trilha deve orientar a próxima ampliação de conteúdo.</p>
+      <div id="audit-objective-list" class="audit-objectives"><p>Carregando mapa…</p></div>
+
+      <h2>Como fazer a revisão com o professor</h2>
+      <ol class="test-steps">
+        <li><strong>Abra este arquivo no navegador</strong><p>No VS Code, abra <code>version1/guias-cloudflare/09-revisao-conteudo.html</code> com o navegador ou Live Server. Se os números mostrarem “—”, verifique se <code>version1/js/data.js</code> está na mesma pasta do projeto. Use computador para anotações e celular para conferir leitura.</p><div class="test-result"><b>Esperado</b><span>14 trilhas, 135 perguntas Free, 19 objetivos e uma lacuna no mapa atual.</span></div></li>
+        <li><strong>Revise uma trilha por vez</strong><p>Abra o cartão da trilha, leia todas as alternativas e a explicação. Anote somente o ID da pergunta, o problema e a correção sugerida. Para comandos que alteram arquivos ou permissões, use um ambiente descartável; não execute no computador de produção.</p><div class="test-result"><b>Esperado</b><span>Cada ID fica classificado como aprovado, corrigir ou retirar.</span></div></li>
+        <li><strong>Confirme fonte e direito de uso</strong><p>Separe a referência curricular do texto/figura efetivamente usado. O professor e a escola devem confirmar por escrito o uso comercial de marca e materiais de aula; compare com o livro LPI antes de aprovar perguntas baseadas nele.</p><div class="test-result"><b>Esperado</b><span>Nenhum ativo de origem incerta integra a versão vendida sem autorização ou substituição.</span></div></li>
+        <li><strong>Faça um piloto supervisionado</strong><p>Depois de acertar direitos, privacidade e infraestrutura, convide um grupo pequeno conforme as regras da escola. Observe entendimento, tempo e dúvidas por trilha; registre resultados agregados sem nomes ou respostas individuais no GitHub.</p><div class="test-result"><b>Esperado</b><span>Professor aprova a versão do commit ou devolve uma lista objetiva de correções.</span></div></li>
+      </ol>
+
+      <h2>Critérios de aceite do professor</h2>
+      <div class="test-grid">
+        <section class="card"><span class="tag">01</span><h3>Precisão técnica</h3><p>Executar ou conferir cada comando, versão e resultado esperado. Corrigir generalizações que dependam da distribuição.</p></section>
+        <section class="card"><span class="tag">02</span><h3>Didática</h3><p>Revisar linguagem, distratores, feedback após erro e progressão entre níveis. A resposta não deve depender de pegadinha.</p></section>
+        <section class="card"><span class="tag">03</span><h3>Inclusão</h3><p>Testar leitura em celular, teclado e leitor de tela. Evitar exemplos que identifiquem alunos ou pressuponham experiência prévia.</p></section>
+        <section class="card"><span class="tag">04</span><h3>Prova com pessoas</h3><p>Conduzir piloto supervisionado com consentimentos definidos pela escola e registrar dúvidas recorrentes sem expor participantes.</p></section>
+      </div>
+      <div class="gate-grid audit-gates">
+        <div class="gate"><strong>Professor: conteúdo</strong><span>Lista de IDs aprovados, pendentes e revisados; data e versão do commit.</span></div>
+        <div class="gate"><strong>Responsável: direitos</strong><span>Autorização escrita para marca, materiais de aula e demais ativos usados comercialmente.</span></div>
+      </div>
+      <p class="note">Registre apenas decisões editoriais em um arquivo privado de revisão. Não inclua nome, nota ou resposta individual de estudantes no GitHub. Depois da revisão, atualizarei perguntas e mapa, repetirei os testes e marcarei a versão aprovada.</p>
+      <p class="tiny">Fontes: <a href="https://www.lpi.org/pt-br/exam-010-objectives/" target="_blank" rel="noopener noreferrer">objetivos oficiais LPI 010-160</a> · <a href="https://learning.lpi.org/pdfstore/LPI-Learning-Material-010-160-en.pdf" target="_blank" rel="noopener noreferrer">material oficial LPI com indicação de licença</a> · <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.pt-br" target="_blank" rel="noopener noreferrer">termos resumidos da CC BY-NC-ND 4.0</a>. A edição portuguesa e cada reutilização devem ser conferidas antes da oferta comercial.</p>
+      <div class="links"><a href="08-plano-testes.html">← Plano e testes</a><a href="../docs/fontes.md">Registro de fontes</a></div>
+    </main>
+  </div>
+  <footer><div class="shell">Linux Flow · Revisão editorial pendente; indicadores são do código.</div></footer>
+</body>
+</html>

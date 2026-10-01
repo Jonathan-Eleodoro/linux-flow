@@ -10,7 +10,7 @@ O plano visual, os donos e o roteiro de teste estão em [`guias-cloudflare/08-pl
 |---|---|---|---|
 | Infraestrutura Pages + D1 | Jonathan + Codex | URL pública, deploy bem-sucedido, `/api/health` 200 em Production e Preview | Código e teste local prontos; nuvem não verificada |
 | Fluxo de dados fictícios | Jonathan + Codex | Perfil, quiz, ranking, exclusão e sala com duas identidades de teste | Aguardando infraestrutura |
-| Produto pedagógico | Professor/escola + Codex | Questões revisadas e piloto supervisionado com feedback | Aguardando revisão docente |
+| Produto pedagógico | Professor/escola + Codex | Questões revisadas, direitos de uso esclarecidos e piloto supervisionado | Inventário visual pronto; aprovação pendente |
 | Privacidade e papel docente | Responsável institucional | Regras para menores, retenção, moderação e concessão/revogação de acesso | Decisão institucional pendente |
 | Oferta Premium | Responsável pelo projeto + Codex | Pagamento conferido, aprovação auditável, suporte e custos ensaiados | Ainda não pronto para venda |
 
@@ -18,6 +18,7 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 
 ## Caminho atual — 01/10/2026
 
+- O inventário `guias-cloudflare/09-revisao-conteudo.html` apresenta questões Free, níveis, fontes e os 19 objetivos relacionados para revisão do professor. O livro oficial do LPI consultado indica CC BY-NC-ND 4.0; referências curriculares não autorizam copiar/adaptar o livro em produto pago. Confirmar direitos dos materiais de aula e do logo antes da oferta.
 - As respostas da comunidade omitem IDs internos dos perfis. A lotação de salas e grupos é validada no próprio `INSERT`, inclusive diante de entradas simultâneas; os corpos JSON são cortados durante a leitura ao superar o limite em bytes. Testes locais cobrem esses comportamentos. Proteção contra spam distribuído e moderação institucional continuam pendentes.
 - A migração `sql/migrations/001-premium-approval.sql` torna a aprovação Premium uma única atualização com concessão automática no mesmo passo e referência única do extrato. O teste SQLite cobre reversão em falhas; aplicar uma vez em cada D1 após backup e validar no Preview antes de operar pagamento real.
 - A exclusão atual do perfil remove pedidos e referências Premium por cascata. Antes de vender, o responsável pelo projeto deve definir com orientação contábil/jurídica quais registros financeiros precisam ser preservados, por quanto tempo e como dissociá-los dos dados de estudo.
