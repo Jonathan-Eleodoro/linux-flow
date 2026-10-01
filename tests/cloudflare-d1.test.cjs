@@ -13,6 +13,8 @@ function d1() {
   sqlite.exec(fs.readFileSync(path.join(__dirname, "../sql/d1-schema.sql"), "utf8"));
   sqlite.exec(fs.readFileSync(path.join(__dirname,
     "../sql/migrations/001-premium-approval.sql"), "utf8"));
+  sqlite.exec(fs.readFileSync(path.join(__dirname,
+    "../sql/migrations/002-educator-access.sql"), "utf8"));
   const wrap = (sql, params = []) => ({
     bind: (...values) => wrap(sql, values),
     first: async () => sqlite.prepare(sql).get(...params) || null,
@@ -61,6 +63,11 @@ test("diagnóstico público distingue D1 pronto de binding ou esquema ausente",
     response = await health.onRequestGet(context(withoutMigration, "GET", "/api/health"));
     assert.equal(response.status, 503);
     withoutMigration.sqlite.close();
+    const withoutEducator = d1();
+    withoutEducator.sqlite.exec("DROP TABLE educator_grants");
+    response = await health.onRequestGet(context(withoutEducator, "GET", "/api/health"));
+    assert.equal(response.status, 503);
+    withoutEducator.sqlite.close();
     response = await health.onRequestGet({ env: {}, request: new Request("https://example.pages.dev/api/health") });
     assert.equal(response.status, 503);
     assert.deepEqual(await response.json(), { status: "unavailable" });
@@ -203,20 +210,53 @@ test("sala coletiva, duelo, cronômetro, registros e grupo respeitam membros e m
     assert.equal(response.status, 409);
     response = await community.onRequestGet(context(db, "GET",
       `/api/community?room=${roomCode}`, null, firstKey));
-    assert.ok((await response.json()).events.some((event) => event.type === "answered"));
+    assert.equal((await response.json()).events, undefined);
     response = await post(firstKey, { action: "createGroup", title: "Estudo Linux" });
     const groupCode = (await response.json()).code;
     response = await post(secondKey, { action: "joinGroup", code: groupCode });
     assert.equal(response.status, 200);
+    const question = FlowData.questions.find((item) => item.level === 1);
+    response = await profile.onRequestPost(context(db, "POST", "/api/profile", {
+      action: "attempt", id: "learner-attempt", level: 1, category: "all",
+      shareRanking: false, answers: [{ id: question.id, selected: question.answer }],
+    }, secondKey));
+    assert.equal(response.status, 201);
     response = await post(secondKey, { action: "suggest", code: groupCode,
       content: "Adicionar exercícios práticos de permissões." });
     assert.equal(response.status, 201);
     response = await community.onRequestGet(context(db, "GET",
       `/api/community?group=${groupCode}`, null, firstKey));
-    const group = await response.json();
-    assert.equal(group.people.length, 2);
-    assert.ok(group.people.every((person) => !("id" in person)));
+    let group = await response.json();
+    assert.equal(group.people.length, 1);
+    assert.equal(group.group.canReview, false);
+    assert.equal(group.summary.quizzes, 0);
     assert.equal(group.suggestions.length, 1);
+    const grant = db.sqlite.prepare(
+      "INSERT INTO educator_grants (profile_id, approved_by) VALUES (?, ?)");
+    grant.run("master", "Responsável da escola");
+    assert.throws(() => grant.run("master", "Outro responsável"), /UNIQUE constraint failed/);
+    response = await community.onRequestGet(context(db, "GET",
+      `/api/community?room=${roomCode}`, null, firstKey));
+    assert.ok((await response.json()).events.some((event) => event.type === "answered"));
+    response = await community.onRequestGet(context(db, "GET",
+      `/api/community?group=${groupCode}`, null, firstKey));
+    group = await response.json();
+    assert.equal(group.group.canReview, true);
+    assert.equal(group.people.length, 2);
+    assert.equal(group.summary.quizzes, 1);
+    assert.ok(group.people.every((person) => !("id" in person)));
+    response = await community.onRequestGet(context(db, "GET",
+      `/api/community?group=${groupCode}`, null, secondKey));
+    assert.equal((await response.json()).people.length, 1);
+    db.sqlite.prepare(`UPDATE educator_grants SET revoked_at =
+      strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), revoked_by = 'Responsável da escola'
+      WHERE profile_id = 'master' AND revoked_at IS NULL`).run();
+    response = await community.onRequestGet(context(db, "GET",
+      `/api/community?group=${groupCode}`, null, firstKey));
+    assert.equal((await response.json()).people.length, 1);
+    response = await community.onRequestGet(context(db, "GET",
+      `/api/community?room=${roomCode}`, null, firstKey));
+    assert.equal((await response.json()).events, undefined);
     db.sqlite.close();
   });
 

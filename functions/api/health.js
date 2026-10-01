@@ -6,7 +6,7 @@ const requiredTables = [
   "profile_attempt_answers", "profile_question_stats", "pro_requests",
   "pro_entitlements", "feedback_comments", "community_profiles", "game_rooms",
   "game_members", "game_answers", "game_events", "study_groups",
-  "study_members", "study_suggestions",
+  "study_members", "study_suggestions", "educator_grants",
 ];
 
 export async function onRequestGet(context) {

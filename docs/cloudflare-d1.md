@@ -13,11 +13,12 @@ O site estático é publicado pela **Pages**. As rotas em `functions/api/` são 
 ## Criar o banco
 
 1. Em **Cloudflare Dashboard → Storage & databases → D1 SQL database**, crie um banco, por exemplo `linux-flow`.
-2. Na aba **Console** desse banco, execute o conteúdo de [`sql/d1-schema.sql`](../sql/d1-schema.sql) e depois, **uma única vez**, a [migração Premium 001](../sql/migrations/001-premium-approval.sql). Alternativamente, no terminal autenticado pelo Wrangler, na raiz do clone, rode os comandos abaixo na ordem. A migração acrescenta uma coluna e não deve ser repetida. Em um banco já criado com o esquema antigo, aplique somente a migração após exportar um backup.
+2. Na aba **Console** desse banco, execute o conteúdo de [`sql/d1-schema.sql`](../sql/d1-schema.sql), a [migração Premium 001](../sql/migrations/001-premium-approval.sql) e a [migração docente 002](../sql/migrations/002-educator-access.sql), nessa ordem. Alternativamente, no terminal autenticado pelo Wrangler, na raiz do clone, rode os comandos abaixo. A 001 não deve ser repetida. Em um banco já criado, faça backup e aplique somente as migrações ainda ausentes.
 
 ```powershell
 npx wrangler d1 execute linux-flow --remote --file=sql/d1-schema.sql
 npx wrangler d1 execute linux-flow --remote --file=sql/migrations/001-premium-approval.sql
+npx wrangler d1 execute linux-flow --remote --file=sql/migrations/002-educator-access.sql
 ```
 3. Confira que as tabelas de perfil, ranking, sugestões e Premium aparecem, além de `game_rooms`, `game_members`, `game_answers`, `game_events`, `study_groups`, `study_members`, `study_suggestions` e `community_profiles`. Como nenhum dado foi colocado no Aiven, não há importação de dados.
 
@@ -41,11 +42,11 @@ O pequeno `functions/package.json` contém apenas `{"type":"module"}` para delim
 
 ## Verificar no endereço `*.pages.dev`
 
-- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB`, as 17 tabelas e os gatilhos da migração Premium. HTTP 503 com `{"status":"unavailable"}` indica que essa cadeia ainda não está pronta. A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui os testes funcionais abaixo.
+- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB`, as 18 tabelas e os gatilhos da migração Premium. HTTP 503 com `{"status":"unavailable"}` indica que essa cadeia ainda não está pronta. A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui os testes funcionais abaixo.
 - Abra o site no celular e no computador; teste as trilhas, o quiz e o terminal.
 - Acesse `/api/ranking?category=all&level=1&total=10`: antes de publicar resultados, a resposta deve ser `{"ranking":[]}`. Se receber erro 503, verifique o binding `DB`, o esquema e os logs das Functions.
 - Crie um perfil de teste, ative a sincronização, anote o código de acesso e recarregue. Confira se o progresso reaparece. Faça um quiz com publicação opcional e confira o ranking.
-- Em **Comunidade**, crie dois perfis sincronizados de teste. Com o primeiro, abra um duelo; com o segundo, entre pelo código. Confirme que só o mestre inicia e avança, que cada pessoa responde uma vez por questão, que o cronômetro bloqueia respostas tardias e que o registro do mestre mostra os eventos. Depois crie um grupo, entre com o segundo perfil, envie uma sugestão e confira o relatório. A partida rápida individual abre o quiz existente.
+- Em **Comunidade**, crie dois perfis sincronizados fictícios. Com o primeiro, abra um duelo; com o segundo, entre pelo código. Confirme que só o criador inicia e avança, que cada pessoa responde uma vez por questão e que o cronômetro bloqueia respostas tardias. Sem concessão docente, o criador não vê os registros nominativos nem o progresso do segundo perfil no grupo. Depois, no D1 de **Preview**, simule aprovação e revogação conforme o [guia de acesso docente](../guias-cloudflare/10-acesso-docente.html). A partida rápida individual abre o quiz existente.
 - Envie uma sugestão de teste e confira uma linha em `feedback_comments` no console D1. Teste a exclusão do perfil na tela de privacidade.
 - Se configurar Pix, gere um pedido, confira valor e recebedor no aplicativo bancário e teste a mudança para `claimed`. **Não conceda Premium sem confirmar o crédito no extrato bancário.** Depois de aplicar a migração 001, o Console D1 precisa de **uma única atualização**. Antes, consulte o pedido e confira perfil, valor, `txid` e estado. Use a referência única do extrato bancário, nunca a referência digitada pelo aluno:
 
@@ -71,6 +72,6 @@ Depois que o domínio Pages estiver testado, **Vercel e Aiven não serão necess
 
 ## Limites pedagógicos da comunidade
 
-O "mestre" é o criador da sala ou grupo e controla a sessão pelo código do próprio perfil. **Ainda não há validação institucional de quem é professor.** Os relatórios do grupo usam apenas quizzes verificados pela API, cujo gabarito está no código público; não servem como nota escolar oficial. A faixa etária é opcional, guardada como intervalo e não aparece em salas ou relatórios. Antes de usar com menores em uma turma real, defina com a escola regras de autorização, retenção, moderação e gestão de acesso. Não peça data de nascimento, nome completo ou e-mail dos alunos nas salas.
+O "mestre" é o criador da sala ou grupo e controla a sessão pelo código do próprio perfil. Criar uma sala ou grupo **não concede** acesso a registros nominativos ou resultados de outros integrantes. Esses dados exigem uma concessão docente manual, vinculada ao perfil e revogável no D1; a escola ainda precisa verificar a pessoa, definir quem autoriza e guardar a decisão fora do GitHub. Os relatórios usam quizzes verificados pela API, cujo gabarito está no código público; não servem como nota escolar oficial. A faixa etária é opcional, guardada como intervalo e não aparece em salas ou relatórios. Antes de usar com menores em uma turma real, defina com a escola regras de autorização, retenção, moderação e gestão de acesso. Não peça data de nascimento, nome completo ou e-mail dos alunos nas salas.
 
 Documentação: [Pages com GitHub](https://developers.cloudflare.com/pages/get-started/git-integration/), [Pages Functions](https://developers.cloudflare.com/pages/functions/get-started/), [binding D1](https://developers.cloudflare.com/pages/functions/bindings/), [D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/), [D1 limits](https://developers.cloudflare.com/d1/platform/limits/) e [Wrangler D1](https://developers.cloudflare.com/d1/wrangler-commands/).

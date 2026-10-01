@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Teste visual e operação de acesso docente a registros e relatórios do Linux Flow.">
+  <title>Acesso docente · Linux Flow</title>
+  <link rel="stylesheet" href="guia.css">
+  <script defer src="guia.js"></script>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+  <header class="top"><div class="shell"><a class="brand" href="index.html">Linux<span>_Flow</span> / Guia</a><small>Permissões · 01/10/2026</small></div></header>
+  <div class="shell layout">
+    <nav class="nav" aria-label="Guia">
+      <p>Etapas</p>
+      <a href="index.html">Painel</a><a href="01-revisao.html">Revisão técnica</a><a href="02-conta.html">Conta e acesso</a><a href="03-publicacao.html">Publicação</a><a href="04-validacao.html">Validação</a><a href="05-manutencao.html">Manutenção</a><a href="06-diagnostico.html">Diagnóstico</a><a href="07-prioridades.html">Prioridades</a><a href="08-plano-testes.html">Plano e testes</a><a href="09-revisao-conteudo.html">Revisão pedagógica</a><a href="10-acesso-docente.html" aria-current="page">Acesso docente</a>
+    </nav>
+    <main id="conteudo">
+      <div class="eyebrow">Antes de usar com turmas</div>
+      <h1>Quem pode consultar o progresso da turma?</h1>
+      <p class="lead">Um perfil sincronizado pode criar uma sala ou grupo, mas isso não prova que pertença a um professor. Somente o criador com concessão docente ativa vê registros nominativos da sala e resultados individuais no grupo.</p>
+      <div class="table-wrap"><table><thead><tr><th>Recurso</th><th>Integrante</th><th>Criador comum</th><th>Criador aprovado</th></tr></thead><tbody>
+        <tr><th>Jogar e ver placar da sala</th><td>Sim</td><td>Sim</td><td>Sim</td></tr>
+        <tr><th>Iniciar e avançar a sala</th><td>Não</td><td>Sim</td><td>Sim</td></tr>
+        <tr><th>Ver registro nominativo</th><td>Não</td><td>Não</td><td>Sim</td></tr>
+        <tr><th>Ver resultado do próprio perfil no grupo</th><td>Sim</td><td>Sim</td><td>Sim</td></tr>
+        <tr><th>Ver resultados individuais do grupo</th><td>Não</td><td>Não</td><td>Sim</td></tr>
+      </tbody></table></div>
+      <p class="note warn">A concessão técnica não verifica identidade por si só. A escola deve identificar o docente fora do aplicativo, definir quem aprova e revoga, registrar a decisão em local privado e proteger o código de acesso do perfil. Não conceda acesso a uma turma real antes dessas decisões e das regras de privacidade para menores.</p>
+
+      <h2>Teste no banco Preview, com duas pessoas fictícias</h2>
+      <ol class="test-steps">
+        <li><strong>Prepare o banco isolado</strong><p>No projeto Pages, abra <b>Settings → Bindings → Preview</b> e confirme que <code>DB</code> aponta para um D1 de teste, diferente do de Production. Aplique o esquema e as migrações 001 e 002 conforme o <a href="03-publicacao.html">guia de publicação</a>. Em <code>/api/health</code> do Preview, espere HTTP 200 e <code>{"status":"ready"}</code>.</p><div class="test-result"><b>Esperado</b><span>A tabela <code>educator_grants</code> existe no D1 Preview; nenhuma concessão real foi feita.</span></div></li>
+        <li><strong>Teste o acesso comum</strong><p>Em duas janelas privadas, crie os perfis fictícios <b>Docente Teste</b> e <b>Aluno Teste</b>. Com o primeiro, crie sala e grupo; com o segundo, entre usando os códigos. Faça um quiz no segundo perfil. Volte ao primeiro e abra sala e grupo.</p><div class="test-result"><b>Esperado</b><span>O criador controla a sala, mas não vê “Registro do mestre”. No grupo vê somente seu próprio progresso, embora veja a quantidade de participantes.</span></div></li>
+        <li><strong>Conceda acesso apenas ao perfil de teste</strong><p>No <b>D1 Preview → Console</b>, localize o ID do perfil fictício. Confira apelido e ID antes de copiar. Troque os campos em maiúsculas no SQL abaixo pelo ID exato e pelo nome do responsável pelo teste; não use o código secreto de acesso.</p><div class="copy-block"><button class="copy" data-copy="teacher-grant">Copiar</button><pre><code id="teacher-grant">SELECT id, nickname FROM synced_profiles WHERE nickname = 'Docente Teste';
+INSERT INTO educator_grants (profile_id, approved_by)
+VALUES ('PROFILE_ID_CONFERIDO', 'RESPONSAVEL_PELO_TESTE');</code></pre></div><div class="test-result"><b>Esperado</b><span>Uma linha de concessão ativa para o ID escolhido. Uma segunda concessão ativa para o mesmo perfil é recusada pelo banco.</span></div></li>
+        <li><strong>Confira e revogue</strong><p>Atualize a sala e o grupo no primeiro navegador. O registro e o relatório com os dois perfis devem aparecer; o segundo perfil continua sem acesso. No D1 Preview, substitua o ID e o responsável e execute a revogação abaixo. Atualize a página novamente.</p><div class="copy-block"><button class="copy" data-copy="teacher-revoke">Copiar</button><pre><code id="teacher-revoke">UPDATE educator_grants
+SET revoked_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+    revoked_by = 'RESPONSAVEL_PELO_TESTE'
+WHERE profile_id = 'PROFILE_ID_CONFERIDO' AND revoked_at IS NULL;</code></pre></div><div class="test-result"><b>Esperado</b><span>Registro e resultados dos demais desaparecem imediatamente após a nova consulta. A linha antiga permanece como histórico de concessão e revogação.</span></div></li>
+        <li><strong>Limpe o teste</strong><p>Apague os dois perfis fictícios pela tela de dados. Não transfira ID, código de perfil, logs ou respostas de estudantes para GitHub, guia público ou chat. Registre apenas se cada verificação passou e a URL do Preview.</p><div class="test-result"><b>Esperado</b><span>Os perfis e suas concessões deixam de existir no banco de teste.</span></div></li>
+      </ol>
+      <div class="gate-grid"><div class="gate"><strong>Antes de conceder em Production</strong><span>Escola confirma identidade, vínculo, finalidade e prazo. Responsável autorizado executa o SQL no banco correto.</span></div><div class="gate"><strong>Se o código de acesso vazar</strong><span>Revogue a concessão imediatamente. Crie outro perfil docente após verificar a pessoa e reveja os acessos.</span></div></div>
+      <p class="note">O esquema registra quem aprovou e revogou, mas a autorização institucional e os detalhes da decisão devem ficar em registro privado. O acesso docente não torna quizzes com gabarito público adequados a notas oficiais.</p>
+      <div class="links"><a href="08-plano-testes.html">← Plano e testes</a><a href="03-publicacao.html">Configurar D1 →</a></div>
+    </main>
+  </div>
+  <footer><div class="shell">Linux Flow · Acesso a dados de turma depende de autorização verificável.</div></footer>
+</body>
+</html>

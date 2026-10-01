@@ -43,7 +43,7 @@
         <p>O mestre escolhe as questões e avança a partida. Até 2 pessoas no duelo e 40 na coletiva.</p>
         <p>Ative um perfil sincronizado para entrar ou criar uma sala.</p></section>
       <section class="panel"><span class="eyebrow">GRUPOS DE ESTUDO</span><h2>Aprender em conjunto</h2>
-        <p>Relatórios de quizzes verificados e sugestões de novos conteúdos ficam visíveis ao grupo.</p></section></div>`;
+        <p>Cada integrante vê seu progresso. O relatório da turma exige acesso docente aprovado.</p></section></div>`;
     area.querySelector("#quick-game").onclick = quick;
   }
   const options = (items, current) => items.map(([value, name]) =>
@@ -119,7 +119,7 @@
         <button id="room-answer" class="primary" disabled>Confirmar resposta</button>`}</section>` : ""}
       <section class="panel"><h2>Placar</h2><ol class="community-score">${members.map((member) =>
         `<li><span><img src="assets/mascots/${esc(member.avatar)}.svg" alt="" class="community-avatar community-accent-${esc(member.accent)}">${esc(member.name)}</span><strong>${member.score} / ${room.total}</strong><small>${member.answered} respondidas</small></li>`).join("")}</ol></section>
-      ${room.owner ? `<section class="panel"><h2>Registro do mestre</h2><p class="small muted">Entradas, respostas, avanços e encerramento desta sessão.</p>
+      ${events ? `<section class="panel"><h2>Registro do mestre</h2><p class="small muted">Entradas, respostas, avanços e encerramento desta sessão.</p>
         <ol class="community-events">${(events || []).map((event) => `<li>${esc(event.date)} · ${esc(event.actor)} · ${esc(event.type)} ${esc(event.detail)}</li>`).join("")}</ol></section>` : ""}`;
     area.querySelector("#community-back").onclick = () => { activeCode = ""; overview(); };
     for (const [id, action] of [["room-start", "start"], ["room-next", "next"], ["room-finish", "finish"]]) {
@@ -146,9 +146,9 @@
     const area = root.querySelector("#community-content");
     area.innerHTML = `<div class="community-top"><button id="community-back">← Comunidade</button></div>
       <section class="panel"><span class="eyebrow">GRUPO ${esc(group.code)}</span><h2>${esc(group.title)}</h2>
-      <p>Compartilhe o código com sua turma. Os relatórios usam apenas quizzes sincronizados e verificados.</p></section>
-      <section class="panel"><h2>${group.owner ? "Relatório de aprendizagem" : "Seu progresso no grupo"}</h2>
-        <p>${value.summary.participants} participantes · ${value.summary.quizzes} quizzes verificados</p>
+      <p>Compartilhe o código somente com convidados. Os relatórios usam quizzes sincronizados e verificados.</p></section>
+      <section class="panel"><h2>${group.canReview ? "Relatório de aprendizagem" : "Seu progresso no grupo"}</h2>
+        <p>${value.summary.participants} participantes · ${value.summary.quizzes} ${group.canReview ? "quizzes do grupo" : "quizzes seus"} verificados</p>
         <div class="community-report">
         ${people.map((person) => `<article><strong>${esc(person.name)}</strong><span>${person.quizzes} quizzes · ${person.questions ? Math.round(100 * person.correct / person.questions) : 0}% de acertos</span></article>`).join("")}</div>
         <p class="small muted">Indicadores didáticos. O gabarito público não permite usar estes dados como avaliação oficial.</p></section>

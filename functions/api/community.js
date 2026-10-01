@@ -18,6 +18,8 @@ const fail = (message, status = 400) => json({ error: message }, status);
 const log = (db, room, actor, event, detail = "") => prepared(db,
   "INSERT INTO game_events (id, room_id, actor_id, event_type, detail) VALUES (?, ?, ?, ?, ?)",
   crypto.randomUUID(), room, actor, event, detail);
+const educator = async (db, profile) => Boolean(await first(db,
+  "SELECT 1 AS ok FROM educator_grants WHERE profile_id = ? AND revoked_at IS NULL", profile.id));
 
 async function roomState(db, room, profile) {
   // O código sozinho não concede acesso a placar ou logs: exige participação.
@@ -37,8 +39,9 @@ async function roomState(db, room, profile) {
   const ownAnswer = question ? await first(db,
     "SELECT correct FROM game_answers WHERE room_id = ? AND profile_id = ? AND question_index = ?",
     room.id, profile.id, room.current_index) : null;
-  // Eventos individuais são visíveis apenas para quem criou a sala.
-  const events = room.owner_id === profile.id ? await rows(db,
+  // Criar a sala não concede acesso aos registros nominativos dos participantes.
+  const canReview = room.owner_id === profile.id && await educator(db, profile);
+  const events = canReview ? await rows(db,
     `SELECT e.event_type AS type, e.detail, e.created_at AS date,
       COALESCE(p.nickname, 'Participante removido') AS actor
      FROM game_events e LEFT JOIN synced_profiles p ON p.id = e.actor_id
@@ -67,15 +70,16 @@ async function groupState(db, group, profile) {
     p.nickname AS author FROM study_suggestions s
     JOIN synced_profiles p ON p.id = s.profile_id
     WHERE s.group_id = ? ORDER BY s.created_at DESC LIMIT 50`, group.id);
-  // Integrantes veem seus próprios resultados; o criador vê o grupo inteiro.
-  const visiblePeople = (group.owner_id === profile.id
+  // Somente o docente aprovado que criou o grupo vê resultados individuais.
+  const canReview = group.owner_id === profile.id && await educator(db, profile);
+  const visiblePeople = (canReview
     ? people : people.filter((person) => person.id === profile.id))
     .map(({ id, ...person }) => person);
   return json({ group: { code: group.code, title: group.title,
-    owner: group.owner_id === profile.id },
+    owner: group.owner_id === profile.id, canReview },
   people: visiblePeople,
   summary: { participants: people.length,
-    quizzes: people.reduce((sum, person) => sum + person.quizzes, 0) }, suggestions });
+    quizzes: visiblePeople.reduce((sum, person) => sum + person.quizzes, 0) }, suggestions });
 }
 
 export async function onRequestGet(context) {

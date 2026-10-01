@@ -18,11 +18,13 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 
 ## Caminho atual — 01/10/2026
 
+- A migração `sql/migrations/002-educator-access.sql` cria concessões docentes revogáveis. O criador comum ainda controla a sala, mas só um criador com concessão ativa lê logs nominativos ou resultados individuais do grupo. Testes locais cobrem concessão, isolamento e revogação; a escola ainda precisa definir e executar aprovação de pessoas reais. O roteiro está em `guias-cloudflare/10-acesso-docente.html`.
+
 - O inventário `guias-cloudflare/09-revisao-conteudo.html` apresenta questões Free, níveis, fontes e os 19 objetivos relacionados para revisão do professor. O livro oficial do LPI consultado indica CC BY-NC-ND 4.0; referências curriculares não autorizam copiar/adaptar o livro em produto pago. Confirmar direitos dos materiais de aula e do logo antes da oferta.
 - As respostas da comunidade omitem IDs internos dos perfis. A lotação de salas e grupos é validada no próprio `INSERT`, inclusive diante de entradas simultâneas; os corpos JSON são cortados durante a leitura ao superar o limite em bytes. Testes locais cobrem esses comportamentos. Proteção contra spam distribuído e moderação institucional continuam pendentes.
 - A migração `sql/migrations/001-premium-approval.sql` torna a aprovação Premium uma única atualização com concessão automática no mesmo passo e referência única do extrato. O teste SQLite cobre reversão em falhas; aplicar uma vez em cada D1 após backup e validar no Preview antes de operar pagamento real.
 - A exclusão atual do perfil remove pedidos e referências Premium por cascata. Antes de vender, o responsável pelo projeto deve definir com orientação contábil/jurídica quais registros financeiros precisam ser preservados, por quanto tempo e como dissociá-los dos dados de estudo.
-- O P0 ganhou `/api/health`, que verifica o binding D1 e as 17 tabelas sem divulgar o esquema ao visitante. O endpoint e seus cenários de falha foram testados localmente; ainda falta verificá-lo em Pages Production e Preview.
+- O P0 ganhou `/api/health`, que verifica o binding D1 e as 18 tabelas sem divulgar o esquema ao visitante. O endpoint e seus cenários de falha foram testados localmente; ainda falta verificá-lo em Pages Production e Preview.
 - Em 01/10/2026, `wrangler.jsonc` foi reintroduzido pelo navegador e convertido de UTF-16 para UTF-8. Ainda não define saída Pages nem D1; o deploy público e o binding permanecem sem comprovação. O painel visual e a priorização estão em `guias-cloudflare/index.html` e `guias-cloudflare/07-prioridades.html`.
 - Em 01/10/2026, a conversa salva sobre a Cloudflare mostrou deploys falhos: `wrangler deploy` tratou a raiz como assets de Worker; depois Pages encontrou `require("node:crypto")` no Pix; por fim, Root directory `dist` falhou antes do build. O diagnóstico está em `guias-cloudflare/06-diagnostico.html`.
 - O Pix, o QR e o hash do código de acesso foram adaptados para APIs Web; manter `functions/` para que Pages publique o backend.
@@ -51,7 +53,7 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 |---|---|---|
 | Alta | Publicar em Cloudflare e testar no domínio real | Perfil, ranking, comunidade, sugestões e Premium funcionam com D1. |
 | Alta | Revisão pedagógica pelo professor | Questões, fontes e dificuldade aprovadas por tema. |
-| Alta | Papel docente verificado | A escola define quem concede e revoga acesso de mestre. |
+| Alta | Papel docente verificado | Código restringe logs e relatórios a concessão ativa; escola define e executa aprovação, revogação e política para menores. |
 | Alta | Uso com menores | A escola define base legal, responsáveis, retenção, moderação e política de acesso. |
 | Média | Proteção contra abuso | Limites por origem, moderação de nomes/sugestões e revisão de logs. |
 | Média | Operação Premium | Migração e teste local entregues; aplicar no D1 Preview/Production e confirmar o procedimento com pagamento real somente após conferência bancária. |
