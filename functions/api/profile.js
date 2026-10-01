@@ -4,6 +4,7 @@ import {
   accessKeyHash, authorized, database, first, json, prepared,
   publicError, readJson, rows,
 } from "../../cloudflare/common.mjs";
+import { financialReady } from "../../cloudflare/financial.mjs";
 
 const { safeId, safeKey, safeName, validateResults, validateLabs } = profileCore;
 const { validateAttempt } = rankingCore;
@@ -169,7 +170,18 @@ export async function onRequestDelete(context) {
     const profile = await authorized(context);
     if (!profile) return json({ error: "Código de acesso inválido." }, 401);
     const db = database(context);
-    // A chave estrangeira remove progresso e salas; o ranking é removido à parte.
+    // A exclusão apaga o estudo; o arquivo financeiro independente retém o pedido.
+    const orders = await first(db,
+      "SELECT COUNT(*) AS total FROM pro_requests WHERE profile_id = ?", profile.id);
+    if (Number(orders?.total) > 0) {
+      if (!await financialReady(db))
+        return json({ error: "Histórico financeiro indisponível. Exclusão suspensa." }, 503);
+      const archived = await first(db, `SELECT COUNT(*) AS total FROM pro_requests r
+        JOIN financial_records f ON f.request_id = r.id
+        WHERE r.profile_id = ?`, profile.id);
+      if (Number(archived?.total) !== Number(orders.total))
+        return json({ error: "Pedido sem arquivo financeiro. Exclusão suspensa." }, 503);
+    }
     await db.batch([
       prepared(db, "DELETE FROM ranking_attempts WHERE participant_id = ?", profile.id),
       prepared(db, "DELETE FROM synced_profiles WHERE id = ?", profile.id),

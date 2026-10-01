@@ -3,6 +3,7 @@ import QRCode from "qrcode/lib/browser.js";
 import pixCore from "../../server/pix-core.cjs";
 import proData from "../../server/pro-data.cjs";
 import { authorized, database, first, json, prepared, publicError, readJson } from "../../cloudflare/common.mjs";
+import { financialReady } from "../../cloudflare/financial.mjs";
 
 const { payload, amountCents, newTxid } = pixCore;
 
@@ -47,6 +48,8 @@ export async function onRequestGet(context) {
       if (!current.pro) return json({ error: "Acesso Premium não ativo." }, 403);
       return json({ questions: proData.questions.filter((question) => question.level === level) });
     }
+    if (!await financialReady(database(context)))
+      return json({ error: "Histórico financeiro indisponível. Pagamento suspenso." }, 503);
     return json(await present(context, profile.id));
   } catch (error) { return publicError(error, "Consulta Premium indisponível."); }
 }
@@ -60,6 +63,8 @@ export async function onRequestPost(context) {
     const profile = await authorized(context);
     if (!profile) return json({ error: "Perfil sincronizado necessário." }, 401);
     const db = database(context);
+    if (!await financialReady(db))
+      return json({ error: "Histórico financeiro indisponível. Pagamento suspenso." }, 503);
     if (body.action === "create") {
       if (!pixSettings(context.env)) return json({ error: "Pix ainda não configurado." }, 503);
       const cents = amountCents(body.amountCents);

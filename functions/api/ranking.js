@@ -1,7 +1,7 @@
 import rankingCore from "../../server/ranking-core.cjs";
-import { database, first, json, prepared, publicError, readJson, rows } from "../../cloudflare/common.mjs";
+import { database, json, publicError, rows } from "../../cloudflare/common.mjs";
 
-const { validateAttempt, validateFilter } = rankingCore;
+const { validateFilter } = rankingCore;
 
 // Cada participante ocupa no máximo uma posição por filtro: sua melhor nota.
 export async function onRequestGet(context) {
@@ -11,10 +11,13 @@ export async function onRequestGet(context) {
   try {
     const ranking = await rows(database(context),
       `SELECT nickname, category, level, total, correct, created_at AS date FROM (
-         SELECT nickname, category, level, total, correct, created_at,
-                ROW_NUMBER() OVER (PARTITION BY participant_id
-                  ORDER BY correct DESC, created_at ASC) AS participant_position
-         FROM ranking_attempts WHERE category = ? AND level = ? AND total = ?
+         SELECT r.nickname, r.category, r.level, r.total, r.correct, r.created_at,
+                ROW_NUMBER() OVER (PARTITION BY r.participant_id
+                  ORDER BY r.correct DESC, r.created_at ASC) AS participant_position
+         FROM ranking_attempts r
+         JOIN synced_profiles p ON p.id = r.participant_id
+         JOIN profile_results v ON v.id = r.id AND v.profile_id = p.id AND v.verified = 1
+         WHERE r.category = ? AND r.level = ? AND r.total = ?
        ) WHERE participant_position = 1
        ORDER BY correct DESC, created_at ASC LIMIT 20`,
       filter.category, filter.level, filter.total);
@@ -22,24 +25,7 @@ export async function onRequestGet(context) {
   } catch (error) { return publicError(error, "Ranking indisponível."); }
 }
 
-export async function onRequestPost(context) {
-  let attempt;
-  try { attempt = validateAttempt(await readJson(context.request, 20000)); }
-  catch (error) { return json({ error: error.message }, error.status || 400); }
-  try {
-    const db = database(context);
-    // Perfis sincronizados publicam pela rota de perfil para vincular a tentativa à chave.
-    const synced = await first(db, "SELECT id FROM synced_profiles WHERE id = ?", attempt.participantId);
-    if (synced) return json({ error: "Use o perfil sincronizado para publicar." }, 403);
-    const prior = await first(db, "SELECT participant_id FROM ranking_attempts WHERE id = ?", attempt.id);
-    if (prior && prior.participant_id !== attempt.participantId)
-      return json({ error: "Identificador já existe." }, 409);
-    await prepared(db,
-      `INSERT OR IGNORE INTO ranking_attempts
-       (id, participant_id, nickname, category, level, total, correct)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      attempt.id, attempt.participantId, attempt.nickname, attempt.category,
-      attempt.level, attempt.total, attempt.correct).run();
-    return json({ saved: true, correct: attempt.correct, total: attempt.total }, 201);
-  } catch (error) { return publicError(error, "Não foi possível salvar no ranking."); }
+export async function onRequestPost() {
+  // Publicação só ocorre via /api/profile, com chave e respostas verificadas.
+  return json({ error: "Sincronize um perfil antes de publicar no ranking." }, 403);
 }

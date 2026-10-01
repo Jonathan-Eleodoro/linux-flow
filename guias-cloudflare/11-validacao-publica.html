@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Diagnóstico visual do Linux Flow publicado em Cloudflare Pages e D1.">
+  <title>Validação pública · Linux Flow</title>
+  <link rel="stylesheet" href="guia.css">
+  <script defer src="guia.js"></script>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+  <header class="top"><div class="shell"><a class="brand" href="index.html">Linux<span>_Flow</span> / Guia</a><small>Produção · 01/10/2026</small></div></header>
+  <div class="shell layout">
+    <nav class="nav" aria-label="Guia">
+      <p>Etapas</p>
+      <a href="index.html">Painel</a><a href="01-revisao.html">Revisão técnica</a><a href="02-conta.html">Conta e acesso</a><a href="03-publicacao.html">Publicação</a><a href="04-validacao.html">Validação</a><a href="05-manutencao.html">Manutenção</a><a href="06-diagnostico.html">Diagnóstico</a><a href="07-prioridades.html">Prioridades</a><a href="08-plano-testes.html">Plano e testes</a><a href="09-revisao-conteudo.html">Revisão pedagógica</a><a href="10-acesso-docente.html">Acesso docente</a><a href="11-validacao-publica.html" aria-current="page">Validação pública</a>
+    </nav>
+    <main id="conteudo">
+      <div class="eyebrow">O endereço já existe</div>
+      <h1>Faça a API responder antes de cadastrar pessoas.</h1>
+      <p class="lead">A captura mostra o projeto Pages com build <code>npm run build</code>, saída <code>dist</code> e binding <code>DB</code> para <code>linux-flow-db</code>. Em 01/10/2026, a consulta pública encontrou o site estático, mas <code>/api/health</code> e <code>/api/ranking</code> retornaram HTTP 503. A captura não mostra se o esquema e as migrações existem no D1.</p>
+      <div class="table-wrap"><table><thead><tr><th>Endereço</th><th>Observado</th><th>Para aceitar</th></tr></thead><tbody>
+        <tr><th><code>/#inicio</code></th><td><span class="tag">Site abre</span></td><td>Landing e navegação utilizáveis</td></tr>
+        <tr><th><code>/api/health</code></th><td><span class="tag danger">503 · unavailable</span></td><td>200 · <code>{"status":"ready"}</code></td></tr>
+        <tr><th><code>/api/ranking?category=all&amp;level=1&amp;total=10</code></th><td><span class="tag danger">503</span></td><td>200 · JSON com <code>ranking</code></td></tr>
+      </tbody></table></div>
+      <p class="note warn">O binding visível no painel é um bom sinal, mas não prova que o banco contenha as tabelas. Não crie perfis reais nem aceite Pix enquanto a API responder 503. O código novo suspende pedidos Premium quando o arquivo financeiro está incompleto.</p>
+
+      <h2>1. Descubra o estado do banco sem alterar dados</h2>
+      <ol class="test-steps">
+        <li><strong>Confira a publicação</strong><p>Entre na sua conta Cloudflare. Abra <b>Workers &amp; Pages → linux-flow → Deployments</b>. Selecione a publicação de <b>Production</b> e confira o commit, a situação “Success” e o endereço <code>linux-flow.pages.dev</code>. Em <b>Settings → Bindings</b>, confirme <code>DB → linux-flow-db</code> em Production. Se alterou o binding após o último deploy, faça redeploy.</p><div class="test-result"><b>Esperado</b><span>O commit da branch <code>main</code> foi publicado, e o binding aparece no ambiente Production.</span></div></li>
+        <li><strong>Abra o Console do D1</strong><p>No painel, abra <b>Storage &amp; databases → D1 → linux-flow-db → Console</b>. Cole e execute a consulta abaixo. Ela lê apenas os nomes das estruturas; não mostra perfis, pagamentos ou segredos.</p><div class="copy-block"><button class="copy" data-copy="inventory">Copiar</button><pre><code id="inventory">SELECT type, name FROM sqlite_master
+WHERE name IN (
+  'synced_profiles', 'ranking_attempts', 'pro_requests',
+  'educator_grants', 'financial_records', 'financial_events',
+  'pro_requests_grant_after_approval', 'financial_request_created',
+  'ranking_requires_verified_profile'
+)
+ORDER BY type, name;</code></pre></div><div class="test-result"><b>Esperado</b><span>Nove nomes. Se não aparecer <code>synced_profiles</code>, falta o esquema base. Se aparecer a base, mas faltar algo, identifique a migração ausente antes de executar SQL.</span></div></li>
+        <li><strong>Confira a migração 001</strong><p>No mesmo Console, execute <code>PRAGMA table_info(pro_requests);</code>. Procure a coluna <code>confirmed_payment_reference</code>. A 001 cria essa coluna e os gatilhos Premium; ela <b>não deve ser repetida</b> se já foi aplicada. Se a coluna aparecer mas o gatilho não, pare e registre essa inconsistência antes de alterar o banco.</p><div class="test-result"><b>Esperado</b><span>Coluna e gatilho Premium presentes juntos, ou ambos ausentes.</span></div></li>
+      </ol>
+
+      <h2>2. Aplique somente o que estiver faltando</h2>
+      <p>Faça um backup do D1 se já houver qualquer dado. Os comandos abaixo usam o nome visto na sua captura e devem ser executados na raiz do clone, em PowerShell autenticado no Wrangler. O <a href="https://developers.cloudflare.com/d1/wrangler-commands/" target="_blank" rel="noopener noreferrer">manual oficial do D1</a> confirma <code>--remote --file</code>. Também é possível colar o conteúdo dos arquivos no Console, um por vez.</p>
+      <div class="copy-block"><button class="copy" data-copy="migrations">Copiar</button><pre><code id="migrations">npx wrangler d1 execute linux-flow-db --remote --file=sql/d1-schema.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/001-premium-approval.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/002-educator-access.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/003-financial-retention.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/004-ranking-synced.sql</code></pre></div>
+      <p class="note danger"><strong>Não execute o bloco inteiro cegamente.</strong> Em banco vazio, siga a ordem completa. Se a base ou alguma migração já estiver aplicada, execute apenas as ausentes. A 004 exclui pontuações legadas sem perfil e rodada verificada; confira o backup antes dela. Se a 001 estiver parcialmente aplicada, interrompa e peça análise do inventário, sem colar dados pessoais.</p>
+      <div class="gate-grid">
+        <div class="gate"><strong>001 · Premium</strong><span>Coluna e gatilhos de aprovação; uma única aplicação.</span></div>
+        <div class="gate"><strong>002 · Docentes</strong><span>Concessão manual e revogável de acesso a relatórios.</span></div>
+        <div class="gate"><strong>003 · Finanças</strong><span>Histórico independente do perfil, preservado por pelo menos um ano.</span></div>
+        <div class="gate"><strong>004 · Ranking</strong><span>Retira entradas anônimas legadas e exige rodada verificada.</span></div>
+      </div>
+
+      <h2>3. Comprove no domínio público</h2>
+      <ol class="test-steps">
+        <li><strong>Saúde da API</strong><p>Abra <a href="https://linux-flow.pages.dev/api/health" target="_blank" rel="noopener noreferrer">linux-flow.pages.dev/api/health</a> ou rode o comando abaixo. O código atualizado espera 20 tabelas e 13 gatilhos. Se ainda der 503, confira o commit publicado, o binding Production e os logs da Function; não adivinhe qual SQL falta.</p><div class="copy-block"><button class="copy" data-copy="health">Copiar</button><pre><code id="health">curl.exe -i https://linux-flow.pages.dev/api/health</code></pre></div><div class="test-result"><b>Esperado</b><span>HTTP 200 e <code>{"status":"ready"}</code>. Isso ainda não prova que perfil, ranking ou Pix estejam funcionando.</span></div></li>
+        <li><strong>Ranking vazio ou autenticado</strong><p>Abra <code>https://linux-flow.pages.dev/api/ranking?category=all&amp;level=1&amp;total=10</code>. Sem rodadas publicadas por perfis sincronizados, a resposta deve ser <code>{"ranking":[]}</code>. No PowerShell, teste também a recusa de envio direto sem perfil; esse comando não grava resultado. Na guia <a href="04-validacao.html">Validação</a>, faça depois uma rodada com perfil fictício sincronizado.</p><div class="copy-block"><button class="copy" data-copy="anonymous-ranking">Copiar</button><pre><code id="anonymous-ranking">curl.exe -i -X POST https://linux-flow.pages.dev/api/ranking -H "Content-Type: application/json" --data "{}"</code></pre></div><div class="test-result"><b>Esperado</b><span>GET com HTTP 200 e nenhuma pontuação anônima; POST direto com HTTP 403.</span></div></li>
+        <li><strong>Retenção financeira sem pagamento real</strong><p>Use o D1 de <b>Preview</b> e os testes do <a href="05-manutencao.html">guia de manutenção</a>. A exclusão de um perfil fictício apaga estudo e ranking, mas mantém o registro do pedido em <code>financial_records</code> e os eventos em <code>financial_events</code>. Não gere Pix real para esse teste.</p><div class="test-result"><b>Esperado</b><span>Histórico com prazo <code>retain_until</code> superior a um ano desde o último evento; tentativa de apagá-lo antes do prazo é recusada.</span></div></li>
+      </ol>
+      <div class="callout"><strong>O que me informar</strong><p>Resultado de <code>/api/health</code>, lista de nomes da consulta de inventário, estado do deployment e eventuais mensagens de erro das migrações. Não envie linhas de tabelas com perfis, referências Pix, códigos de acesso ou extratos.</p></div>
+      <p class="tiny">A retenção de um ano é um mínimo técnico definido pelo projeto. A <a href="https://www.gov.br/anpd/pt-br/acesso-a-informacao/perguntas-frequentes/perguntas-frequentes" target="_blank" rel="noopener noreferrer">ANPD explica</a> que o prazo apropriado depende da finalidade e de obrigações aplicáveis; confirme o período fiscal com orientação profissional antes da venda.</p>
+      <div class="links"><a href="06-diagnostico.html">← Diagnóstico anterior</a><a href="04-validacao.html">Testes funcionais →</a></div>
+    </main>
+  </div>
+  <footer><div class="shell">Linux Flow · Use dados fictícios e compartilhe apenas resultados de teste sem identificadores.</div></footer>
+</body>
+</html>

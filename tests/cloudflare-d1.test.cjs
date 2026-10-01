@@ -15,6 +15,10 @@ function d1() {
     "../sql/migrations/001-premium-approval.sql"), "utf8"));
   sqlite.exec(fs.readFileSync(path.join(__dirname,
     "../sql/migrations/002-educator-access.sql"), "utf8"));
+  sqlite.exec(fs.readFileSync(path.join(__dirname,
+    "../sql/migrations/003-financial-retention.sql"), "utf8"));
+  sqlite.exec(fs.readFileSync(path.join(__dirname,
+    "../sql/migrations/004-ranking-synced.sql"), "utf8"));
   const wrap = (sql, params = []) => ({
     bind: (...values) => wrap(sql, values),
     first: async () => sqlite.prepare(sql).get(...params) || null,
@@ -68,6 +72,11 @@ test("diagnóstico público distingue D1 pronto de binding ou esquema ausente",
     response = await health.onRequestGet(context(withoutEducator, "GET", "/api/health"));
     assert.equal(response.status, 503);
     withoutEducator.sqlite.close();
+    const withoutFinancial = d1();
+    withoutFinancial.sqlite.exec("DROP TRIGGER financial_request_created");
+    response = await health.onRequestGet(context(withoutFinancial, "GET", "/api/health"));
+    assert.equal(response.status, 503);
+    withoutFinancial.sqlite.close();
     response = await health.onRequestGet({ env: {}, request: new Request("https://example.pages.dev/api/health") });
     assert.equal(response.status, 503);
     assert.deepEqual(await response.json(), { status: "unavailable" });
@@ -130,6 +139,124 @@ test("migração Premium preserva pedidos já criados e exige data de aprovaçã
     sql.close();
   });
 
+test("ranking rejeita envio sem perfil e remove pontuações legadas anônimas",
+  { skip: !DatabaseSync }, async () => {
+    const ranking = await import("../functions/api/ranking.js");
+    const db = d1();
+    const response = await ranking.onRequestPost(context(db, "POST", "/api/ranking", {
+      id: "fake", participantId: "anon", nickname: "Visitante", category: "all",
+      level: 1, answers: [],
+    }));
+    assert.equal(response.status, 403);
+    assert.throws(() => db.sqlite.prepare(`INSERT INTO ranking_attempts
+      (id, participant_id, nickname, category, level, total, correct)
+      VALUES ('fake', 'anon', 'Visitante', 'all', 1, 10, 10)`).run(),
+    /ranking_requires_verified_profile/);
+    db.sqlite.exec("DROP TRIGGER ranking_requires_verified_profile");
+    db.sqlite.exec(`INSERT INTO ranking_attempts
+      (id, participant_id, nickname, category, level, total, correct)
+      VALUES ('fake', 'anon', 'Visitante', 'all', 1, 10, 10)`);
+    const publicResult = await ranking.onRequestGet(context(db, "GET",
+      "/api/ranking?category=all&level=1&total=10"));
+    assert.deepEqual(await publicResult.json(), { ranking: [] });
+    db.sqlite.close();
+
+    const legacy = new DatabaseSync(":memory:");
+    legacy.exec(fs.readFileSync(path.join(__dirname, "../sql/d1-schema.sql"), "utf8"));
+    legacy.exec(`INSERT INTO ranking_attempts
+      (id, participant_id, nickname, category, level, total, correct)
+      VALUES ('old', 'anon', 'Visitante', 'all', 1, 10, 10)`);
+    legacy.exec(fs.readFileSync(path.join(__dirname,
+      "../sql/migrations/004-ranking-synced.sql"), "utf8"));
+    assert.equal(legacy.prepare("SELECT COUNT(*) AS n FROM ranking_attempts").get().n, 0);
+    legacy.close();
+  });
+
+test("migração financeira guarda pedidos preexistentes sem duplicar o histórico",
+  { skip: !DatabaseSync }, () => {
+    const sql = new DatabaseSync(":memory:");
+    sql.exec(fs.readFileSync(path.join(__dirname, "../sql/d1-schema.sql"), "utf8"));
+    sql.exec(fs.readFileSync(path.join(__dirname,
+      "../sql/migrations/001-premium-approval.sql"), "utf8"));
+    sql.exec(`INSERT INTO synced_profiles (id, access_key_hash, nickname)
+      VALUES ('legacy-buyer', '${"e".repeat(64)}', 'Comprador Antigo')`);
+    sql.exec(`INSERT INTO pro_requests (id, profile_id, txid, amount_cents)
+      VALUES ('legacy-order', 'legacy-buyer', 'TXID-LEGADO', 990)`);
+    const migration = fs.readFileSync(path.join(__dirname,
+      "../sql/migrations/003-financial-retention.sql"), "utf8");
+    sql.exec(migration);
+    sql.exec(migration);
+    assert.equal(sql.prepare(`SELECT COUNT(*) AS n FROM financial_records
+      WHERE request_id = 'legacy-order'`).get().n, 1);
+    assert.equal(sql.prepare(`SELECT COUNT(*) AS n FROM financial_events
+      WHERE request_id = 'legacy-order'`).get().n, 1);
+    sql.close();
+  });
+
+test("registros financeiros sobrevivem à exclusão do perfil por pelo menos um ano",
+  { skip: !DatabaseSync }, async () => {
+    const db = d1();
+    const sql = db.sqlite;
+    sql.prepare("INSERT INTO synced_profiles (id, access_key_hash, nickname) VALUES (?, ?, ?)")
+      .run("buyer", "d".repeat(64), "Comprador Teste");
+    sql.prepare(`INSERT INTO pro_requests (id, profile_id, txid, amount_cents)
+      VALUES ('pedido-fin', 'buyer', 'TXID-FIN', 990)`).run();
+    sql.exec(`UPDATE pro_requests SET status = 'claimed', payer_reference = 'REF-CLIENTE',
+      claimed_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE id = 'pedido-fin'`);
+    sql.exec(`UPDATE pro_requests SET status = 'approved',
+      confirmed_payment_reference = 'EXTRATO-UNICO-FIN',
+      approved_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE id = 'pedido-fin'`);
+    assert.equal(sql.prepare(`SELECT COUNT(*) AS n FROM financial_events
+      WHERE request_id = 'pedido-fin'`).get().n, 4);
+    sql.exec("DELETE FROM synced_profiles WHERE id = 'buyer'");
+    assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM pro_requests").get().n, 0);
+    assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM pro_entitlements").get().n, 0);
+    const record = sql.prepare(`SELECT profile_id, amount_cents, status,
+      confirmed_payment_reference AS paymentReference, granted_at AS grantedAt,
+      retain_until AS retainUntil
+      FROM financial_records WHERE request_id = 'pedido-fin'`).get();
+    assert.equal(record.profile_id, "buyer");
+    assert.equal(record.amount_cents, 990);
+    assert.equal(record.status, "approved");
+    assert.equal(record.paymentReference, "EXTRATO-UNICO-FIN");
+    assert.ok(record.grantedAt);
+    assert.ok(Date.parse(record.retainUntil) > Date.now() + 360 * 24 * 60 * 60 * 1000);
+    assert.equal(sql.prepare(`SELECT event_type FROM financial_events
+      WHERE request_id = 'pedido-fin' ORDER BY id DESC LIMIT 1`).get().event_type, "removed");
+    assert.throws(() => sql.exec("DELETE FROM financial_records WHERE request_id = 'pedido-fin'"),
+      /financial_retention_not_elapsed/);
+    assert.throws(() => sql.exec("DELETE FROM financial_events WHERE request_id = 'pedido-fin'"),
+      /financial_retention_not_elapsed/);
+    assert.throws(() => sql.exec("UPDATE financial_events SET status = 'rejected'"),
+      /financial_event_immutable/);
+    sql.close();
+  });
+
+test("Pix e exclusão com pedido falham se o arquivo financeiro está incompleto",
+  { skip: !DatabaseSync }, async () => {
+    const db = d1();
+    const profile = await import("../functions/api/profile.js");
+    const pro = await import("../functions/api/pro.js");
+    const key = "9".repeat(64);
+    let response = await profile.onRequestPost(context(db, "POST", "/api/profile", {
+      action: "create", id: "buyer-incomplete", key, name: "Comprador Teste",
+      shareRanking: false,
+    }));
+    assert.equal(response.status, 201);
+    db.sqlite.exec("DROP TRIGGER financial_request_created");
+    response = await pro.onRequestPost(context(db, "POST", "/api/pro", {
+      action: "create", amountCents: 990,
+    }, key));
+    assert.equal(response.status, 503);
+    assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM pro_requests").get().n, 0);
+    db.sqlite.exec(`INSERT INTO pro_requests (id, profile_id, txid, amount_cents)
+      VALUES ('unarchived', 'buyer-incomplete', 'TXID-UNARCHIVED', 990)`);
+    response = await profile.onRequestDelete(context(db, "DELETE", "/api/profile", null, key));
+    assert.equal(response.status, 503);
+    assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM synced_profiles").get().n, 1);
+    db.sqlite.close();
+  });
+
 test("Pages Functions persistem perfil, tentativa verificada, ranking, sugestão e Pix no D1",
   { skip: !DatabaseSync }, async () => {
   const db = d1();
@@ -160,11 +287,14 @@ test("Pages Functions persistem perfil, tentativa verificada, ranking, sugestão
   response = await pro.onRequestPost(context(db, "POST", "/api/pro", {
     action: "create", amountCents: 990 }, key));
   assert.equal(response.status, 201);
-  assert.match((await response.json()).qr, /^data:image\/svg\+xml;charset=utf-8,/);
+  const order = await response.json();
+  assert.match(order.qr, /^data:image\/svg\+xml;charset=utf-8,/);
   response = await profile.onRequestDelete(context(db, "DELETE", "/api/profile", null, key));
   assert.equal(response.status, 200);
   assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM synced_profiles").get().n, 0);
   assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM ranking_attempts").get().n, 0);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM financial_records WHERE request_id = ?")
+    .get(order.request.id).n, 1);
   db.sqlite.close();
 });
 

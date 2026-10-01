@@ -2,7 +2,7 @@
 
 ## Política de acesso
 
-A aplicação é pública. Criar um perfil local não comprova identidade. O botão **Entrar** oferece perfil local, código de acesso, criação e sessão visitante; a sessão visitante não é gravada no armazenamento persistente. Google, GitHub e Apple aparecem como opções indisponíveis até que OAuth seja implementado e configurado no domínio publicado. Ao ativar a sincronização por código, o site gera uma chave aleatória; a API guarda seu hash e exige o código para ler, alterar ou apagar o perfil da nuvem. Quem souber o código tem acesso ao perfil. Não há papéis de professor/administrador. Pessoas que compartilham navegador podem consultar perfis locais.
+A aplicação é pública. Criar um perfil local não comprova identidade. O botão **Entrar** oferece perfil local, código de acesso, criação e sessão visitante; a sessão visitante não é gravada no armazenamento persistente. Google, GitHub e Apple aparecem como opções indisponíveis até que OAuth seja implementado e configurado no domínio publicado. Ao ativar a sincronização por código, o site gera uma chave aleatória; a API guarda seu hash e exige o código para ler, alterar ou apagar o perfil da nuvem. Quem souber o código tem acesso ao perfil. A concessão docente é manual e revogável; criar sala ou grupo não concede acesso a registros nominativos. Não há autenticação social ou painel administrativo. Pessoas que compartilham navegador podem consultar perfis locais.
 
 A atribuição de autoria em uma rodada usa o perfil escolhido no início. Trocar de perfil durante uma rodada é bloqueado na interface. Isso é uma regra de uso, não uma barreira de segurança contra um usuário que altera o código.
 
@@ -20,19 +20,19 @@ A atribuição de autoria em uma rodada usa o perfil escolhido no início. Troca
 | Apelido, identificador aleatório do perfil, assunto, nível, total, acertos e data de rodadas publicadas | Ranking compartilhado opcional | D1 da Cloudflare |
 | E-mail informado e comentário de sugestão | Analisar sugestões e eventualmente responder | D1 da Cloudflare; não exibidos publicamente |
 | Mascote, cor e faixa etária opcional | Personalizar o perfil; a faixa não aparece em placares | D1 da Cloudflare |
-| Participação, respostas, placar e eventos da sala | Conduzir partidas e permitir revisão pelo criador | D1 da Cloudflare; membros veem placar, criador vê eventos |
-| Participação, sugestões e indicadores do grupo | Acompanhar estudo coletivo | D1 da Cloudflare; criador vê indicadores individuais |
-| Pedido Premium e referência de pagamento confirmada | Conferência manual e trilha de ativação | D1 da Cloudflare; não exibidos no ranking |
+| Participação, respostas, placar e eventos da sala | Conduzir partidas e permitir revisão pelo criador | D1 da Cloudflare; membros veem placar, apenas criador com concessão docente ativa vê eventos nominativos |
+| Participação, sugestões e indicadores do grupo | Acompanhar estudo coletivo | D1 da Cloudflare; integrantes veem dados próprios, criador com concessão docente ativa vê indicadores individuais |
+| Pedido Premium, Pix, referências e eventos financeiros | Conferência manual e histórico por pelo menos um ano após o último evento | D1 da Cloudflare; arquivo independente do perfil, acesso restrito ao operador |
 
 O quiz não solicita senha, CPF, e-mail ou telefone do participante. O formulário opcional de sugestões solicita e-mail e comentário, com ciência explícita; o endereço é informado pelo remetente e não é verificado. O contato em `config.js` é dado público do autor.
 
 O aplicativo não cria cookies próprios nem integra analytics ou anúncios. O aviso de armazenamento é lembrado apenas na aba atual por `sessionStorage`. A sincronização envia apelido, resultados e missões à Pages Functions. Novas rodadas enviam respostas para recálculo dos acertos; a opção de ranking controla a publicação da pontuação. Compartilhar um resultado abre um serviço externo somente após ação do usuário e transmite apenas o resumo escolhido, sem respostas nem código de acesso. A hospedagem pode manter logs de acesso fora do controle do JavaScript. Consulte suas próprias configurações e políticas antes de uso institucional. Este texto descreve a implementação e não é uma certificação de conformidade jurídica.
 
-Salas e grupos exigem perfil sincronizado. Quem cria uma sala pode consultar os eventos da sessão; quem cria um grupo vê os indicadores individuais dos membros. A indicação de faixa etária é opcional e não verifica a idade. O uso com menores exige regras institucionais de autorização, moderação e retenção antes da aplicação em turma real.
+Salas e grupos exigem perfil sincronizado. Quem cria uma sala controla a sessão; registros nominativos e indicadores individuais de outros integrantes exigem concessão docente ativa no perfil do criador. A indicação de faixa etária é opcional e não verifica a idade. O uso com menores exige regras institucionais de autorização, moderação e retenção antes da aplicação em turma real.
 
 ## Consentimento funcional
 
-O salvamento local é opt-in no cadastro. Ativar a sincronização salva o código de acesso no navegador. A publicação no ranking compartilhado tem uma opção separada. A tela Sobre permite apagar a cópia local ou apagar o perfil da nuvem. Desligar a publicação impede novos registros no ranking; os antigos são removidos ao apagar o perfil da nuvem.
+O salvamento local é opt-in no cadastro. Ativar a sincronização salva o código de acesso no navegador. A publicação no ranking compartilhado exige perfil sincronizado, rodada verificada na API e uma opção separada. A tela Sobre permite apagar a cópia local ou apagar o perfil da nuvem. Desligar a publicação impede novos registros no ranking; os antigos são removidos ao apagar o perfil da nuvem. Pedidos e eventos financeiros ficam no arquivo independente por pelo menos um ano após o último evento.
 
 Limites locais: 30 perfis e 300 resultados recentes. O navegador pode limpar os dados; perfis sincronizados podem ser recuperados com o código de acesso. Não há sincronização em tempo real entre abas. Resultados e missões são unidos por identificador; preferências de tema e som permanecem locais.
 
@@ -40,7 +40,7 @@ Limites locais: 30 perfis e 300 resultados recentes. O navegador pode limpar os 
 
 - Conteúdo de usuário nunca é interpretado como HTML.
 - O terminal usa somente comandos reconhecidos e dados em memória.
-- Não há `eval`, `new Function`, execução de shell ou requisições de rede.
+- Não há `eval`, `new Function` nem execução de shell. A sincronização usa a API da mesma origem; serviços externos só abrem após ação do usuário.
 - Validação defensiva dos dados carregados do armazenamento, tipos e limites.
 - Política CSP sem scripts inline, recursos externos ou objetos incorporados; conexões limitadas à mesma origem para a API.
 - Cabeçalhos de publicação: `nosniff`, `DENY`, política de referência restrita e bloqueio de câmera/microfone/geolocalização.

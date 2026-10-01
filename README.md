@@ -24,7 +24,7 @@ O [painel HTML de implantação](guias-cloudflare/index.html) compara o que est�
 
 ## Limites
 
-O terminal é uma simulação; não executa comandos no aparelho. Ranking, relatórios e certificados são didáticos: apelidos não verificam identidade, e o gabarito do quiz é público. O criador de uma sala controla a partida como mestre, e somente o criador com concessão docente manual pode ler registros nominativos e relatórios individuais do seu grupo. A escola deve verificar a pessoa antes da concessão. Google, GitHub e Apple aparecem como possibilidades futuras de login e não estão ativos.
+O terminal é uma simulação; não executa comandos no aparelho. O ranking compartilhado exige perfil sincronizado e rodada verificada. Pedidos Premium têm histórico financeiro preservado por pelo menos um ano após o último evento. Ranking, relatórios e certificados são didáticos: apelidos não verificam identidade, e o gabarito do quiz é público. O criador de uma sala controla a partida como mestre, e somente o criador com concessão docente manual pode ler registros nominativos e relatórios individuais do seu grupo. A escola deve verificar a pessoa antes da concessão. Google, GitHub e Apple aparecem como possibilidades futuras de login e não estão ativos.
 
 ## Documentação
 

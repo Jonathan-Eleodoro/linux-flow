@@ -8,7 +8,7 @@ O plano visual, os donos e o roteiro de teste estão em [`guias-cloudflare/08-pl
 
 | Marco | Dono | Evidência necessária | Situação em 01/10/2026 |
 |---|---|---|---|
-| Infraestrutura Pages + D1 | Jonathan + Codex | URL pública, deploy bem-sucedido, `/api/health` 200 em Production e Preview | Código e teste local prontos; nuvem não verificada |
+| Infraestrutura Pages + D1 | Jonathan + Codex | URL pública, deploy bem-sucedido, `/api/health` 200 em Production e Preview | Frontend publicado; API 503, esquema D1 a conferir |
 | Fluxo de dados fictícios | Jonathan + Codex | Perfil, quiz, ranking, exclusão e sala com duas identidades de teste | Aguardando infraestrutura |
 | Produto pedagógico | Professor/escola + Codex | Questões revisadas, direitos de uso esclarecidos e piloto supervisionado | Inventário visual pronto; aprovação pendente |
 | Privacidade e papel docente | Responsável institucional | Regras para menores, retenção, moderação e concessão/revogação de acesso | Decisão institucional pendente |
@@ -18,21 +18,24 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 
 ## Caminho atual — 01/10/2026
 
+- A URL pública `https://linux-flow.pages.dev/` abre o frontend, mas `/api/health` e `/api/ranking` responderam HTTP 503 em 01/10/2026. A captura mostra binding `DB` para `linux-flow-db`; ainda falta inventariar o esquema remoto e aplicar apenas as migrações ausentes. O guia `guias-cloudflare/11-validacao-publica.html` orienta o diagnóstico.
+- Ranking compartilhado agora exige perfil sincronizado e rodada verificada; a migração 004 remove entradas anônimas legadas. A migração 003 guarda pedidos e eventos financeiros por pelo menos um ano após o último evento, independentemente da exclusão do perfil. Ambos passaram em SQLite local; Pix e exclusão com pedido agora falham se o arquivo financeiro estiver incompleto. A nuvem ainda precisa de migração e teste.
+
 - A migração `sql/migrations/002-educator-access.sql` cria concessões docentes revogáveis. O criador comum ainda controla a sala, mas só um criador com concessão ativa lê logs nominativos ou resultados individuais do grupo. Testes locais cobrem concessão, isolamento e revogação; a escola ainda precisa definir e executar aprovação de pessoas reais. O roteiro está em `guias-cloudflare/10-acesso-docente.html`.
 
 - O inventário `guias-cloudflare/09-revisao-conteudo.html` apresenta questões Free, níveis, fontes e os 19 objetivos relacionados para revisão do professor. O livro oficial do LPI consultado indica CC BY-NC-ND 4.0; referências curriculares não autorizam copiar/adaptar o livro em produto pago. Confirmar direitos dos materiais de aula e do logo antes da oferta.
 - As respostas da comunidade omitem IDs internos dos perfis. A lotação de salas e grupos é validada no próprio `INSERT`, inclusive diante de entradas simultâneas; os corpos JSON são cortados durante a leitura ao superar o limite em bytes. Testes locais cobrem esses comportamentos. Proteção contra spam distribuído e moderação institucional continuam pendentes.
 - A migração `sql/migrations/001-premium-approval.sql` torna a aprovação Premium uma única atualização com concessão automática no mesmo passo e referência única do extrato. O teste SQLite cobre reversão em falhas; aplicar uma vez em cada D1 após backup e validar no Preview antes de operar pagamento real.
-- A exclusão atual do perfil remove pedidos e referências Premium por cascata. Antes de vender, o responsável pelo projeto deve definir com orientação contábil/jurídica quais registros financeiros precisam ser preservados, por quanto tempo e como dissociá-los dos dados de estudo.
-- O P0 ganhou `/api/health`, que verifica o binding D1 e as 18 tabelas sem divulgar o esquema ao visitante. O endpoint e seus cenários de falha foram testados localmente; ainda falta verificá-lo em Pages Production e Preview.
-- Em 01/10/2026, `wrangler.jsonc` foi reintroduzido pelo navegador e convertido de UTF-16 para UTF-8. Ainda não define saída Pages nem D1; o deploy público e o binding permanecem sem comprovação. O painel visual e a priorização estão em `guias-cloudflare/index.html` e `guias-cloudflare/07-prioridades.html`.
+- A migração 003 arquiva pedidos e eventos financeiros por pelo menos um ano após o último evento, mesmo com a exclusão do perfil de estudo. O prazo fiscal total, comprovantes, acesso e descarte ainda precisam de decisão profissional.
+- O P0 ganhou `/api/health`, que verifica o binding D1, 20 tabelas e 13 gatilhos sem divulgar o esquema ao visitante. O endpoint e seus cenários de falha foram testados localmente; Production retornou 503; após as migrações, repetir em Production e Preview.
+- Em 01/10/2026, `wrangler.jsonc` foi reintroduzido pelo navegador e convertido de UTF-16 para UTF-8. Ainda não define saída Pages nem D1; o frontend está publicado e o binding aparece no painel; o esquema D1 e as APIs não passaram. O painel visual e a priorização estão em `guias-cloudflare/index.html` e `guias-cloudflare/07-prioridades.html`.
 - Em 01/10/2026, a conversa salva sobre a Cloudflare mostrou deploys falhos: `wrangler deploy` tratou a raiz como assets de Worker; depois Pages encontrou `require("node:crypto")` no Pix; por fim, Root directory `dist` falhou antes do build. O diagnóstico está em `guias-cloudflare/06-diagnostico.html`.
 - O Pix, o QR e o hash do código de acesso foram adaptados para APIs Web; manter `functions/` para que Pages publique o backend.
-- A conta Cloudflare e o 2FA foram configurados segundo a conversa salva; o estado atual do painel e a publicação bem-sucedida ainda precisam ser verificados.
+- A conta Cloudflare e o 2FA foram configurados segundo a conversa salva; o frontend Pages está publicado; falta validar a API e o D1.
 - Dois commits feitos pelo navegador adicionaram `wrangler.jsonc` parcial e removeram `functions/package.json`. Na integração, o arquivo parcial foi removido para manter bindings no painel e o delimitador ESM das Functions foi restaurado; os commits originais permanecem no histórico.
 - A revisão antes da conta Cloudflare e os comandos copiáveis estão em `guias-cloudflare/index.html`. A pasta é pública no GitHub, mas não é copiada para `dist/`.
 - A CSP agora também é enviada por `_headers` para os ativos estáticos, inclusive `frame-ancestors`; verificar o cabeçalho no domínio Pages após publicar.
-- Publicação planejada: Cloudflare Pages + Pages Functions + D1. O frontend e as rotas `/api/*` compartilham a origem.
+- Publicação atual: frontend na Cloudflare Pages; Pages Functions e D1 ainda precisam de validação funcional. O frontend e as rotas `/api/*` compartilham a origem.
 - O GitHub pessoal de Jonathan contém o código na raiz. A conta Cloudflare deve pertencer ao projeto e receber membros individuais; nunca compartilhar senha ou 2FA.
 - Nada foi cadastrado no Aiven. A alternativa Vercel/MySQL foi retirada dos arquivos ativos; seu histórico permanece nos commits anteriores.
 - O contato público é `linuxflow2026@gmail.com`. Credenciais Pix, binding D1 e códigos de acesso não pertencem ao Git.

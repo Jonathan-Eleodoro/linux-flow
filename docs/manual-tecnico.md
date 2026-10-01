@@ -23,7 +23,7 @@ O frontend navega com fragmentos de URL (`#quiz`, `#comunidade`). Uma rodada gua
 
 O terminal interpreta apenas comandos previstos em uma árvore de arquivos em memória. Nunca chama shell, disco ou rede reais. Ao alterar comandos, mantenha essa fronteira e amplie os testes de domínio.
 
-Um perfil sincronizado usa um código aleatório guardado no navegador; o D1 guarda seu hash. Quem obtiver o código pode acessar o perfil. As rotas recebem JSON com tamanho limitado, usam consultas preparadas e verificam o dono antes de expor salas ou grupos. O criador controla a sessão como mestre; não há verificação de vínculo docente.
+Um perfil sincronizado usa um código aleatório guardado no navegador; o D1 guarda seu hash. Quem obtiver o código pode acessar o perfil. As rotas recebem JSON com tamanho limitado, usam consultas preparadas e verificam o dono antes de expor salas ou grupos. O criador controla a sessão como mestre. Registros nominativos e relatórios individuais exigem concessão docente manual e ativa; a escola verifica a pessoa fora do aplicativo.
 
 Salas são consultadas periodicamente pelo navegador. O servidor valida prazo, questão ativa, participação e resposta única. O relatório individual do grupo é visto pelo criador; cada participante consulta apenas o próprio desempenho. A faixa etária opcional não é retornada em placares ou relatórios.
 

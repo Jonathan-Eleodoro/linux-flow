@@ -12,13 +12,15 @@ O site estático é publicado pela **Pages**. As rotas em `functions/api/` são 
 
 ## Criar o banco
 
-1. Em **Cloudflare Dashboard → Storage & databases → D1 SQL database**, crie um banco, por exemplo `linux-flow`.
-2. Na aba **Console** desse banco, execute o conteúdo de [`sql/d1-schema.sql`](../sql/d1-schema.sql), a [migração Premium 001](../sql/migrations/001-premium-approval.sql) e a [migração docente 002](../sql/migrations/002-educator-access.sql), nessa ordem. Alternativamente, no terminal autenticado pelo Wrangler, na raiz do clone, rode os comandos abaixo. A 001 não deve ser repetida. Em um banco já criado, faça backup e aplique somente as migrações ainda ausentes.
+1. Em **Cloudflare Dashboard → Storage & databases → D1 SQL database**, abra o banco `linux-flow-db` mostrado no binding `DB`. Antes de modificar, siga o [diagnóstico da publicação](../guias-cloudflare/11-validacao-publica.html) para ver o que já existe.
+2. Na aba **Console** desse banco, aplique [`sql/d1-schema.sql`](../sql/d1-schema.sql) e as migrações [001](../sql/migrations/001-premium-approval.sql), [002](../sql/migrations/002-educator-access.sql), [003](../sql/migrations/003-financial-retention.sql) e [004](../sql/migrations/004-ranking-synced.sql), nessa ordem, **somente se faltarem**. A 001 não pode ser repetida. Em banco com dados, faça backup antes; a 004 remove pontuações legadas sem perfil e rodada verificada.
 
 ```powershell
-npx wrangler d1 execute linux-flow --remote --file=sql/d1-schema.sql
-npx wrangler d1 execute linux-flow --remote --file=sql/migrations/001-premium-approval.sql
-npx wrangler d1 execute linux-flow --remote --file=sql/migrations/002-educator-access.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/d1-schema.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/001-premium-approval.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/002-educator-access.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/003-financial-retention.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/004-ranking-synced.sql
 ```
 3. Confira que as tabelas de perfil, ranking, sugestões e Premium aparecem, além de `game_rooms`, `game_members`, `game_answers`, `game_events`, `study_groups`, `study_members`, `study_suggestions` e `community_profiles`. Como nenhum dado foi colocado no Aiven, não há importação de dados.
 
@@ -42,7 +44,7 @@ O pequeno `functions/package.json` contém apenas `{"type":"module"}` para delim
 
 ## Verificar no endereço `*.pages.dev`
 
-- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB`, as 18 tabelas e os gatilhos da migração Premium. HTTP 503 com `{"status":"unavailable"}` indica que essa cadeia ainda não está pronta. A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui os testes funcionais abaixo.
+- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB`, as 20 tabelas e 13 gatilhos necessários. Em 01/10/2026, a URL pública retornou HTTP 503; veja o [passo a passo de diagnóstico](../guias-cloudflare/11-validacao-publica.html). A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui testes funcionais.
 - Abra o site no celular e no computador; teste as trilhas, o quiz e o terminal.
 - Acesse `/api/ranking?category=all&level=1&total=10`: antes de publicar resultados, a resposta deve ser `{"ranking":[]}`. Se receber erro 503, verifique o binding `DB`, o esquema e os logs das Functions.
 - Crie um perfil de teste, ative a sincronização, anote o código de acesso e recarregue. Confira se o progresso reaparece. Faça um quiz com publicação opcional e confira o ranking.
@@ -60,13 +62,13 @@ WHERE id = 'ID_DO_PEDIDO' AND status = 'claimed' AND amount_cents = 990;
 
 Troque `990` pelo valor exato do pedido em centavos. O gatilho grava o acesso na mesma operação; se faltar referência, o pedido não estiver declarado ou a referência já tiver sido usada, a atualização inteira falha. Depois confira `pro_requests.status = 'approved'` e a linha correspondente em `pro_entitlements`. Não execute o SQL antigo de duas etapas.
 
-Antes da primeira venda, defina a política de comprovantes e retenção de registros financeiros: hoje a exclusão do perfil apaga também pedidos e referências Premium por cascata. Isso exige uma solução institucional/contábil antes de tratar a trilha do D1 como histórico financeiro definitivo.
+Após a migração 003, excluir um perfil remove os dados de estudo e os pedidos ligados a ele, mas mantém um histórico independente em `financial_records` e `financial_events` por **pelo menos um ano após o último evento**. Os registros preservam ID do perfil, valor, identificador Pix, referências, concessão do acesso e decisões; o acesso deve ficar restrito a operadores autorizados. A migração só recupera o estado atual de pedidos anteriores, não transições já perdidas. Extratos bancários e comprovantes externos precisam de guarda própria. O prazo de um ano é um mínimo técnico definido pelo projeto, não uma conclusão sobre obrigações fiscais. Antes da venda, defina com orientação profissional o prazo total, comprovantes, acesso e descarte após o período aplicável.
 
 ## Operação e custos
 
 No plano gratuito, a Pages tem até 500 builds por mês. Requisições estáticas não consomem a cota das Functions; as Functions entram na cota gratuita de Workers. O D1 gratuito tem limites próprios de consultas e armazenamento. Confira o uso nos painéis de **Workers & Pages** e **D1**. Quando a cota D1 é excedida, as consultas param até o próximo ciclo; o site estático pode continuar abrindo, mas perfil, ranking, sugestões e Premium deixam de responder.
 
-Exporte o D1 antes de alterações importantes com `npx wrangler d1 export linux-flow --remote --output=backup.sql` e mantenha o arquivo fora do repositório, pois contém dados pessoais. O pedido de exclusão de sugestões recebidas por e-mail ainda é manual: pesquise e remova as linhas correspondentes no Console D1 após verificar o solicitante.
+Exporte o D1 antes de alterações importantes com `npx wrangler d1 export linux-flow-db --remote --output=backup.sql` e mantenha o arquivo fora do repositório, pois contém dados pessoais. O pedido de exclusão de sugestões recebidas por e-mail ainda é manual: pesquise e remova as linhas correspondentes no Console D1 após verificar o solicitante.
 
 Depois que o domínio Pages estiver testado, **Vercel e Aiven não serão necessários** para esta implantação. Como nenhum dado foi cadastrado no Aiven, basta validar os fluxos no D1. A Cloudflare passa a hospedar o frontend, a API e o banco.
 

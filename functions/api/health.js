@@ -1,4 +1,5 @@
 import { database, first, json } from "../../cloudflare/common.mjs";
+import { financialTriggers } from "../../cloudflare/financial.mjs";
 
 // Confere apenas a infraestrutura; a resposta pública nunca revela dados ou esquema.
 const requiredTables = [
@@ -7,6 +8,12 @@ const requiredTables = [
   "pro_entitlements", "feedback_comments", "community_profiles", "game_rooms",
   "game_members", "game_answers", "game_events", "study_groups",
   "study_members", "study_suggestions", "educator_grants",
+  "financial_records", "financial_events",
+];
+const requiredTriggers = [
+  "pro_requests_grant_after_approval", "pro_requests_keep_approved",
+  ...financialTriggers,
+  "ranking_requires_verified_profile", "ranking_keep_verified_profile",
 ];
 
 export async function onRequestGet(context) {
@@ -18,8 +25,9 @@ export async function onRequestGet(context) {
        WHERE type = 'table' AND name IN (${names})`, ...requiredTables);
     const approval = await first(db,
       `SELECT COUNT(*) AS total FROM sqlite_master WHERE type = 'trigger'
-       AND name IN ('pro_requests_grant_after_approval', 'pro_requests_keep_approved')`);
-    if (Number(result?.total) === requiredTables.length && Number(approval?.total) === 2)
+       AND name IN (${requiredTriggers.map(() => "?").join(", ")})`, ...requiredTriggers);
+    if (Number(result?.total) === requiredTables.length &&
+        Number(approval?.total) === requiredTriggers.length)
       return json({ status: "ready" });
   } catch {
     // Sem binding, com erro de conexão ou sem esquema, o serviço não está pronto.

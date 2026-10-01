@@ -235,7 +235,7 @@
   }
   function privacyView() {
     // Este texto descreve exatamente os dados enviados pelas rotas atuais.
-    main.innerHTML = heading("Transparência / LGPD", "Privacidade e controle dos seus dados.", "Saiba o que fica nesta sessão, neste dispositivo e na nuvem; escolha o que deseja publicar.") + `<div class="privacy-grid"><section class="panel"><h2>Quais dados usamos</h2><p>O quiz pode ser usado com um apelido, sem e-mail, CPF ou senha. Durante a sessão, guardamos em memória o perfil, respostas, resultados e missões. Ao escolher salvar neste dispositivo, esses dados, as preferências de tema e som e eventual código de acesso passam ao localStorage.</p><p>Ao ativar a sincronização, apelido, resultados, missões e progresso são enviados à API e guardados no banco D1 da Cloudflare. A API guarda apenas o hash do código de acesso. Quem possui o código pode abrir e alterar o perfil. Em Comunidade, o banco também guarda salas, respostas, placares, grupos, sugestões e uma faixa etária opcional. A faixa etária não é exibida aos demais. Registros nominativos da sala e resultados de outros integrantes do grupo são visíveis apenas ao criador com concessão docente ativa.</p></section><section class="panel"><h2>Cookies e serviços externos</h2><p>Este aplicativo não cria cookies próprios, nem usa anúncios, rastreadores ou análise de uso. O aviso de armazenamento é lembrado somente nesta aba pelo sessionStorage. A hospedagem pode manter registros técnicos conforme suas políticas.</p><p>Compartilhar um resultado pelo sistema do aparelho ou por um link de rede social só acontece após seu clique; essa ação abre o serviço escolhido, sujeito à política dele.</p></section><section class="panel"><h2>Ranking e Premium</h2><p>O ranking compartilhado é opcional e publica apelido, assunto, nível, número de questões, acertos e data. Desativá-lo afeta novas rodadas; para remover as antigas da nuvem, apague o perfil sincronizado.</p><p>O Premium requer sincronização, pedido Pix e liberação manual. O site não coleta dados bancários nem confirma pagamentos automaticamente. Os resultados e certificados Premium são locais ou sincronizados; não entram no ranking público.</p></section><section class="panel"><h2>Suas escolhas</h2><p>Você pode usar uma sessão temporária, ativar ou desligar o armazenamento local, optar pelo ranking e apagar o perfil na nuvem. A tela Sobre reúne esses controles. A cópia local dura até você apagá-la ou limpar o navegador; apagar só a cópia local não remove a nuvem.</p><p>Para solicitações sobre dados, use ${cfg.email ? `<a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>` : "o contato do responsável pelo projeto informado na apresentação institucional"}. Consulte também a <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> e o <a href="https://www.gov.br/anpd/pt-br/centrais-de-conteudo/materiais-educativos-e-publicacoes/guia_orientativo_cookies_e_protecao_de_dados_pessoais" target="_blank" rel="noopener noreferrer">guia de cookies da ANPD</a>.</p><button id="privacy-controls" class="primary">Gerenciar meus dados →</button></section></div>`;
+    main.innerHTML = heading("Transparência / LGPD", "Privacidade e controle dos seus dados.", "Saiba o que fica nesta sessão, neste dispositivo e na nuvem; escolha o que deseja publicar.") + `<div class="privacy-grid"><section class="panel"><h2>Quais dados usamos</h2><p>O quiz pode ser usado com um apelido, sem e-mail, CPF ou senha. Durante a sessão, guardamos em memória o perfil, respostas, resultados e missões. Ao escolher salvar neste dispositivo, esses dados, as preferências de tema e som e eventual código de acesso passam ao localStorage.</p><p>Ao ativar a sincronização, apelido, resultados, missões e progresso são enviados à API e guardados no banco D1 da Cloudflare. A API guarda apenas o hash do código de acesso. Quem possui o código pode abrir e alterar o perfil. Em Comunidade, o banco também guarda salas, respostas, placares, grupos, sugestões e uma faixa etária opcional. A faixa etária não é exibida aos demais. Registros nominativos da sala e resultados de outros integrantes do grupo são visíveis apenas ao criador com concessão docente ativa.</p></section><section class="panel"><h2>Cookies e serviços externos</h2><p>Este aplicativo não cria cookies próprios, nem usa anúncios, rastreadores ou análise de uso. O aviso de armazenamento é lembrado somente nesta aba pelo sessionStorage. A hospedagem pode manter registros técnicos conforme suas políticas.</p><p>Compartilhar um resultado pelo sistema do aparelho ou por um link de rede social só acontece após seu clique; essa ação abre o serviço escolhido, sujeito à política dele.</p></section><section class="panel"><h2>Ranking e Premium</h2><p>O ranking compartilhado exige perfil sincronizado e é opcional. Publica apelido, assunto, nível, número de questões, acertos e data. Desativá-lo afeta novas rodadas; para remover as antigas da nuvem, apague o perfil sincronizado.</p><p>O Premium requer sincronização, pedido Pix e liberação manual. O site não coleta dados bancários nem confirma pagamentos automaticamente. Pedidos, valores, identificadores Pix, referências e decisões de pagamento são preservados por pelo menos um ano após o último evento financeiro, mesmo se o perfil de estudo for apagado. Os resultados e certificados Premium são locais ou sincronizados; não entram no ranking público.</p></section><section class="panel"><h2>Suas escolhas</h2><p>Você pode usar uma sessão temporária, ativar ou desligar o armazenamento local, optar pelo ranking e apagar o perfil na nuvem. A tela Sobre reúne esses controles. A cópia local dura até você apagá-la ou limpar o navegador; apagar só a cópia local não remove a nuvem.</p><p>Para solicitações sobre dados, use ${cfg.email ? `<a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>` : "o contato do responsável pelo projeto informado na apresentação institucional"}. Consulte também a <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> e o <a href="https://www.gov.br/anpd/pt-br/centrais-de-conteudo/materiais-educativos-e-publicacoes/guia_orientativo_cookies_e_protecao_de_dados_pessoais" target="_blank" rel="noopener noreferrer">guia de cookies da ANPD</a>.</p><button id="privacy-controls" class="primary">Gerenciar meus dados →</button></section></div>`;
     main.querySelector(".privacy-grid").insertAdjacentHTML("beforeend", `<section class="panel"><h2>Sugestões identificadas</h2><p>O formulário solicita e-mail e comentário para análise e eventual resposta. Esses dados ficam privados no banco D1 da Cloudflare. Para solicitar acesso ou exclusão, escreva para <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>, informando o e-mail usado no envio.</p></section>`);
     $("#privacy-controls").onclick = () => navigate("sobre");
   }
@@ -390,7 +390,6 @@
     }
     $("#nickname").value = "";
     $("#remember").checked = store.persistent;
-    $("#share-ranking").checked = user()?.shareRanking === true;
     $("#profile-error").textContent = "";
     $("#import-error").textContent = "";
     const existing = $("#existing-profiles");
@@ -406,7 +405,6 @@
           button(`${p.name} · ${p.temporary ? "Sessão livre" : p.syncKey ? "Nuvem" : "Local"}`, () => {
             store.state.current = p.id;
             proQuestionCache.clear();
-            $("#share-ranking").checked = p.shareRanking === true;
             lastResult = null;
             save();
             $("#profile-dialog").close();
@@ -502,7 +500,7 @@
     store.state.profiles.push(profile);
     store.state.current = profile.id;
     proQuestionCache.clear();
-    profile.shareRanking = $("#share-ranking").checked;
+    profile.shareRanking = false;
     lastResult = null;
     const saved = remembered ? store.permission(true) : store.save();
     $("#profile-dialog").close();
@@ -820,22 +818,6 @@
         updateSyncStatus("error");
         toast("Resultado salvo localmente; sincronização indisponível.");
       });
-    } else if (profile?.shareRanking) {
-      fetch("/api/ranking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: record.id,
-          participantId: record.userId,
-          nickname: profile.name,
-          category: record.category,
-          level: record.level,
-          answers: round.answers.map((answer) => ({ id: answer.question.id, selected: answer.selected })),
-        }),
-      }).then((response) => {
-        if (!response.ok) throw new Error("Falha ao salvar ranking.");
-        toast("Pontuação publicada no ranking compartilhado.");
-      }).catch(() => toast("Pontuação salva localmente; ranking compartilhado indisponível."));
     }
     round = null;
     showResult();
@@ -1304,7 +1286,7 @@
       `
     <div class="about-grid"><section class="panel"><div class="institution"><span class="institution-mark"><img src="assets/colegio.png" alt="Colégio Sinodal Progresso"></span><div><span class="eyebrow">INSTITUIÇÃO DE ENSINO</span><h2>${esc(cfg.institution)}</h2><p>${esc(cfg.course)} · ${cfg.year}</p></div></div><p><strong>Aluno:</strong> ${esc(cfg.author)}<br><strong>Disciplina:</strong> ${esc(cfg.subject)}<br><strong>Professor:</strong> ${esc(cfg.teacher)}</p><p>${esc(cfg.purpose)}</p><p><strong>Telefone:</strong> ${esc(cfg.phone || "Não informado")}<br><strong>E-mail:</strong> ${esc(cfg.email || "Não informado")}</p><p class="small muted">Marca institucional usada para identificar o contexto do trabalho acadêmico. A aplicação não representa um serviço oficial do colégio.</p></section>
     <section class="panel"><h2>Como funciona</h2><ol><li>Crie um perfil simples.</li><li>Escolha uma trilha ou um quiz geral.</li><li>Confirme uma alternativa e leia a explicação.</li><li>Revise o resultado, pratique e acompanhe suas conquistas.</li></ol><p>Som opcional, tema claro ou escuro e navegação por teclado. O terminal interpreta apenas os comandos listados em help.</p><p class="small muted">Funciona como site estático. Abrir index.html após extrair o ZIP também permite estudar sem conexão; a persistência em arquivos locais pode variar conforme o navegador.</p></section>
-<section class="panel"><h2>Acesso, cookies e dados locais</h2><p>O acesso ao site é público. Perfis locais usam apelidos; perfis sincronizados usam um código secreto para recuperar dados em outro aparelho. Quem tiver o código pode acessar o perfil.</p><p>Com sua escolha, o navegador usa localStorage para guardar apelido, pontuação, conquistas e preferências. Caso contrário, mantém tudo só na página aberta. Ao ativar a sincronização, resultados e missões são guardados também no banco D1 da Cloudflare. Novas rodadas enviam respostas à API para recalcular os acertos. A opção de ranking decide se a pontuação também aparece publicamente.</p><p>A hospedagem pode registrar acessos e dados técnicos conforme suas próprias políticas. Não informe dados sensíveis no apelido.</p><p>Os dados locais duram até você apagá-los ou limpar o navegador; há limite de 30 perfis e 300 resultados recentes. Apagar dados locais não remove a cópia na nuvem. Use Apagar perfil da nuvem para remover perfil, progresso e pontuações publicadas do banco. Tema e som continuam locais.</p><label class="check"><input id="persist-setting" type="checkbox" ${store.persistent ? "checked" : ""}> Manter os dados neste dispositivo</label><label class="check"><input id="share-setting" type="checkbox" ${user()?.shareRanking ? "checked" : ""} ${user() ? "" : "disabled"}> Publicar próximas pontuações deste perfil no ranking compartilhado</label><button id="erase-data" class="danger">Apagar todos os dados locais</button></section>
+<section class="panel"><h2>Acesso, cookies e dados locais</h2><p>O acesso ao site é público. Perfis locais usam apelidos; perfis sincronizados usam um código secreto para recuperar dados em outro aparelho. Quem tiver o código pode acessar o perfil.</p><p>Com sua escolha, o navegador usa localStorage para guardar apelido, pontuação, conquistas e preferências. Caso contrário, mantém tudo só na página aberta. Ao ativar a sincronização, resultados e missões são guardados também no banco D1 da Cloudflare. Novas rodadas enviam respostas à API para recalcular os acertos. A opção de ranking, disponível após sincronizar o perfil, decide se a pontuação também aparece publicamente.</p><p>A hospedagem pode registrar acessos e dados técnicos conforme suas próprias políticas. Não informe dados sensíveis no apelido.</p><p>Os dados locais duram até você apagá-los ou limpar o navegador; há limite de 30 perfis e 300 resultados recentes. Apagar dados locais não remove a cópia na nuvem. Use Apagar perfil da nuvem para remover perfil, progresso e pontuações publicadas do banco. Registros financeiros permanecem por pelo menos um ano. Tema e som continuam locais.</p><label class="check"><input id="persist-setting" type="checkbox" ${store.persistent ? "checked" : ""}> Manter os dados neste dispositivo</label><label class="check"><input id="share-setting" type="checkbox" ${user()?.syncKey && user()?.shareRanking ? "checked" : ""} ${user()?.syncKey ? "" : "disabled"}> Publicar próximas pontuações deste perfil no ranking compartilhado</label><p class="small muted">Disponível para perfis sincronizados.</p><button id="erase-data" class="danger">Apagar todos os dados locais</button></section>
     <section class="panel"><h2>Critérios de estudo</h2><p>Questões elaboradas para a prática didática. Os exemplos de terminal usam dados fictícios.</p><p>Os três níveis têm acesso livre. Um quiz geral com pelo menos 10 questões e 80% de acertos libera o certificado do nível. Erros orientam a revisão por assunto.</p><p>O ranking local guarda as rodadas neste navegador. O ranking compartilhado recebe somente as rodadas que você escolher publicar; as pontuações são recalculadas no servidor. Nenhum dos dois serve como avaliação oficial.</p><p class="small muted">Os PDFs originais não são publicados neste pacote. Consulte docs/fontes.md para o recorte, as adaptações e os tópicos ainda não cobertos.</p></section></div>`;
     main.querySelector(".about-grid").insertAdjacentHTML("afterbegin", `<section class="panel sync-panel"><div class="sync-heading"><div><span class="eyebrow">PERFIL E PROGRESSO</span><h2>Continue em outro aparelho</h2></div><span class="badge green">${user()?.syncKey ? "Nuvem ativada" : "Neste dispositivo"}</span></div><p>${user()?.syncKey ? "Resultados e missões deste perfil são sincronizados. Guarde o código para recuperar o acesso." : "Ative a nuvem para guardar seu progresso e continuar de onde parou em outro navegador."}</p>${user() ? user().syncKey ? '<div class="actions sync-actions"><button id="sync-now" class="primary">Sincronizar agora</button><button id="show-access-code">Mostrar código</button><button id="copy-access-code">Copiar código</button></div><div id="access-code-display" class="access-code" aria-live="polite"></div><p class="small muted">Quem tiver o código poderá acessar este perfil. Guarde-o em local seguro.</p><button id="delete-cloud" class="text-button danger">Apagar perfil da nuvem</button>' : '<button id="enable-sync" class="primary">Ativar sincronização →</button><div id="access-code-display" class="access-code" aria-live="polite"></div><p class="small muted">Um código de acesso será criado para este perfil. Você poderá copiá-lo e usá-lo em outro aparelho.</p>' : '<button id="create-from-about" class="primary">Entrar →</button>'}</section>`);
     if (!user()) $("#create-from-about").onclick = openProfile;
@@ -1330,10 +1312,11 @@
       };
       $("#delete-cloud").onclick = async () => {
         const profile = user();
-        if (!confirm("Apagar este perfil, progresso e pontuações da nuvem? Os dados locais permanecerão neste dispositivo.")) return;
+        if (!confirm("Apagar este perfil, progresso e pontuações da nuvem? Registros financeiros permanecem por pelo menos um ano. Os dados locais ficarão neste dispositivo.")) return;
         try {
           await sync.remove(profile.syncKey);
           profile.syncKey = null;
+          profile.shareRanking = false;
           save();
           about();
           toast("Perfil da nuvem apagado. Progresso local preservado.");
@@ -1374,7 +1357,7 @@
         );
     };
     $("#share-setting").onchange = (e) => {
-      if (!user()) return;
+      if (!user()?.syncKey) { e.target.checked = false; return; }
       user().shareRanking = e.target.checked;
       save();
       syncProfile(user()).catch(() => {});
