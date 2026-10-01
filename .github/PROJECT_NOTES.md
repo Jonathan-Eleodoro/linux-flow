@@ -2,6 +2,20 @@
 
 Este arquivo concentra decisões, mudanças de plano e trabalho pendente. Ele é público, mas fica fora do README para que a página inicial do repositório permaneça objetiva. Atualize a data e a situação de cada item ao mudar o produto.
 
+## Objetivo ativo: primeira oferta comercial responsável
+
+O plano visual, os donos e o roteiro de teste estão em [`guias-cloudflare/08-plano-testes.html`](../guias-cloudflare/08-plano-testes.html). As datas são alvos de trabalho; nenhum deploy, aprovação escolar ou pagamento ocorre automaticamente.
+
+| Marco | Dono | Evidência necessária | Situação em 01/10/2026 |
+|---|---|---|---|
+| Infraestrutura Pages + D1 | Jonathan + Codex | URL pública, deploy bem-sucedido, `/api/health` 200 em Production e Preview | Código e teste local prontos; nuvem não verificada |
+| Fluxo de dados fictícios | Jonathan + Codex | Perfil, quiz, ranking, exclusão e sala com duas identidades de teste | Aguardando infraestrutura |
+| Produto pedagógico | Professor/escola + Codex | Questões revisadas e piloto supervisionado com feedback | Aguardando revisão docente |
+| Privacidade e papel docente | Responsável institucional | Regras para menores, retenção, moderação e concessão/revogação de acesso | Decisão institucional pendente |
+| Oferta Premium | Responsável pelo projeto + Codex | Pagamento conferido, aprovação auditável, suporte e custos ensaiados | Ainda não pronto para venda |
+
+No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar falhas concretas e corrigir antes de avançar; não inferir sucesso a partir de testes locais.
+
 ## Caminho atual — 01/10/2026
 
 - O P0 ganhou `/api/health`, que verifica o binding D1 e as 17 tabelas sem divulgar o esquema ao visitante. O endpoint e seus cenários de falha foram testados localmente; ainda falta verificá-lo em Pages Production e Preview.
