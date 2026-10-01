@@ -7,6 +7,7 @@ Este arquivo concentra decisões, mudanças de plano e trabalho pendente. Ele é
 - Em 01/10/2026, a conversa salva sobre a Cloudflare mostrou deploys falhos: `wrangler deploy` tratou a raiz como assets de Worker; depois Pages encontrou `require("node:crypto")` no Pix; por fim, Root directory `dist` falhou antes do build. O diagnóstico está em `guias-cloudflare/06-diagnostico.html`.
 - O Pix, o QR e o hash do código de acesso foram adaptados para APIs Web; manter `functions/` para que Pages publique o backend.
 - A conta Cloudflare e o 2FA foram configurados segundo a conversa salva; o estado atual do painel e a publicação bem-sucedida ainda precisam ser verificados.
+- Dois commits feitos pelo navegador adicionaram `wrangler.jsonc` parcial e removeram `functions/package.json`. Na integração, o arquivo parcial foi removido para manter bindings no painel e o delimitador ESM das Functions foi restaurado; os commits originais permanecem no histórico.
 - A revisão antes da conta Cloudflare e os comandos copiáveis estão em `guias-cloudflare/index.html`. A pasta é pública no GitHub, mas não é copiada para `dist/`.
 - A CSP agora também é enviada por `_headers` para os ativos estáticos, inclusive `frame-ancestors`; verificar o cabeçalho no domínio Pages após publicar.
 - Publicação planejada: Cloudflare Pages + Pages Functions + D1. O frontend e as rotas `/api/*` compartilham a origem.

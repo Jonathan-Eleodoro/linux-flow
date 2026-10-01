@@ -1,5 +1,0 @@
-{
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "linux-flow",
-  "compatibility_flags": [ "nodejs_compat" ]
-}
