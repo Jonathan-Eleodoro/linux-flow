@@ -41,6 +41,24 @@ function context(db, method, path, body, key) {
       ...(body ? { body: JSON.stringify(body) } : {}) }) };
 }
 
+test("diagnóstico público distingue D1 pronto de binding ou esquema ausente",
+  { skip: !DatabaseSync }, async () => {
+    const health = await import("../functions/api/health.js");
+    const db = d1();
+    let response = await health.onRequestGet(context(db, "GET", "/api/health"));
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { status: "ready" });
+    assert.equal(response.headers.get("Cache-Control"), "no-store");
+    db.sqlite.exec("DROP TABLE study_groups");
+    response = await health.onRequestGet(context(db, "GET", "/api/health"));
+    assert.equal(response.status, 503);
+    assert.deepEqual(await response.json(), { status: "unavailable" });
+    db.sqlite.close();
+    response = await health.onRequestGet({ env: {}, request: new Request("https://example.pages.dev/api/health") });
+    assert.equal(response.status, 503);
+    assert.deepEqual(await response.json(), { status: "unavailable" });
+  });
+
 test("Pages Functions persistem perfil, tentativa verificada, ranking, sugestão e Pix no D1",
   { skip: !DatabaseSync }, async () => {
   const db = d1();

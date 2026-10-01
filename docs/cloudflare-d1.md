@@ -36,6 +36,7 @@ O pequeno `functions/package.json` contém apenas `{"type":"module"}` para delim
 
 ## Verificar no endereço `*.pages.dev`
 
+- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB` e as 17 tabelas esperadas. HTTP 503 com `{"status":"unavailable"}` indica que essa cadeia ainda não está pronta. A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui os testes funcionais abaixo.
 - Abra o site no celular e no computador; teste as trilhas, o quiz e o terminal.
 - Acesse `/api/ranking?category=all&level=1&total=10`: antes de publicar resultados, a resposta deve ser `{"ranking":[]}`. Se receber erro 503, verifique o binding `DB`, o esquema e os logs das Functions.
 - Crie um perfil de teste, ative a sincronização, anote o código de acesso e recarregue. Confira se o progresso reaparece. Faça um quiz com publicação opcional e confira o ranking.
