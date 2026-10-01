@@ -24,7 +24,7 @@ async function roomState(db, room, profile) {
   const member = await first(db,
     "SELECT 1 AS ok FROM game_members WHERE room_id = ? AND profile_id = ?", room.id, profile.id);
   if (!member) return fail("Entre na sala com o código recebido.", 403);
-  const members = await rows(db, `SELECT p.id, p.nickname AS name,
+  const members = await rows(db, `SELECT p.nickname AS name,
     COALESCE(c.avatar, 'penguin') AS avatar,
     COALESCE(c.accent, 'lime') AS accent, COUNT(a.question_index) AS answered,
     COALESCE(SUM(a.correct), 0) AS score
@@ -68,9 +68,12 @@ async function groupState(db, group, profile) {
     JOIN synced_profiles p ON p.id = s.profile_id
     WHERE s.group_id = ? ORDER BY s.created_at DESC LIMIT 50`, group.id);
   // Integrantes veem seus próprios resultados; o criador vê o grupo inteiro.
+  const visiblePeople = (group.owner_id === profile.id
+    ? people : people.filter((person) => person.id === profile.id))
+    .map(({ id, ...person }) => person);
   return json({ group: { code: group.code, title: group.title,
     owner: group.owner_id === profile.id },
-  people: group.owner_id === profile.id ? people : people.filter((person) => person.id === profile.id),
+  people: visiblePeople,
   summary: { participants: people.length,
     quizzes: people.reduce((sum, person) => sum + person.quizzes, 0) }, suggestions });
 }
@@ -162,11 +165,19 @@ export async function onRequestPost(context) {
       const room = joinCode && await first(db, "SELECT * FROM game_rooms WHERE code = ?", joinCode);
       if (!room) return fail("Sala não encontrada.", 404);
       if (room.status !== "waiting") return fail("Esta sala já começou.", 409);
-      const count = await first(db, "SELECT COUNT(*) AS total FROM game_members WHERE room_id = ?", room.id);
-      if (count.total >= (room.mode === "duel" ? 2 : 40)) return fail("Sala lotada.", 409);
       const result = await prepared(db,
-        "INSERT OR IGNORE INTO game_members (room_id, profile_id) VALUES (?, ?)", room.id, profile.id).run();
-      if (result.meta.changes) await log(db, room.id, profile.id, "joined").run();
+        `INSERT OR IGNORE INTO game_members (room_id, profile_id)
+         SELECT ?, ? WHERE EXISTS
+           (SELECT 1 FROM game_rooms WHERE id = ? AND status = 'waiting')
+         AND (SELECT COUNT(*) FROM game_members WHERE room_id = ?) < ?`,
+        room.id, profile.id, room.id, room.id, room.mode === "duel" ? 2 : 40).run();
+      if (!result.meta.changes) {
+        const member = await first(db,
+          "SELECT 1 AS ok FROM game_members WHERE room_id = ? AND profile_id = ?",
+          room.id, profile.id);
+        return member ? json({ code: joinCode }) : fail("Sala lotada ou iniciada.", 409);
+      }
+      await log(db, room.id, profile.id, "joined").run();
       return json({ code: joinCode });
     }
     if (body.action === "createGroup") {
@@ -187,10 +198,15 @@ export async function onRequestPost(context) {
       const joinCode = roomCode(body.code);
       const group = joinCode && await first(db, "SELECT id FROM study_groups WHERE code = ?", joinCode);
       if (!group) return fail("Grupo não encontrado.", 404);
-      const count = await first(db, "SELECT COUNT(*) AS total FROM study_members WHERE group_id = ?", group.id);
-      if (count.total >= 80) return fail("Grupo lotado.", 409);
-      await prepared(db, "INSERT OR IGNORE INTO study_members (group_id, profile_id) VALUES (?, ?)",
-        group.id, profile.id).run();
+      const result = await prepared(db, `INSERT OR IGNORE INTO study_members (group_id, profile_id)
+        SELECT ?, ? WHERE (SELECT COUNT(*) FROM study_members WHERE group_id = ?) < 80`,
+      group.id, profile.id, group.id).run();
+      if (!result.meta.changes) {
+        const member = await first(db,
+          "SELECT 1 AS ok FROM study_members WHERE group_id = ? AND profile_id = ?",
+          group.id, profile.id);
+        if (!member) return fail("Grupo lotado.", 409);
+      }
       return json({ code: joinCode });
     }
     const joinCode = roomCode(body.code);

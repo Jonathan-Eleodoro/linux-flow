@@ -192,6 +192,7 @@ test("sala coletiva, duelo, cronômetro, registros e grupo respeitam membros e m
     assert.equal(room.room.status, "active");
     assert.ok(room.room.deadlineAt);
     assert.equal(room.events, undefined);
+    assert.ok(room.members.every((member) => !("id" in member)));
     response = await post(secondKey, { action: "answer", code: roomCode,
       questionId: room.question.id,
       selected: room.question.options[0] });
@@ -214,6 +215,45 @@ test("sala coletiva, duelo, cronômetro, registros e grupo respeitam membros e m
       `/api/community?group=${groupCode}`, null, firstKey));
     const group = await response.json();
     assert.equal(group.people.length, 2);
+    assert.ok(group.people.every((person) => !("id" in person)));
     assert.equal(group.suggestions.length, 1);
+    db.sqlite.close();
+  });
+
+test("lotação de sala e grupo é verificada no INSERT e preserva membros atuais",
+  { skip: !DatabaseSync }, async () => {
+    const db = d1();
+    const profile = await import("../functions/api/profile.js");
+    const community = await import("../functions/api/community.js");
+    const ownerKey = "e".repeat(64), outsiderKey = "f".repeat(64);
+    for (const [id, key] of [["owner", ownerKey], ["outsider", outsiderKey]]) {
+      const response = await profile.onRequestPost(context(db, "POST", "/api/profile",
+        { action: "create", id, key, name: id, shareRanking: false }));
+      assert.equal(response.status, 201);
+    }
+    const post = (key, body) => community.onRequestPost(context(db, "POST", "/api/community", body, key));
+    const roomResponse = await post(ownerKey, { action: "createRoom", title: "Sala lotada",
+      mode: "collective", category: "all", count: 2, secondsPerQuestion: 0 });
+    const roomCode = (await roomResponse.json()).code;
+    const roomId = db.sqlite.prepare("SELECT id FROM game_rooms WHERE code = ?").get(roomCode).id;
+    const groupResponse = await post(ownerKey, { action: "createGroup", title: "Grupo lotado" });
+    const groupCode = (await groupResponse.json()).code;
+    const groupId = db.sqlite.prepare("SELECT id FROM study_groups WHERE code = ?").get(groupCode).id;
+    const addProfile = db.sqlite.prepare(`INSERT INTO synced_profiles
+      (id, access_key_hash, nickname) VALUES (?, ?, ?)`);
+    const addRoomMember = db.sqlite.prepare("INSERT INTO game_members (room_id, profile_id) VALUES (?, ?)");
+    const addGroupMember = db.sqlite.prepare("INSERT INTO study_members (group_id, profile_id) VALUES (?, ?)");
+    for (let index = 1; index <= 79; index++) {
+      const id = `fill-${index}`;
+      addProfile.run(id, `test-hash-${index}`, id);
+      addGroupMember.run(groupId, id);
+      if (index <= 39) addRoomMember.run(roomId, id);
+    }
+    assert.equal((await post(outsiderKey, { action: "joinRoom", code: roomCode })).status, 409);
+    assert.equal((await post(ownerKey, { action: "joinRoom", code: roomCode })).status, 200);
+    assert.equal((await post(outsiderKey, { action: "joinGroup", code: groupCode })).status, 409);
+    assert.equal((await post(ownerKey, { action: "joinGroup", code: groupCode })).status, 200);
+    assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM game_members").get().n, 40);
+    assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM study_members").get().n, 80);
     db.sqlite.close();
   });

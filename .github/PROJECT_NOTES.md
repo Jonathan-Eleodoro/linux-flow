@@ -18,6 +18,7 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 
 ## Caminho atual — 01/10/2026
 
+- As respostas da comunidade omitem IDs internos dos perfis. A lotação de salas e grupos é validada no próprio `INSERT`, inclusive diante de entradas simultâneas; os corpos JSON são cortados durante a leitura ao superar o limite em bytes. Testes locais cobrem esses comportamentos. Proteção contra spam distribuído e moderação institucional continuam pendentes.
 - A migração `sql/migrations/001-premium-approval.sql` torna a aprovação Premium uma única atualização com concessão automática no mesmo passo e referência única do extrato. O teste SQLite cobre reversão em falhas; aplicar uma vez em cada D1 após backup e validar no Preview antes de operar pagamento real.
 - A exclusão atual do perfil remove pedidos e referências Premium por cascata. Antes de vender, o responsável pelo projeto deve definir com orientação contábil/jurídica quais registros financeiros precisam ser preservados, por quanto tempo e como dissociá-los dos dados de estudo.
 - O P0 ganhou `/api/health`, que verifica o binding D1 e as 17 tabelas sem divulgar o esquema ao visitante. O endpoint e seus cenários de falha foram testados localmente; ainda falta verificá-lo em Pages Production e Preview.

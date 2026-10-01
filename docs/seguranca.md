@@ -48,6 +48,8 @@ Limites locais: 30 perfis e 300 resultados recentes. O navegador pode limpar os 
 - Build por lista de permissão; documentos e testes não entram no diretório hospedado.
 - O binding D1 fica apenas nas Pages Functions. A chave Pix é configurada como secret na Cloudflare.
 - A migração Premium concede acesso no mesmo UPDATE que aprova o pedido, após conferência humana do extrato; o usuário não pode aprovar pela API.
+- A API coletiva não envia IDs internos no placar nem nos relatórios visíveis; limites de membros são aplicados na instrução de gravação do D1.
+- O corpo JSON é limitado em bytes durante a leitura; envios acima do limite recebem HTTP 413 sem ler o restante do fluxo.
 - A marca institucional e os certificados indicam o caráter acadêmico, sem afirmar chancela oficial.
 
 Os cabeçalhos estáticos da Cloudflare são definidos em `_headers`; as Functions definem seus próprios cabeçalhos. A prévia Node local não replica esses cabeçalhos HTTP; a CSP de meta protege o que pode ser aplicado por HTML. A diretiva `frame-ancestors` depende de cabeçalho HTTP.

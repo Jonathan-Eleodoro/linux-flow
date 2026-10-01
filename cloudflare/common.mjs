@@ -12,14 +12,32 @@ export function database(context) {
   return context.env.DB;
 }
 
-// O limite evita que uma requisição grande consuma a cota de CPU das Functions.
-export async function readJson(request, maxLength) {
-  const raw = await request.text();
-  if (raw.length > maxLength) {
+// Interrompe a leitura assim que ultrapassa o limite em bytes, inclusive sem Content-Length.
+export async function readJson(request, maxBytes) {
+  const tooLarge = () => {
     const error = new Error("Envio muito grande.");
     error.status = 413;
-    throw error;
+    return error;
+  };
+  const declaredSize = Number(request.headers.get("content-length"));
+  if (Number.isFinite(declaredSize) && declaredSize > maxBytes) throw tooLarge();
+  const reader = request.body?.getReader();
+  const decoder = new TextDecoder();
+  const parts = [];
+  let bytes = 0;
+  if (reader) {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > maxBytes) {
+        try { await reader.cancel(); } catch { /* O limite continua sendo a causa da rejeição. */ }
+        throw tooLarge();
+      }
+      parts.push(decoder.decode(value, { stream: true }));
+    }
   }
+  const raw = parts.join("") + decoder.decode();
   try { return JSON.parse(raw); }
   catch {
     const error = new Error("JSON inválido.");
