@@ -13,7 +13,12 @@ O site estático é publicado pela **Pages**. As rotas em `functions/api/` são 
 ## Criar o banco
 
 1. Em **Cloudflare Dashboard → Storage & databases → D1 SQL database**, crie um banco, por exemplo `linux-flow`.
-2. Na aba **Console** desse banco, execute o conteúdo de [`sql/d1-schema.sql`](../sql/d1-schema.sql). O script usa `CREATE TABLE IF NOT EXISTS`, então pode ser repetido. Alternativamente, no terminal autenticado pelo Wrangler, na raiz do clone, rode `npx wrangler d1 execute linux-flow --remote --file=sql/d1-schema.sql`.
+2. Na aba **Console** desse banco, execute o conteúdo de [`sql/d1-schema.sql`](../sql/d1-schema.sql) e depois, **uma única vez**, a [migração Premium 001](../sql/migrations/001-premium-approval.sql). Alternativamente, no terminal autenticado pelo Wrangler, na raiz do clone, rode os comandos abaixo na ordem. A migração acrescenta uma coluna e não deve ser repetida. Em um banco já criado com o esquema antigo, aplique somente a migração após exportar um backup.
+
+```powershell
+npx wrangler d1 execute linux-flow --remote --file=sql/d1-schema.sql
+npx wrangler d1 execute linux-flow --remote --file=sql/migrations/001-premium-approval.sql
+```
 3. Confira que as tabelas de perfil, ranking, sugestões e Premium aparecem, além de `game_rooms`, `game_members`, `game_answers`, `game_events`, `study_groups`, `study_members`, `study_suggestions` e `community_profiles`. Como nenhum dado foi colocado no Aiven, não há importação de dados.
 
 ## Conectar GitHub e publicar
@@ -36,25 +41,25 @@ O pequeno `functions/package.json` contém apenas `{"type":"module"}` para delim
 
 ## Verificar no endereço `*.pages.dev`
 
-- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB` e as 17 tabelas esperadas. HTTP 503 com `{"status":"unavailable"}` indica que essa cadeia ainda não está pronta. A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui os testes funcionais abaixo.
+- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB`, as 17 tabelas e os gatilhos da migração Premium. HTTP 503 com `{"status":"unavailable"}` indica que essa cadeia ainda não está pronta. A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui os testes funcionais abaixo.
 - Abra o site no celular e no computador; teste as trilhas, o quiz e o terminal.
 - Acesse `/api/ranking?category=all&level=1&total=10`: antes de publicar resultados, a resposta deve ser `{"ranking":[]}`. Se receber erro 503, verifique o binding `DB`, o esquema e os logs das Functions.
 - Crie um perfil de teste, ative a sincronização, anote o código de acesso e recarregue. Confira se o progresso reaparece. Faça um quiz com publicação opcional e confira o ranking.
 - Em **Comunidade**, crie dois perfis sincronizados de teste. Com o primeiro, abra um duelo; com o segundo, entre pelo código. Confirme que só o mestre inicia e avança, que cada pessoa responde uma vez por questão, que o cronômetro bloqueia respostas tardias e que o registro do mestre mostra os eventos. Depois crie um grupo, entre com o segundo perfil, envie uma sugestão e confira o relatório. A partida rápida individual abre o quiz existente.
 - Envie uma sugestão de teste e confira uma linha em `feedback_comments` no console D1. Teste a exclusão do perfil na tela de privacidade.
-- Se configurar Pix, gere um pedido, confira valor e recebedor no aplicativo bancário e teste a mudança para `claimed`. **Não conceda Premium sem confirmar o crédito no extrato bancário.** Para ativar manualmente, execute as duas instruções no Console D1, com o ID real do pedido e a referência real do pagamento:
+- Se configurar Pix, gere um pedido, confira valor e recebedor no aplicativo bancário e teste a mudança para `claimed`. **Não conceda Premium sem confirmar o crédito no extrato bancário.** Depois de aplicar a migração 001, o Console D1 precisa de **uma única atualização**. Antes, consulte o pedido e confira perfil, valor, `txid` e estado. Use a referência única do extrato bancário, nunca a referência digitada pelo aluno:
 
 ```sql
 UPDATE pro_requests
-SET status = 'approved', approved_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-WHERE id = 'ID_DO_PEDIDO' AND status = 'claimed';
-
-INSERT INTO pro_entitlements (profile_id, request_id, payment_reference)
-SELECT profile_id, id, 'REFERENCIA_UNICA_DO_EXTRATO'
-FROM pro_requests WHERE id = 'ID_DO_PEDIDO' AND status = 'approved';
+SET status = 'approved',
+    confirmed_payment_reference = 'REFERENCIA_UNICA_DO_EXTRATO',
+    approved_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+WHERE id = 'ID_DO_PEDIDO' AND status = 'claimed' AND amount_cents = 990;
 ```
 
-Antes de executar, confirme que o pedido pertence ao perfil esperado, que a quantia foi creditada e que a referência ainda não foi usada. Execute uma instrução de cada vez; se a primeira atualização não atingir exatamente uma linha, não insira o entitlement. Se a segunda falhar, o pedido ficará aprovado sem acesso; corrija a referência e repita apenas a segunda instrução.
+Troque `990` pelo valor exato do pedido em centavos. O gatilho grava o acesso na mesma operação; se faltar referência, o pedido não estiver declarado ou a referência já tiver sido usada, a atualização inteira falha. Depois confira `pro_requests.status = 'approved'` e a linha correspondente em `pro_entitlements`. Não execute o SQL antigo de duas etapas.
+
+Antes da primeira venda, defina a política de comprovantes e retenção de registros financeiros: hoje a exclusão do perfil apaga também pedidos e referências Premium por cascata. Isso exige uma solução institucional/contábil antes de tratar a trilha do D1 como histórico financeiro definitivo.
 
 ## Operação e custos
 

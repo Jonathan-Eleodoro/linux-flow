@@ -22,6 +22,7 @@ A atribuição de autoria em uma rodada usa o perfil escolhido no início. Troca
 | Mascote, cor e faixa etária opcional | Personalizar o perfil; a faixa não aparece em placares | D1 da Cloudflare |
 | Participação, respostas, placar e eventos da sala | Conduzir partidas e permitir revisão pelo criador | D1 da Cloudflare; membros veem placar, criador vê eventos |
 | Participação, sugestões e indicadores do grupo | Acompanhar estudo coletivo | D1 da Cloudflare; criador vê indicadores individuais |
+| Pedido Premium e referência de pagamento confirmada | Conferência manual e trilha de ativação | D1 da Cloudflare; não exibidos no ranking |
 
 O quiz não solicita senha, CPF, e-mail ou telefone do participante. O formulário opcional de sugestões solicita e-mail e comentário, com ciência explícita; o endereço é informado pelo remetente e não é verificado. O contato em `config.js` é dado público do autor.
 
@@ -46,6 +47,7 @@ Limites locais: 30 perfis e 300 resultados recentes. O navegador pode limpar os 
 - `form-action 'none'`; formulários são tratados pelo JavaScript, e as chamadas à API usam `fetch` na mesma origem.
 - Build por lista de permissão; documentos e testes não entram no diretório hospedado.
 - O binding D1 fica apenas nas Pages Functions. A chave Pix é configurada como secret na Cloudflare.
+- A migração Premium concede acesso no mesmo UPDATE que aprova o pedido, após conferência humana do extrato; o usuário não pode aprovar pela API.
 - A marca institucional e os certificados indicam o caráter acadêmico, sem afirmar chancela oficial.
 
 Os cabeçalhos estáticos da Cloudflare são definidos em `_headers`; as Functions definem seus próprios cabeçalhos. A prévia Node local não replica esses cabeçalhos HTTP; a CSP de meta protege o que pode ser aplicado por HTML. A diretiva `frame-ancestors` depende de cabeçalho HTTP.

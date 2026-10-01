@@ -11,6 +11,8 @@ const { FlowData } = require("../js/data.js");
 function d1() {
   const sqlite = new DatabaseSync(":memory:");
   sqlite.exec(fs.readFileSync(path.join(__dirname, "../sql/d1-schema.sql"), "utf8"));
+  sqlite.exec(fs.readFileSync(path.join(__dirname,
+    "../sql/migrations/001-premium-approval.sql"), "utf8"));
   const wrap = (sql, params = []) => ({
     bind: (...values) => wrap(sql, values),
     first: async () => sqlite.prepare(sql).get(...params) || null,
@@ -54,9 +56,71 @@ test("diagnóstico público distingue D1 pronto de binding ou esquema ausente",
     assert.equal(response.status, 503);
     assert.deepEqual(await response.json(), { status: "unavailable" });
     db.sqlite.close();
+    const withoutMigration = d1();
+    withoutMigration.sqlite.exec("DROP TRIGGER pro_requests_grant_after_approval");
+    response = await health.onRequestGet(context(withoutMigration, "GET", "/api/health"));
+    assert.equal(response.status, 503);
+    withoutMigration.sqlite.close();
     response = await health.onRequestGet({ env: {}, request: new Request("https://example.pages.dev/api/health") });
     assert.equal(response.status, 503);
     assert.deepEqual(await response.json(), { status: "unavailable" });
+  });
+
+test("aprovação Premium é atômica e exige referência bancária única",
+  { skip: !DatabaseSync }, () => {
+    const db = d1();
+    const sql = db.sqlite;
+    sql.prepare("INSERT INTO synced_profiles (id, access_key_hash, nickname) VALUES (?, ?, ?)")
+      .run("a", "a".repeat(64), "Teste A");
+    sql.prepare("INSERT INTO synced_profiles (id, access_key_hash, nickname) VALUES (?, ?, ?)")
+      .run("b", "b".repeat(64), "Teste B");
+    const insert = sql.prepare(`INSERT INTO pro_requests
+      (id, profile_id, txid, amount_cents) VALUES (?, ?, ?, 990)`);
+    insert.run("pedido-a", "a", "TXIDA");
+    insert.run("pedido-b", "b", "TXIDB");
+    const approve = sql.prepare(`UPDATE pro_requests SET status = 'approved',
+      confirmed_payment_reference = ?, approved_at = '2026-10-01T00:00:00Z'
+      WHERE id = ?`);
+    assert.throws(() => approve.run("EXTRATO-001", "pedido-a"), /approval_requires_claimed_payment/);
+    assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM pro_entitlements").get().n, 0);
+    sql.exec("UPDATE pro_requests SET status = 'claimed' WHERE id IN ('pedido-a', 'pedido-b')");
+    assert.throws(() => approve.run(null, "pedido-a"), /approval_requires_claimed_payment/);
+    assert.equal(sql.prepare("SELECT status FROM pro_requests WHERE id = 'pedido-a'").get().status,
+      "claimed");
+    approve.run("EXTRATO-001", "pedido-a");
+    assert.deepEqual({ ...sql.prepare(`SELECT profile_id, request_id, payment_reference
+      FROM pro_entitlements WHERE profile_id = 'a'`).get() }, {
+      profile_id: "a", request_id: "pedido-a", payment_reference: "EXTRATO-001",
+    });
+    assert.throws(() => approve.run("EXTRATO-001", "pedido-b"),
+      /UNIQUE constraint failed/);
+    assert.equal(sql.prepare("SELECT status FROM pro_requests WHERE id = 'pedido-b'").get().status,
+      "claimed");
+    assert.throws(() => sql.exec("UPDATE pro_requests SET status = 'rejected' WHERE id = 'pedido-a'"),
+      /approved_payment_cannot_change_status/);
+    sql.close();
+  });
+
+test("migração Premium preserva pedidos já criados e exige data de aprovação",
+  { skip: !DatabaseSync }, () => {
+    const sql = new DatabaseSync(":memory:");
+    sql.exec(fs.readFileSync(path.join(__dirname, "../sql/d1-schema.sql"), "utf8"));
+    sql.prepare("INSERT INTO synced_profiles (id, access_key_hash, nickname) VALUES (?, ?, ?)")
+      .run("legacy", "d".repeat(64), "Teste legado");
+    sql.prepare(`INSERT INTO pro_requests (id, profile_id, txid, amount_cents, status)
+      VALUES ('antigo', 'legacy', 'TXIDLEGACY', 990, 'claimed')`).run();
+    sql.exec(fs.readFileSync(path.join(__dirname,
+      "../sql/migrations/001-premium-approval.sql"), "utf8"));
+    assert.throws(() => sql.exec(`UPDATE pro_requests SET status = 'approved',
+      confirmed_payment_reference = 'EXTRATO-002' WHERE id = 'antigo'`),
+    /approval_requires_claimed_payment/);
+    assert.equal(sql.prepare("SELECT status FROM pro_requests WHERE id = 'antigo'").get().status,
+      "claimed");
+    sql.exec(`UPDATE pro_requests SET status = 'approved',
+      confirmed_payment_reference = 'EXTRATO-002',
+      approved_at = '2026-10-01T00:00:00Z' WHERE id = 'antigo'`);
+    assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM pro_entitlements").get().n, 1);
+    sql.close();
   });
 
 test("Pages Functions persistem perfil, tentativa verificada, ranking, sugestão e Pix no D1",

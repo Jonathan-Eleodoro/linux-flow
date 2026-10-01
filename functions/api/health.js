@@ -11,11 +11,15 @@ const requiredTables = [
 
 export async function onRequestGet(context) {
   try {
+    const db = database(context);
     const names = requiredTables.map(() => "?").join(", ");
-    const result = await first(database(context),
+    const result = await first(db,
       `SELECT COUNT(*) AS total FROM sqlite_master
        WHERE type = 'table' AND name IN (${names})`, ...requiredTables);
-    if (Number(result?.total) === requiredTables.length)
+    const approval = await first(db,
+      `SELECT COUNT(*) AS total FROM sqlite_master WHERE type = 'trigger'
+       AND name IN ('pro_requests_grant_after_approval', 'pro_requests_keep_approved')`);
+    if (Number(result?.total) === requiredTables.length && Number(approval?.total) === 2)
       return json({ status: "ready" });
   } catch {
     // Sem binding, com erro de conexão ou sem esquema, o serviço não está pronto.

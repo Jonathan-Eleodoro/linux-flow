@@ -18,6 +18,8 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 
 ## Caminho atual — 01/10/2026
 
+- A migração `sql/migrations/001-premium-approval.sql` torna a aprovação Premium uma única atualização com concessão automática no mesmo passo e referência única do extrato. O teste SQLite cobre reversão em falhas; aplicar uma vez em cada D1 após backup e validar no Preview antes de operar pagamento real.
+- A exclusão atual do perfil remove pedidos e referências Premium por cascata. Antes de vender, o responsável pelo projeto deve definir com orientação contábil/jurídica quais registros financeiros precisam ser preservados, por quanto tempo e como dissociá-los dos dados de estudo.
 - O P0 ganhou `/api/health`, que verifica o binding D1 e as 17 tabelas sem divulgar o esquema ao visitante. O endpoint e seus cenários de falha foram testados localmente; ainda falta verificá-lo em Pages Production e Preview.
 - Em 01/10/2026, `wrangler.jsonc` foi reintroduzido pelo navegador e convertido de UTF-16 para UTF-8. Ainda não define saída Pages nem D1; o deploy público e o binding permanecem sem comprovação. O painel visual e a priorização estão em `guias-cloudflare/index.html` e `guias-cloudflare/07-prioridades.html`.
 - Em 01/10/2026, a conversa salva sobre a Cloudflare mostrou deploys falhos: `wrangler deploy` tratou a raiz como assets de Worker; depois Pages encontrou `require("node:crypto")` no Pix; por fim, Root directory `dist` falhou antes do build. O diagnóstico está em `guias-cloudflare/06-diagnostico.html`.
@@ -50,7 +52,7 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 | Alta | Papel docente verificado | A escola define quem concede e revoga acesso de mestre. |
 | Alta | Uso com menores | A escola define base legal, responsáveis, retenção, moderação e política de acesso. |
 | Média | Proteção contra abuso | Limites por origem, moderação de nomes/sugestões e revisão de logs. |
-| Média | Operação Premium | Substituir as duas instruções SQL manuais por aprovação transacional auditável. |
+| Média | Operação Premium | Migração e teste local entregues; aplicar no D1 Preview/Production e confirmar o procedimento com pagamento real somente após conferência bancária. |
 | Média | Retenção de dados | Definir e automatizar descarte de salas, eventos, grupos e sugestões conforme política institucional. |
 | Média | Manutenibilidade da interface | Separar `js/app.js`, `js/data.js` e blocos finais repetidos de `css/style.css` em unidades menores. |
 | Média | Relatórios pedagógicos | Métricas por objetivo, tendências e exportação sem expor dados a outros alunos. |
