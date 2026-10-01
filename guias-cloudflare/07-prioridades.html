@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Prioridades e oportunidades de evolução do Linux Flow.">
+  <title>Prioridades · Linux Flow</title>
+  <link rel="stylesheet" href="guia.css">
+  <script defer src="guia.js"></script>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+  <header class="top"><div class="shell"><a class="brand" href="index.html">Linux<span>_Flow</span> / Guia</a><small>Decisões e oportunidades · 01/10/2026</small></div></header>
+  <div class="shell layout">
+    <nav class="nav" aria-label="Guia">
+      <p>Etapas</p>
+      <a href="index.html">Painel</a><a href="01-revisao.html">Revisão técnica</a><a href="02-conta.html">Conta e acesso</a><a href="03-publicacao.html">Publicação</a><a href="04-validacao.html">Validação</a><a href="05-manutencao.html">Manutenção</a><a href="06-diagnostico.html">Diagnóstico</a><a href="07-prioridades.html" aria-current="page">Prioridades</a>
+    </nav>
+    <main id="conteudo">
+      <div class="eyebrow">Roteiro de evolução</div>
+      <h1>Primeiro provar. Depois ampliar.</h1>
+      <p class="lead">Prioridade considera dependência, risco e valor pedagógico. Impacto e esforço abaixo são estimativas qualitativas de planejamento, não medições de uso.</p>
+      <div class="priority-stack">
+        <section class="priority-card p0"><span class="priority-number">P0</span><div><h2>Publicar e proteger o uso real</h2><p>Pages + D1 funcionando; revisão docente; regras de dados de menores e retenção antes de turmas.</p></div><span class="priority-when">Agora</span></section>
+        <section class="priority-card p1"><span class="priority-number">P1</span><div><h2>Confiabilidade e aprendizagem</h2><p>Abuso, Premium auditável, acessibilidade e relatórios por objetivo.</p></div><span class="priority-when">Após P0</span></section>
+        <section class="priority-card p2"><span class="priority-number">P2</span><div><h2>Personalização útil</h2><p>Revisão adaptativa e painel docente com dados mínimos.</p></div><span class="priority-when">Após piloto</span></section>
+        <section class="priority-card p3"><span class="priority-number">P3</span><div><h2>Escala e novos canais</h2><p>Tempo real, PWA e login social conforme demanda observada.</p></div><span class="priority-when">Depois</span></section>
+      </div>
+      <h2>Inovações comparadas</h2>
+      <figure class="card chart-card"><figcaption>Valor pedagógico potencial × esforço estimado <small>Escala qualitativa de 1 a 5 · sujeito a revisão após o piloto</small></figcaption>
+        <div class="bar-chart" role="img" aria-label="Revisão adaptativa: valor 5, esforço 2. Relatórios por objetivos: valor 5, esforço 3. Painel docente: valor 5, esforço 4. Salas em tempo real: valor 3, esforço 5. PWA: valor 3, esforço 3. Login social: valor 2, esforço 4.">
+          <div class="bar-labels"><span>Ideia</span><span>Valor</span><span>Esforço</span></div>
+          <div class="bar-row"><strong>Revisão adaptativa</strong><span class="bar value" style="--size:100%"></span><span class="bar effort" style="--size:40%"></span></div>
+          <div class="bar-row"><strong>Relatórios LPI</strong><span class="bar value" style="--size:100%"></span><span class="bar effort" style="--size:60%"></span></div>
+          <div class="bar-row"><strong>Painel docente</strong><span class="bar value" style="--size:100%"></span><span class="bar effort" style="--size:80%"></span></div>
+          <div class="bar-row"><strong>Salas em tempo real</strong><span class="bar value" style="--size:60%"></span><span class="bar effort" style="--size:100%"></span></div>
+          <div class="bar-row"><strong>PWA individual</strong><span class="bar value" style="--size:60%"></span><span class="bar effort" style="--size:60%"></span></div>
+          <div class="bar-row"><strong>Login social</strong><span class="bar value" style="--size:40%"></span><span class="bar effort" style="--size:80%"></span></div>
+        </div>
+      </figure>
+      <div class="table-wrap"><table class="status-table"><thead><tr><th>Proposta</th><th>O que reaproveita</th><th>Ganho esperado</th><th>Condição de início</th></tr></thead><tbody>
+        <tr><th>Revisão adaptativa <span class="tag">P2</span></th><td>Acertos por questão já registrados</td><td>Revisitar erros no momento certo</td><td>Validar questões e objetivos</td></tr>
+        <tr><th>Relatórios por objetivo <span class="tag warn">P1</span></th><td>Mapa LPI + tentativas verificadas</td><td>Mostrar lacunas por tema</td><td>Revisão pedagógica e privacidade</td></tr>
+        <tr><th>Painel docente <span class="tag">P2</span></th><td>Grupos e eventos existentes</td><td>Planejar intervenções de turma</td><td>Papel docente verificado</td></tr>
+        <tr><th>Tempo real <span class="tag">P3</span></th><td>Salas, placar e logs</td><td>Partidas mais fluidas</td><td>Medir latência e custo do polling</td></tr>
+        <tr><th>PWA <span class="tag">P3</span></th><td>Quiz e terminal locais</td><td>Prática individual sem rede</td><td>Política de cache e sincronização</td></tr>
+        <tr><th>Login social <span class="tag">P3</span></th><td>Perfis sincronizados</td><td>Recuperação mais familiar</td><td>Política de conta e identidade</td></tr>
+      </tbody></table></div>
+      <h2>Portões de decisão</h2>
+      <div class="gate-grid">
+        <div class="gate"><strong>Para publicar</strong><span>Deploy Pages + API + D1 verificados no domínio.</span></div>
+        <div class="gate"><strong>Para convidar turma</strong><span>Docentes autorizados; regras de menores, moderação e retenção.</span></div>
+        <div class="gate"><strong>Para cobrar</strong><span>Pix conferido, processo Premium auditável e suporte definido.</span></div>
+        <div class="gate"><strong>Para nota oficial</strong><span>Identidade e avaliação redesenhadas; gabarito público não basta.</span></div>
+      </div>
+      <p class="note">O melhor ganho de curto prazo é completar o caminho Pages → D1 → teste com dois perfis fictícios. As ideias acima permanecem propostas até terem critérios e evidência de uso.</p>
+      <div class="links"><a href="index.html">← Painel</a><a href="01-revisao.html">Revisão técnica</a><a href="03-publicacao.html">Configurar Pages</a></div>
+    </main>
+  </div>
+  <footer><div class="shell">Linux Flow · Priorização em 01/10/2026 · <a href="../.github/PROJECT_NOTES.md">Decisões registradas</a></div></footer>
+</body>
+</html>

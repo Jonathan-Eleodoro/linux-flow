@@ -20,7 +20,7 @@ Abra `http://127.0.0.1:4173`. A prévia serve o frontend; recursos de nuvem exig
 
 O frontend usa **Cloudflare Pages**, a API usa **Pages Functions** e os dados sincronizados usam **D1**. Para gerar `dist/`, execute `npm run build`. O passo a passo de banco, GitHub, binding `DB` e validação está em [docs/cloudflare-d1.md](docs/cloudflare-d1.md).
 
-Antes de criar a conta, consulte os [guias HTML de configuração e revisão](guias-cloudflare/index.html), que ficam fora do site publicado.
+O [painel HTML de implantação e prioridades](guias-cloudflare/index.html) compara o que está no código, o que falta validar na Cloudflare e as próximas evoluções. Esses guias ficam fora do site publicado.
 
 ## Limites
 

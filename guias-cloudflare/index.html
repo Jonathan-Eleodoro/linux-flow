@@ -1,3 +1,66 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Linux Flow · Guia de publicação</title><link rel="stylesheet" href="guia.css"><script defer src="guia.js"></script></head>
-<body><a class="skip" href="#conteudo">Pular para o conteúdo</a><header class="top"><div class="shell"><a class="brand" href="index.html">Linux<span>_Flow</span> / Guia</a><small>Preparação para Cloudflare Pages + D1 · 30/09/2026</small></div></header><div class="shell layout"><nav class="nav" aria-label="Guia"><p>Etapas</p><a href="index.html" aria-current="page">Visão geral</a><a href="01-revisao.html">Revisão técnica</a><a href="02-conta.html">Conta e acesso</a><a href="03-publicacao.html">Publicação</a><a href="04-validacao.html">Validação</a><a href="05-manutencao.html">Manutenção</a><a href="06-diagnostico.html">Diagnóstico</a></nav><main id="conteudo"><div class="eyebrow">Comece aqui</div><h1>Do repositório ao site publicado.</h1><p class="lead">Este conjunto de páginas organiza a revisão do projeto e as ações necessárias para criar a conta, conectar o GitHub, configurar o D1 e manter a aplicação. Abra os arquivos no navegador; os botões “Copiar” ajudam nos comandos.</p><div class="callout"><strong>Estado atual</strong><p>O código está no GitHub pessoal, mas a Cloudflare ainda não foi configurada. Não há dados reais no Aiven para migrar. Os guias entram no repositório, porém o build por lista de permissão não os copia para <code>dist/</code>; portanto, não aparecem no site Pages.</p></div><h2>Sequência recomendada</h2><div class="grid"><article class="card"><span class="tag">01 · Antes da conta</span><h3><a href="01-revisao.html">Revisão técnica</a></h3><p>Veja o que já está protegido e as pendências de segurança, manutenção e experiência de uso.</p></article><article class="card"><span class="tag">02 · Identidade</span><h3><a href="02-conta.html">Conta e acesso</a></h3><p>Crie a conta com controle institucional, 2FA e permissões individuais.</p></article><article class="card"><span class="tag">03 · Infraestrutura</span><h3><a href="03-publicacao.html">Publicação</a></h3><p>Conecte o repositório, crie o D1, aplique o esquema e configure o binding.</p></article><article class="card"><span class="tag">04 · Aceite</span><h3><a href="04-validacao.html">Validação</a></h3><p>Teste site, API, privacidade, comunidade e custo antes de convidar usuários.</p></article><article class="card"><span class="tag">05 · Rotina</span><h3><a href="05-manutencao.html">Manutenção</a></h3><p>Tenha comandos de backup, diagnóstico, atualização e Premium manual à mão.</p></article></div><div class="card"><span class="tag warn">06 · Problemas de deploy</span><h3><a href="06-diagnostico.html">Diagnóstico da migração</a></h3><p>Veja os erros de Worker, node:crypto e Root directory encontrados nos logs de 01/10/2026.</p></div><h2>O que este guia não substitui</h2><p>Ele não concede identidade docente, conformidade jurídica ou avaliação oficial. Para uma turma com menores, alinhe acesso, retenção e responsabilidades com o colégio antes de usar contas reais. As telas do painel Cloudflare podem mudar; confira os links oficiais em cada etapa.</p><div class="links"><a href="../docs/cloudflare-d1.md">Roteiro técnico em Markdown</a><a href="../docs/seguranca.md">Privacidade do projeto</a><a href="../.github/PROJECT_NOTES.md">Plano de manutenção</a></div></main></div><footer><div class="shell">Linux Flow · Guia interno versionado com o código · Não coloque chaves ou dados reais nestes arquivos.</div></footer></body></html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Painel local de implantação e evolução do Linux Flow.">
+  <title>Painel do projeto · Linux Flow</title>
+  <link rel="stylesheet" href="guia.css">
+  <script defer src="guia.js"></script>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+  <header class="top"><div class="shell"><a class="brand" href="index.html">Linux<span>_Flow</span> / Guia</a><small>Retrato do projeto · 01/10/2026</small></div></header>
+  <div class="shell layout">
+    <nav class="nav" aria-label="Guia">
+      <p>Etapas</p>
+      <a href="index.html" aria-current="page">Painel</a>
+      <a href="01-revisao.html">Revisão técnica</a>
+      <a href="02-conta.html">Conta e acesso</a>
+      <a href="03-publicacao.html">Publicação</a>
+      <a href="04-validacao.html">Validação</a>
+      <a href="05-manutencao.html">Manutenção</a>
+      <a href="06-diagnostico.html">Diagnóstico</a>
+      <a href="07-prioridades.html">Prioridades</a>
+    </nav>
+    <main id="conteudo">
+      <div class="eyebrow">Estado confirmado no código</div>
+      <h1>O produto avançou.<br>A nuvem ainda pede prova.</h1>
+      <p class="lead">Conta e GitHub foram configurados segundo a conversa salva. Código, testes e empacotamento local estão prontos para a próxima tentativa. O deploy Pages e o banco D1 ainda não foram confirmados no domínio público.</p>
+      <div class="metric-grid" aria-label="Indicadores do repositório">
+        <div class="metric"><strong>14</strong><span>trilhas no código</span></div>
+        <div class="metric"><strong>135</strong><span>questões no acervo Free</span></div>
+        <div class="metric"><strong>20</strong><span>questões Premium no servidor</span></div>
+        <div class="metric"><strong>25/25</strong><span>testes locais · 01/10</span></div>
+      </div>
+      <p class="tiny muted">Os números descrevem o repositório. Não representam usuários ativos nem funcionamento já comprovado na Cloudflare.</p>
+      <h2>Mapa de implantação</h2>
+      <ol class="pipeline" aria-label="Etapas da implantação">
+        <li class="done"><span>01</span><strong>Código e guias</strong><small>Entregues no GitHub</small></li>
+        <li class="done"><span>02</span><strong>Build e Functions</strong><small>Compilam localmente</small></li>
+        <li class="pending"><span>03</span><strong>Pages + D1</strong><small>Falta validar no domínio</small></li>
+        <li class="blocked"><span>04</span><strong>Turmas reais</strong><small>Depende da escola</small></li>
+      </ol>
+      <div class="legend"><span><i class="dot done"></i> Verificado</span><span><i class="dot pending"></i> A validar</span><span><i class="dot blocked"></i> Depende de decisão</span></div>
+      <h2>Feito, falta provar, próximo ganho</h2>
+      <div class="table-wrap"><table class="status-table"><thead><tr><th>Frente</th><th>Feito</th><th>Falta provar ou definir</th><th>Próximo guia</th></tr></thead><tbody>
+        <tr><th>Conta</th><td>2FA e GitHub conectados, conforme conversa</td><td>Permissões e recuperação revisadas</td><td><a href="02-conta.html">Acesso</a></td></tr>
+        <tr><th>Interface</th><td>Trilhas, quiz, terminal e perfis locais</td><td>Mobile, teclado e espanhol no domínio</td><td><a href="04-validacao.html">Aceite</a></td></tr>
+        <tr><th>Backend</th><td>Functions compiladas; Pix sem dependência dinâmica de Node</td><td>Rotas respondendo no Pages</td><td><a href="06-diagnostico.html">Diagnóstico</a></td></tr>
+        <tr><th>Dados</th><td>Esquema D1 e testes locais</td><td>Banco, binding <code>DB</code> e exclusão real</td><td><a href="03-publicacao.html">Publicar</a></td></tr>
+        <tr><th>Ensino coletivo</th><td>Duelo, salas, grupos e logs no código</td><td>Docente verificado e regras para menores</td><td><a href="07-prioridades.html">Priorizar</a></td></tr>
+      </tbody></table></div>
+      <div class="spotlight"><span class="tag danger">P0 · Próximo passo</span><strong>Confirmar tipo Pages, build em <code>dist</code>, binding <code>DB</code> e teste de uma rota API.</strong><a href="03-publicacao.html">Abrir configuração →</a></div>
+      <h2>Explore por objetivo</h2>
+      <div class="grid quick-links">
+        <a class="card" href="01-revisao.html"><span class="tag">Segurança</span><strong>O que bloquear antes de turmas</strong></a>
+        <a class="card" href="06-diagnostico.html"><span class="tag warn">Deploy</span><strong>Entenda os erros registrados</strong></a>
+        <a class="card" href="07-prioridades.html"><span class="tag">Evolução</span><strong>Compare impacto e esforço</strong></a>
+        <a class="card" href="05-manutencao.html"><span class="tag">Operação</span><strong>Backup e Premium manual</strong></a>
+      </div>
+      <p class="note">Esta pasta é pública no GitHub, mas o build não a copia para <code>dist/</code>. Não preencha guias com chaves, comprovantes ou dados de alunos.</p>
+    </main>
+  </div>
+  <footer><div class="shell">Linux Flow · Estado dos arquivos em 01/10/2026 · <a href="../.github/PROJECT_NOTES.md">Notas de manutenção</a></div></footer>
+</body>
+</html>

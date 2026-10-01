@@ -6,7 +6,7 @@ O site estático é publicado pela **Pages**. As rotas em `functions/api/` são 
 
 ## Antes de publicar
 
-1. Crie uma conta em [Cloudflare](https://dash.cloudflare.com/sign-up) e conecte-a ao GitHub. Você poderá fazer a autenticação e o 2FA pessoalmente; não coloque credenciais no código nem as compartilhe.
+1. A conversa salva indica que a conta Cloudflare, o 2FA e a conexão com GitHub foram configurados. Confirme no painel as permissões e os códigos de recuperação; não coloque credenciais no código nem as compartilhe.
 2. Confirme que o repositório `Jonathan-Eleodoro/linux-flow` contém a **versão local mais recente na raiz**. Ela deve incluir `functions/`, `cloudflare/`, `server/`, `sql/d1-schema.sql`, `package.json`, `package-lock.json`, `scripts/`, `index.html`, `css/`, `js/` e `assets/`. Inclua também `.gitignore`. Não envie `node_modules/`, `dist/`, `.env`, chaves de acesso de perfis ou credenciais.
 3. Na raiz do clone, execute `npm ci`, `npm test` e `npm run build`. O build só publica os arquivos permitidos em `dist/`; as Functions são descobertas separadamente pela Pages.
 
@@ -30,7 +30,7 @@ O HTML salvo da conversa de 01/10/2026 mostra três falhas distintas: `npx wrang
 
 No painel, devolva **Root directory** para a raiz/vazio, mantenha **Build output directory** em `dist` e **Build command** em `npm run build`. Confirme que a aplicação é Pages e que nenhum comando de Worker (`npx wrangler deploy`) será executado. Não renomeie nem exclua `functions/`: isso desativa perfil, ranking, grupos e Premium. `Build watch paths` controla quando um build dispara; não corrige a pasta de assets. Não crie `.pagesignore` para esconder as Functions.
 
-Não adicione agora um `wrangler.jsonc` parcial: quando o arquivo com `pages_build_output_dir` é usado como configuração de produção, ele passa a ser fonte de verdade também para bindings. Antes de migrar a configuração do painel para código, inclua os IDs reais dos bancos D1 de Production e Preview e revise as variáveis/segredos. Até lá, configure tudo pelo painel. Leia o [diagnóstico passo a passo](../guias-cloudflare/06-diagnostico.html).
+Em 01/10/2026, um `wrangler.jsonc` parcial foi reintroduzido no GitHub. Ele contém nome, data e compatibilidade, mas **não** define `pages_build_output_dir` nem binding D1; foi convertido de UTF-16 para UTF-8. Use o painel para Pages e D1 até decidir migrar toda a configuração. Se adicionar `pages_build_output_dir`, o arquivo passa a ser fonte de verdade também para bindings: inclua os IDs reais dos bancos de Production e Preview e revise variáveis/segredos antes do deploy. Leia o [diagnóstico passo a passo](../guias-cloudflare/06-diagnostico.html).
 
 O pequeno `functions/package.json` contém apenas `{"type":"module"}` para delimitar o formato dos arquivos `.js` das Functions. Não instala dependências nem cria um segundo build; deixe-o enquanto as Functions usam `import`/`export`.
 

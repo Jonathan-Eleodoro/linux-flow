@@ -2,8 +2,9 @@
 
 Este arquivo concentra decisões, mudanças de plano e trabalho pendente. Ele é público, mas fica fora do README para que a página inicial do repositório permaneça objetiva. Atualize a data e a situação de cada item ao mudar o produto.
 
-## Caminho atual — 30/09/2026
+## Caminho atual — 01/10/2026
 
+- Em 01/10/2026, `wrangler.jsonc` foi reintroduzido pelo navegador e convertido de UTF-16 para UTF-8. Ainda não define saída Pages nem D1; o deploy público e o binding permanecem sem comprovação. O painel visual e a priorização estão em `guias-cloudflare/index.html` e `guias-cloudflare/07-prioridades.html`.
 - Em 01/10/2026, a conversa salva sobre a Cloudflare mostrou deploys falhos: `wrangler deploy` tratou a raiz como assets de Worker; depois Pages encontrou `require("node:crypto")` no Pix; por fim, Root directory `dist` falhou antes do build. O diagnóstico está em `guias-cloudflare/06-diagnostico.html`.
 - O Pix, o QR e o hash do código de acesso foram adaptados para APIs Web; manter `functions/` para que Pages publique o backend.
 - A conta Cloudflare e o 2FA foram configurados segundo a conversa salva; o estado atual do painel e a publicação bem-sucedida ainda precisam ser verificados.
@@ -14,7 +15,7 @@ Este arquivo concentra decisões, mudanças de plano e trabalho pendente. Ele é
 - O GitHub pessoal de Jonathan contém o código na raiz. A conta Cloudflare deve pertencer ao projeto e receber membros individuais; nunca compartilhar senha ou 2FA.
 - Nada foi cadastrado no Aiven. A alternativa Vercel/MySQL foi retirada dos arquivos ativos; seu histórico permanece nos commits anteriores.
 - O contato público é `linuxflow2026@gmail.com`. Credenciais Pix, binding D1 e códigos de acesso não pertencem ao Git.
-- A Cloudflare ainda precisa ser criada/configurada e a publicação real ainda não foi validada. Consulte `docs/cloudflare-d1.md`.
+- A conta Cloudflare e o 2FA constam da conversa salva; a configuração Pages/D1 e a publicação real ainda não foram validadas. Consulte `docs/cloudflare-d1.md`.
 
 ## Entregue no código
 
