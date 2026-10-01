@@ -114,7 +114,7 @@ export async function onRequestPost(context) {
         return json({ error: "Perfil inválido." }, 400);
       await prepared(db,
         `INSERT INTO synced_profiles (id, access_key_hash, nickname, share_ranking)
-         VALUES (?, ?, ?, ?)`, body.id, accessKeyHash(body.key),
+        VALUES (?, ?, ?, ?)`, body.id, await accessKeyHash(body.key),
         body.name.trim(), Number(body.shareRanking === true)).run();
       return json({ created: true }, 201);
     }

@@ -1,5 +1,3 @@
-import { createHash } from "node:crypto";
-
 // Respostas da API não devem ser armazenadas pelo navegador ou por caches intermediários.
 export function json(value, status = 200) {
   return Response.json(value, { status, headers: {
@@ -36,8 +34,11 @@ export async function rows(db, sql, ...params) {
   return (await prepared(db, sql, ...params).all()).results;
 }
 
-export function accessKeyHash(key) {
-  return createHash("sha256").update(Buffer.from(key, "hex")).digest("hex");
+export async function accessKeyHash(key) {
+  // A chave hexadecimal é convertida em bytes antes do SHA-256.
+  const bytes = Uint8Array.from(key.match(/.{2}/g), (part) => Number.parseInt(part, 16));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 // O código de acesso é um segredo de posse; só seu hash é consultado no D1.
@@ -46,7 +47,7 @@ export async function authorized(context) {
   if (!match) return null;
   return first(database(context),
     "SELECT id, nickname, share_ranking AS shareRanking FROM synced_profiles WHERE access_key_hash = ?",
-    accessKeyHash(match[1]));
+    await accessKeyHash(match[1]));
 }
 
 // Falhas internas ficam nos logs do servidor; a resposta pública não expõe SQL.

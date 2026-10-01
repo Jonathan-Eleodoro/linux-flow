@@ -1,18 +1,17 @@
 "use strict";
 // Monta o BR Code Pix sem executar pagamento nem conferir crédito bancário.
-const { randomBytes } = require("node:crypto");
 
 function field(id, value) {
   // O tamanho de cada campo é medido em bytes UTF-8, conforme o formato TLV.
   const text = String(value);
-  const length = Buffer.byteLength(text, "utf8");
+  const length = new TextEncoder().encode(text).length;
   if (!/^\d{2}$/.test(id) || length > 99) throw new Error("Campo Pix inválido.");
   return id + String(length).padStart(2, "0") + text;
 }
 function crc16(payload) {
   // O CRC cobre todo o conteúdo anterior aos quatro caracteres finais.
   let crc = 0xffff;
-  for (const byte of Buffer.from(payload, "utf8")) {
+  for (const byte of new TextEncoder().encode(payload)) {
     crc ^= byte << 8;
     for (let bit = 0; bit < 8; bit++) crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
     crc &= 0xffff;
@@ -30,9 +29,13 @@ function amountCents(value) {
     throw new Error("Contribuição mínima de R$ 9,90; informe o valor em centavos.");
   return amount;
 }
-function newTxid() { return randomBytes(12).toString("hex").toUpperCase(); }
+function newTxid() {
+  // Web Crypto funciona tanto nos testes Node quanto nas Pages Functions.
+  return Array.from(globalThis.crypto.getRandomValues(new Uint8Array(12)),
+    (byte) => byte.toString(16).padStart(2, "0")).join("").toUpperCase();
+}
 function payload({ key, name, city, cents, txid }) {
-  if (typeof key !== "string" || !key.trim() || Buffer.byteLength(key, "utf8") > 77 ||
+  if (typeof key !== "string" || !key.trim() || new TextEncoder().encode(key).length > 77 ||
       !/^[A-Z0-9]{1,25}$/.test(txid)) throw new Error("Dados Pix inválidos.");
   const receiver = normalizeLabel(name, 25);
   const locality = normalizeLabel(city, 15);

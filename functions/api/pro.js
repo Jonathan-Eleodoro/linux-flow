@@ -1,4 +1,5 @@
-import QRCode from "qrcode";
+// A entrada browser gera SVG sem depender de módulos nativos do Node no Worker.
+import QRCode from "qrcode/lib/browser.js";
 import pixCore from "../../server/pix-core.cjs";
 import proData from "../../server/pro-data.cjs";
 import { authorized, database, first, json, prepared, publicError, readJson } from "../../cloudflare/common.mjs";
@@ -29,8 +30,9 @@ async function present(context, profileId) {
   // O QR mostra um pedido; nunca libera Premium por si só.
   const copyPaste = payload({ ...settings, cents: current.request.amountCents,
     txid: current.request.txid });
-  const qr = await QRCode.toDataURL(copyPaste,
+  const svg = await QRCode.toString(copyPaste,
     { errorCorrectionLevel: "M", margin: 3, width: 300 });
+  const qr = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   return { ...current, paymentReady: true, receiver: settings.name,
     copyPaste, qr };
 }

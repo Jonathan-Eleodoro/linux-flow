@@ -71,7 +71,7 @@ test("Pages Functions persistem perfil, tentativa verificada, ranking, sugestão
   response = await pro.onRequestPost(context(db, "POST", "/api/pro", {
     action: "create", amountCents: 990 }, key));
   assert.equal(response.status, 201);
-  assert.match((await response.json()).qr, /^data:image\/png;base64,/);
+  assert.match((await response.json()).qr, /^data:image\/svg\+xml;charset=utf-8,/);
   response = await profile.onRequestDelete(context(db, "DELETE", "/api/profile", null, key));
   assert.equal(response.status, 200);
   assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM synced_profiles").get().n, 0);

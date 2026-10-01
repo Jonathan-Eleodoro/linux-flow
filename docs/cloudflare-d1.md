@@ -18,11 +18,21 @@ O site estático é publicado pela **Pages**. As rotas em `functions/api/` são 
 
 ## Conectar GitHub e publicar
 
-1. Em **Workers & Pages → Create application → Pages → Connect to Git**, selecione `Jonathan-Eleodoro/linux-flow` e a branch que receberá as atualizações.
-2. Deixe **Root directory** na raiz do repositório (campo vazio ou `/`), configure **Build command** como `npm run build` e **Build output directory** como `dist`. Deixe o framework como **None**. A Pages instala as dependências do `package-lock.json` e publica a cada push na branch de produção.
-3. Em **Settings → Functions**, defina uma data de compatibilidade recente, ao menos `2026-08-04`, para disponibilidade das APIs Node usadas pelas Functions. Ative `nodejs_compat` se o painel exigir essa flag. Use os mesmos ajustes em **Production** e **Preview**. O build copia `_routes.json` para `dist/`, limitando as invocações das Functions a `/api/*`.
+1. Em **Workers & Pages → Create application → Pages → Connect to Git**, selecione `Jonathan-Eleodoro/linux-flow` e a branch que receberá as atualizações. Confirme que o tipo criado é **Pages**, não **Worker**.
+2. Deixe **Root directory** na raiz do repositório (campo vazio ou `/`), configure **Build command** como `npm run build` e **Build output directory** como `dist`. Deixe o framework como **None**. A Pages instala as dependências do `package-lock.json` e publica a cada push na branch de produção. **Não use `npx wrangler deploy` no campo Deploy command**: esse comando é de Worker e pode tentar enviar a raiz inteira, inclusive `node_modules/`.
+3. Em **Settings → Functions**, defina uma data de compatibilidade recente, ao menos `2026-08-04`, em **Production** e **Preview**. O fluxo atual usa Web Crypto e QR em SVG, sem `require("node:crypto")` no Pix. O build copia `_routes.json` para `dist/`, limitando as invocações das Functions a `/api/*`.
 4. Em **Settings → Bindings → Add → D1 database**, vincule o banco criado à variável **`DB`**. Faça isso no ambiente **Production**; se testar previews, use um banco D1 separado e outro binding `DB` em **Preview**. Salve e faça **Redeploy** após adicionar o binding.
 5. Em **Settings → Variables and Secrets**, configure `PIX_KEY`, `PIX_RECEIVER_NAME` e `PIX_RECEIVER_CITY` apenas quando for oferecer o Pix. Guarde a chave como secret e faça redeploy. Sem as três variáveis, a solicitação Premium permanece indisponível. Nunca coloque esses valores no GitHub.
+
+### Se o primeiro deploy falhou
+
+O HTML salvo da conversa de 01/10/2026 mostra três falhas distintas: `npx wrangler deploy` tentou publicar a raiz do repositório como Worker e encontrou `node_modules/workerd` maior que 25 MiB; o empacotamento das Pages Functions encontrou `require("node:crypto")` no Pix; e mudar o **Root directory** para `dist` causou `Cannot find cwd`, porque `dist` só surge depois do build. O código do Pix e do hash foi adaptado para Web Crypto e o QR usa SVG.
+
+No painel, devolva **Root directory** para a raiz/vazio, mantenha **Build output directory** em `dist` e **Build command** em `npm run build`. Confirme que a aplicação é Pages e que nenhum comando de Worker (`npx wrangler deploy`) será executado. Não renomeie nem exclua `functions/`: isso desativa perfil, ranking, grupos e Premium. `Build watch paths` controla quando um build dispara; não corrige a pasta de assets. Não crie `.pagesignore` para esconder as Functions.
+
+Não adicione agora um `wrangler.jsonc` parcial: quando o arquivo com `pages_build_output_dir` é usado como configuração de produção, ele passa a ser fonte de verdade também para bindings. Antes de migrar a configuração do painel para código, inclua os IDs reais dos bancos D1 de Production e Preview e revise as variáveis/segredos. Até lá, configure tudo pelo painel. Leia o [diagnóstico passo a passo](../guias-cloudflare/06-diagnostico.html).
+
+O pequeno `functions/package.json` contém apenas `{"type":"module"}` para delimitar o formato dos arquivos `.js` das Functions. Não instala dependências nem cria um segundo build; deixe-o enquanto as Functions usam `import`/`export`.
 
 ## Verificar no endereço `*.pages.dev`
 
