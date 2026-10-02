@@ -229,6 +229,16 @@ test("registros financeiros sobrevivem à exclusão do perfil por pelo menos um 
       /financial_retention_not_elapsed/);
     assert.throws(() => sql.exec("UPDATE financial_events SET status = 'rejected'"),
       /financial_event_immutable/);
+    sql.prepare("INSERT INTO synced_profiles (id, access_key_hash, nickname) VALUES (?, ?, ?)")
+      .run("buyer-two", "f".repeat(64), "Outro Comprador");
+    sql.exec(`INSERT INTO pro_requests (id, profile_id, txid, amount_cents, status)
+      VALUES ('pedido-two', 'buyer-two', 'TXID-TWO', 990, 'claimed')`);
+    assert.throws(() => sql.exec(`UPDATE pro_requests SET status = 'approved',
+      confirmed_payment_reference = 'EXTRATO-UNICO-FIN',
+      approved_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE id = 'pedido-two'`),
+    /UNIQUE constraint failed/);
+    assert.equal(sql.prepare("SELECT status FROM pro_requests WHERE id = 'pedido-two'").get().status,
+      "claimed");
     sql.close();
   });
 
