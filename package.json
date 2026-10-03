@@ -6,6 +6,7 @@
   "scripts": {
     "build": "node scripts/build.cjs",
     "test": "node --test tests/*.test.cjs",
+    "smoke:live": "node scripts/smoke-live.cjs",
     "start": "node scripts/preview.cjs"
   },
   "engines": {

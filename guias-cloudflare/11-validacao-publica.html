@@ -19,7 +19,7 @@
     <main id="conteudo">
       <div class="eyebrow">O endereço já existe</div>
       <h1>Faça a API responder antes de cadastrar pessoas.</h1>
-      <p class="lead">A captura mostra o projeto Pages com build <code>npm run build</code>, saída <code>dist</code> e binding <code>DB</code> para <code>linux-flow-db</code>. Em 01/10/2026, a consulta pública encontrou o site estático, mas <code>/api/health</code> e <code>/api/ranking</code> retornaram HTTP 503. <code>/api/health</code> continuou em 503 na consulta de 03/10/2026. A captura não mostra se o esquema e as migrações existem no D1.</p>
+      <p class="lead">A captura mostra o projeto Pages com build <code>npm run build</code>, saída <code>dist</code> e binding <code>DB</code> para <code>linux-flow-db</code>. A checagem pública de 03/10/2026 confirmou site HTTP 200, mas <code>/api/health</code> e <code>/api/ranking</code> retornaram HTTP 503. A captura não mostra se o esquema e as migrações existem no D1.</p>
       <div class="table-wrap"><table><thead><tr><th>Endereço</th><th>Observado</th><th>Para aceitar</th></tr></thead><tbody>
         <tr><th><code>/#inicio</code></th><td><span class="tag">Site abre</span></td><td>Landing e navegação utilizáveis</td></tr>
         <tr><th><code>/api/health</code></th><td><span class="tag danger">503 · unavailable</span></td><td>200 · <code>{"status":"ready"}</code></td></tr>
@@ -70,6 +70,8 @@ npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/005-financi
       </div>
 
       <h2>3. Comprove no domínio público</h2>
+      <p>Na raiz do clone, rode o comando abaixo para conferir site, saúde e ranking em uma única leitura. Ele usa apenas GET, não autentica, não cria dados e mostra somente a quantidade de posições do ranking. Se alguma etapa falhar, o processo termina com erro e indica este guia.</p>
+      <div class="copy-block"><button class="copy" data-copy="smoke-live">Copiar</button><pre><code id="smoke-live">npm run smoke:live</code></pre></div>
       <ol class="test-steps">
         <li><strong>Saúde da API</strong><p>Abra <a href="https://linux-flow.pages.dev/api/health" target="_blank" rel="noopener noreferrer">linux-flow.pages.dev/api/health</a> ou rode o comando abaixo. O código atualizado espera 20 tabelas, 14 gatilhos e nenhum pedido existente sem arquivo financeiro. Se ainda der 503, confira o commit publicado, o binding Production e os logs da Function; não adivinhe qual SQL falta. Com todas as estruturas presentes, confira a quantidade de pedidos sem arquivo pela consulta abaixo, sem abrir valores nem referências.</p><div class="copy-block"><button class="copy" data-copy="health">Copiar</button><pre><code id="health">curl.exe -i https://linux-flow.pages.dev/api/health</code></pre></div><div class="copy-block"><button class="copy" data-copy="archive-gaps">Copiar</button><pre><code id="archive-gaps">SELECT COUNT(*) AS pedidos_sem_arquivo
 FROM pro_requests r LEFT JOIN financial_records f ON f.request_id = r.id

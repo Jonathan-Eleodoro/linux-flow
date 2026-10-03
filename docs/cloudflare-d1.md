@@ -45,6 +45,7 @@ O pequeno `functions/package.json` contém apenas `{"type":"module"}` para delim
 
 ## Verificar no endereço `*.pages.dev`
 
+- Rode `npm run smoke:live` na raiz do clone. A checagem usa somente GET, não cria perfis nem imprime apelidos; ela falha enquanto site, saúde da API ou leitura do ranking não passarem. O [guia público](../guias-cloudflare/11-validacao-publica.html) detalha o diagnóstico.
 - Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB`, as 20 tabelas, os 14 gatilhos necessários e a ausência de pedidos sem arquivo financeiro. Em 03/10/2026, a URL pública retornou HTTP 503; veja o [passo a passo de diagnóstico](../guias-cloudflare/11-validacao-publica.html). A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui testes funcionais.
 - Abra o site no celular e no computador; teste as trilhas, o quiz e o terminal.
 - Acesse `/api/ranking?category=all&level=1&total=10`: antes de publicar resultados, a resposta deve ser `{"ranking":[]}`. Se receber erro 503, verifique o binding `DB`, o esquema e os logs das Functions.

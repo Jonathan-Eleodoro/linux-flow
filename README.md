@@ -20,6 +20,8 @@ Abra `http://127.0.0.1:4173`. A prévia serve o frontend; recursos de nuvem exig
 
 O frontend usa **Cloudflare Pages**, a API usa **Pages Functions** e os dados sincronizados usam **D1**. Para gerar `dist/`, execute `npm run build`. O passo a passo de banco, GitHub, binding `DB` e validação está em [docs/cloudflare-d1.md](docs/cloudflare-d1.md).
 
+Após publicar, `npm run smoke:live` verifica a página, `/api/health` e a leitura do ranking sem criar dados. O comando retorna erro enquanto a API ou o D1 estiverem indisponíveis.
+
 O [painel HTML de implantação](guias-cloudflare/index.html) compara o que está no código e o que falta validar na Cloudflare. O [plano e roteiro de testes](guias-cloudflare/08-plano-testes.html) acompanha a preparação para a primeira oferta. Esses guias ficam fora do site publicado.
 
 ## Limites

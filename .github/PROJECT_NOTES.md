@@ -18,7 +18,7 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 
 ## Caminho atual — 01/10/2026
 
-- A URL pública `https://linux-flow.pages.dev/` abre o frontend, mas `/api/health` retornou HTTP 503 novamente em 03/10/2026. A captura mostra binding `DB` para `linux-flow-db`; ainda falta inventariar o esquema remoto e aplicar apenas as migrações ausentes. O guia `guias-cloudflare/11-validacao-publica.html` orienta o diagnóstico.
+- `npm run smoke:live` confirmou em 03/10/2026: site HTTP 200, `/api/health` e `/api/ranking` HTTP 503. A captura mostra binding `DB` para `linux-flow-db`; ainda falta inventariar o esquema remoto e aplicar apenas as migrações ausentes. O guia `guias-cloudflare/11-validacao-publica.html` orienta o diagnóstico.
 - Ranking compartilhado agora exige perfil sincronizado e rodada verificada; a migração 004 remove entradas anônimas legadas. A migração 003 guarda pedidos e eventos financeiros por pelo menos um ano após o último evento, independentemente da exclusão do perfil. Ambos passaram em SQLite local; Pix e exclusão com pedido agora falham se o arquivo financeiro estiver incompleto. A nuvem ainda precisa de migração e teste.
 
 - A migração `sql/migrations/002-educator-access.sql` cria concessões docentes revogáveis. O criador comum ainda controla a sala, mas só um criador com concessão ativa lê logs nominativos ou resultados individuais do grupo. Testes locais cobrem concessão, isolamento e revogação; a escola ainda precisa definir e executar aprovação de pessoas reais. O roteiro está em `guias-cloudflare/10-acesso-docente.html`.
