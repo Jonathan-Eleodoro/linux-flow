@@ -16,6 +16,8 @@ test("checagem pública exige API pronta e não expõe apelidos do ranking", asy
     paths.push([new URL(url).pathname, options.method]);
     if (url.endsWith("/api/health"))
       return Response.json({ status: "ready" });
+    if (url.endsWith("/deployment.json"))
+      return Response.json({ commit: "a".repeat(40) });
     if (url.includes("/api/ranking?"))
       return Response.json({ ranking: [{ nickname: "Pessoa Fictícia" }] });
     return new Response("<!doctype html>", {
@@ -24,8 +26,9 @@ test("checagem pública exige API pronta e não expõe apelidos do ranking", asy
   };
   const result = await run(undefined, fetcher);
   assert.equal(result.ready, true);
-  assert.equal(result.results.length, 3);
-  assert.deepEqual(paths, [["/", "GET"], ["/api/health", "GET"],
+  assert.equal(result.results.length, 4);
+  assert.deepEqual(paths, [["/", "GET"], ["/deployment.json", "GET"],
+    ["/api/health", "GET"],
     ["/api/ranking", "GET"]]);
   assert.ok(!JSON.stringify(result).includes("Pessoa Fictícia"));
 
@@ -33,6 +36,6 @@ test("checagem pública exige API pronta e não expõe apelidos do ranking", asy
     url.endsWith("/api/health") ? Response.json({ status: "unavailable" }, { status: 503 })
       : new Response("<!doctype html>", { headers: { "Content-Type": "text/html" } }));
   assert.equal(unavailable.ready, false);
-  assert.equal(unavailable.results[1].status, 503);
-  assert.equal(unavailable.results[2].ok, false);
+  assert.equal(unavailable.results[2].status, 503);
+  assert.equal(unavailable.results[3].ok, false);
 });

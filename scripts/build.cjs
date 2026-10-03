@@ -10,4 +10,9 @@ fs.mkdirSync(out, { recursive: true });
 for (const name of ["index.html", "css", "js", "assets", "_headers", "_routes.json"]) {
   fs.cpSync(path.join(root, name), path.join(out, name), { recursive: true });
 }
+// Pages informa o SHA no build; o marcador público contém apenas esse ID do Git.
+const commit = process.env.CF_PAGES_COMMIT_SHA;
+if (/^[0-9a-f]{40}$/i.test(commit || ""))
+  fs.writeFileSync(path.join(out, "deployment.json"),
+    JSON.stringify({ commit: commit.toLowerCase() }) + "\n");
 console.log("Build estático concluído em dist.");

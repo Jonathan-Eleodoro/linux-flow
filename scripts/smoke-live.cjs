@@ -31,6 +31,14 @@ async function run(input, fetcher = fetch) {
       ok: response.ok && (response.headers.get("content-type") || "").includes("text/html"),
       detail: response.ok ? "HTML publicado" : "Site indisponível",
     })],
+    ["Deploy", "/deployment.json", async (response) => {
+      const body = await response.json().catch(() => null);
+      const commit = body?.commit;
+      const valid = response.status === 200 &&
+        typeof commit === "string" && /^[0-9a-f]{40}$/.test(commit);
+      return { ok: valid,
+        detail: valid ? `Commit ${commit.slice(0, 12)}` : "Commit do deploy não identificado" };
+    }],
     ["API", "/api/health", async (response) => {
       const body = await response.json().catch(() => null);
       return { ok: response.status === 200 && body?.status === "ready",
