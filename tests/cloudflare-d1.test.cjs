@@ -290,6 +290,14 @@ test("Pages Functions persistem perfil, tentativa verificada, ranking, sugestão
   response = await ranking.onRequestGet(context(db, "GET",
     "/api/ranking?category=all&level=1&total=1"));
   assert.equal((await response.json()).ranking[0].nickname, "Aluno Teste");
+  response = await profile.onRequestPost(context(db, "POST", "/api/profile", {
+    action: "sync", name: "Aluno Teste", shareRanking: false, results: [], labs: [],
+  }, key));
+  assert.equal(response.status, 200);
+  response = await ranking.onRequestGet(context(db, "GET",
+    "/api/ranking?category=all&level=1&total=1"));
+  assert.deepEqual(await response.json(), { ranking: [] });
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM ranking_attempts").get().n, 0);
   response = await feedback.onRequestPost(context(db, "POST", "/api/feedback", {
     email: "aluno@example.com", comment: "Gostei bastante das trilhas interativas!", agree: true,
   }));

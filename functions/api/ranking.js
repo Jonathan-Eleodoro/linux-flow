@@ -17,7 +17,8 @@ export async function onRequestGet(context) {
          FROM ranking_attempts r
          JOIN synced_profiles p ON p.id = r.participant_id
          JOIN profile_results v ON v.id = r.id AND v.profile_id = p.id AND v.verified = 1
-         WHERE r.category = ? AND r.level = ? AND r.total = ?
+         WHERE p.share_ranking = 1
+           AND r.category = ? AND r.level = ? AND r.total = ?
        ) WHERE participant_position = 1
        ORDER BY correct DESC, created_at ASC LIMIT 20`,
       filter.category, filter.level, filter.total);

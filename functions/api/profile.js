@@ -62,6 +62,9 @@ function verifiedAttemptStatements(db, profile, attempt, shareRanking) {
     attempt.id, profile.id, attempt.category, attempt.level,
     attempt.total, attempt.correct, new Date().toISOString()),
   ];
+  // Revogar o compartilhamento retira também as rodadas publicadas antes.
+  if (!shareRanking) statements.push(prepared(db,
+    "DELETE FROM ranking_attempts WHERE participant_id = ?", profile.id));
   for (let offset = 0; offset < attempt.outcomes.length; offset += 20) {
     const chunk = attempt.outcomes.slice(offset, offset + 20);
     statements.push(prepared(db,
@@ -134,6 +137,8 @@ export async function onRequestPost(context) {
         "UPDATE synced_profiles SET nickname = ?, share_ranking = ? WHERE id = ?",
         body.name.trim(), Number(body.shareRanking), profile.id),
       ...importedResultStatements(db, profile.id, results)];
+      if (!body.shareRanking) statements.push(prepared(db,
+        "DELETE FROM ranking_attempts WHERE participant_id = ?", profile.id));
       if (labs.length) statements.push(prepared(db,
         `INSERT OR IGNORE INTO profile_labs (profile_id, mission) VALUES
          ${labs.map(() => "(?, ?)").join(", ")}`,

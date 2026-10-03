@@ -32,7 +32,7 @@ Salas e grupos exigem perfil sincronizado. Quem cria uma sala controla a sessão
 
 ## Consentimento funcional
 
-O salvamento local é opt-in no cadastro. Ativar a sincronização salva o código de acesso no navegador. A publicação no ranking compartilhado exige perfil sincronizado, rodada verificada na API e uma opção separada. A tela Sobre permite apagar a cópia local ou apagar o perfil da nuvem. Desligar a publicação impede novos registros no ranking; os antigos são removidos ao apagar o perfil da nuvem. Pedidos e eventos financeiros ficam no arquivo independente por pelo menos um ano após o último evento.
+O salvamento local é opt-in no cadastro. Ativar a sincronização salva o código de acesso no navegador. A publicação no ranking compartilhado exige perfil sincronizado, rodada verificada na API e uma opção separada. A tela Sobre permite apagar a cópia local ou apagar o perfil da nuvem. Desligar a publicação oculta o perfil no ranking e remove suas rodadas publicadas anteriormente. Pedidos e eventos financeiros ficam no arquivo independente por pelo menos um ano após o último evento.
 
 Limites locais: 30 perfis e 300 resultados recentes. O navegador pode limpar os dados; perfis sincronizados podem ser recuperados com o código de acesso. Não há sincronização em tempo real entre abas. Resultados e missões são unidos por identificador; preferências de tema e som permanecem locais.
 
