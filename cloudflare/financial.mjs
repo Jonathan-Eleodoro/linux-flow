@@ -3,6 +3,7 @@ import { first } from "./common.mjs";
 export const financialTriggers = [
   "financial_records_keep_one_year", "financial_events_keep_one_year",
   "financial_events_append_only", "financial_records_keep_identity",
+  "financial_records_keep_retention",
   "financial_request_created", "financial_request_changed", "financial_request_removed",
   "financial_entitlement_granted", "financial_entitlement_removed",
 ];

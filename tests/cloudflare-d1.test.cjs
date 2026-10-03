@@ -19,6 +19,8 @@ function d1() {
     "../sql/migrations/003-financial-retention.sql"), "utf8"));
   sqlite.exec(fs.readFileSync(path.join(__dirname,
     "../sql/migrations/004-ranking-synced.sql"), "utf8"));
+  sqlite.exec(fs.readFileSync(path.join(__dirname,
+    "../sql/migrations/005-financial-retention-guard.sql"), "utf8"));
   const wrap = (sql, params = []) => ({
     bind: (...values) => wrap(sql, values),
     first: async () => sqlite.prepare(sql).get(...params) || null,
@@ -227,6 +229,12 @@ test("registros financeiros sobrevivem à exclusão do perfil por pelo menos um 
       /financial_retention_not_elapsed/);
     assert.throws(() => sql.exec("DELETE FROM financial_events WHERE request_id = 'pedido-fin'"),
       /financial_retention_not_elapsed/);
+    assert.throws(() => sql.exec(`UPDATE financial_records
+      SET retain_until = '2000-01-01T00:00:00Z' WHERE request_id = 'pedido-fin'`),
+    /financial_retention_cannot_shorten/);
+    assert.throws(() => sql.exec(`UPDATE financial_records
+      SET last_event_at = '2040-01-01T00:00:00Z' WHERE request_id = 'pedido-fin'`),
+    /financial_retention_cannot_shorten/);
     assert.throws(() => sql.exec("UPDATE financial_events SET status = 'rejected'"),
       /financial_event_immutable/);
     sql.prepare("INSERT INTO synced_profiles (id, access_key_hash, nickname) VALUES (?, ?, ?)")

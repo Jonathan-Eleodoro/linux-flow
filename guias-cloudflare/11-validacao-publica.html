@@ -41,13 +41,14 @@ WHERE name IN (
   'pro_requests_grant_after_approval', 'pro_requests_keep_approved',
   'financial_records_keep_one_year', 'financial_events_keep_one_year',
   'financial_events_append_only', 'financial_records_keep_identity',
+  'financial_records_keep_retention',
   'financial_request_created', 'financial_request_changed',
   'financial_request_removed', 'financial_entitlement_granted',
   'financial_entitlement_removed', 'ranking_requires_verified_profile',
   'ranking_keep_verified_profile', 'pro_requests_confirmed_payment',
   'educator_grants_one_active'
 )
-ORDER BY type, name;</code></pre></div><div class="test-result"><b>Esperado</b><span>35 nomes: 20 tabelas, 13 gatilhos e 2 índices. O endpoint de saúde confere as tabelas e gatilhos; os índices ajudam a detectar migrações parciais. Qualquer nome ausente exige diagnóstico antes de executar SQL.</span></div></li>
+ORDER BY type, name;</code></pre></div><div class="test-result"><b>Esperado</b><span>36 nomes: 20 tabelas, 14 gatilhos e 2 índices. O endpoint de saúde confere as tabelas e gatilhos; os índices ajudam a detectar migrações parciais. Qualquer nome ausente exige diagnóstico antes de executar SQL.</span></div></li>
         <li><strong>Confira as colunas alteradas</strong><p>No mesmo Console, execute <code>PRAGMA table_info(pro_requests);</code> e <code>PRAGMA table_info(profile_results);</code>. Procure <code>confirmed_payment_reference</code> na primeira tabela e <code>verified</code> na segunda. Compartilhe apenas os nomes das colunas. A 001 acrescenta <code>confirmed_payment_reference</code> e <b>não deve ser repetida</b> se a coluna já existe. Se a coluna, o índice e os gatilhos não concordarem, pare e registre a inconsistência antes de alterar o banco.</p><div class="test-result"><b>Esperado</b><span>Estruturas da mesma migração presentes juntas, ou todas ausentes. O banco parcialmente migrado precisa de reparo específico.</span></div></li>
       </ol>
 
@@ -57,18 +58,20 @@ ORDER BY type, name;</code></pre></div><div class="test-result"><b>Esperado</b><
 npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/001-premium-approval.sql
 npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/002-educator-access.sql
 npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/003-financial-retention.sql
-npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/004-ranking-synced.sql</code></pre></div>
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/004-ranking-synced.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/005-financial-retention-guard.sql</code></pre></div>
       <p class="note danger"><strong>Não execute o bloco inteiro cegamente.</strong> Em banco vazio, siga a ordem completa. Se a base ou alguma migração já estiver aplicada, execute apenas as ausentes. A 004 exclui pontuações legadas sem perfil e rodada verificada; confira o backup antes dela. Se a 001 estiver parcialmente aplicada, interrompa e peça análise do inventário, sem colar dados pessoais.</p>
       <div class="gate-grid">
         <div class="gate"><strong>001 · Premium</strong><span>Coluna e gatilhos de aprovação; uma única aplicação.</span></div>
         <div class="gate"><strong>002 · Docentes</strong><span>Concessão manual e revogável de acesso a relatórios.</span></div>
         <div class="gate"><strong>003 · Finanças</strong><span>Histórico independente do perfil, preservado por pelo menos um ano.</span></div>
         <div class="gate"><strong>004 · Ranking</strong><span>Retira entradas anônimas legadas e exige rodada verificada.</span></div>
+        <div class="gate"><strong>005 · Retenção</strong><span>Impede encurtar o prazo financeiro já concedido.</span></div>
       </div>
 
       <h2>3. Comprove no domínio público</h2>
       <ol class="test-steps">
-        <li><strong>Saúde da API</strong><p>Abra <a href="https://linux-flow.pages.dev/api/health" target="_blank" rel="noopener noreferrer">linux-flow.pages.dev/api/health</a> ou rode o comando abaixo. O código atualizado espera 20 tabelas, 13 gatilhos e nenhum pedido existente sem arquivo financeiro. Se ainda der 503, confira o commit publicado, o binding Production e os logs da Function; não adivinhe qual SQL falta. Com todas as estruturas presentes, confira a quantidade de pedidos sem arquivo pela consulta abaixo, sem abrir valores nem referências.</p><div class="copy-block"><button class="copy" data-copy="health">Copiar</button><pre><code id="health">curl.exe -i https://linux-flow.pages.dev/api/health</code></pre></div><div class="copy-block"><button class="copy" data-copy="archive-gaps">Copiar</button><pre><code id="archive-gaps">SELECT COUNT(*) AS pedidos_sem_arquivo
+        <li><strong>Saúde da API</strong><p>Abra <a href="https://linux-flow.pages.dev/api/health" target="_blank" rel="noopener noreferrer">linux-flow.pages.dev/api/health</a> ou rode o comando abaixo. O código atualizado espera 20 tabelas, 14 gatilhos e nenhum pedido existente sem arquivo financeiro. Se ainda der 503, confira o commit publicado, o binding Production e os logs da Function; não adivinhe qual SQL falta. Com todas as estruturas presentes, confira a quantidade de pedidos sem arquivo pela consulta abaixo, sem abrir valores nem referências.</p><div class="copy-block"><button class="copy" data-copy="health">Copiar</button><pre><code id="health">curl.exe -i https://linux-flow.pages.dev/api/health</code></pre></div><div class="copy-block"><button class="copy" data-copy="archive-gaps">Copiar</button><pre><code id="archive-gaps">SELECT COUNT(*) AS pedidos_sem_arquivo
 FROM pro_requests r LEFT JOIN financial_records f ON f.request_id = r.id
 WHERE f.request_id IS NULL;</code></pre></div><div class="test-result"><b>Esperado</b><span>HTTP 200, <code>{"status":"ready"}</code> e zero pedidos sem arquivo. Isso ainda não prova que perfil, ranking ou Pix estejam funcionando.</span></div></li>
         <li><strong>Ranking vazio ou autenticado</strong><p>Abra <code>https://linux-flow.pages.dev/api/ranking?category=all&amp;level=1&amp;total=10</code>. Sem rodadas publicadas por perfis sincronizados, a resposta deve ser <code>{"ranking":[]}</code>. No PowerShell, teste também a recusa de envio direto sem perfil; esse comando não grava resultado. Na guia <a href="04-validacao.html">Validação</a>, faça depois uma rodada com perfil fictício sincronizado.</p><div class="copy-block"><button class="copy" data-copy="anonymous-ranking">Copiar</button><pre><code id="anonymous-ranking">curl.exe -i -X POST https://linux-flow.pages.dev/api/ranking -H "Content-Type: application/json" --data "{}"</code></pre></div><div class="test-result"><b>Esperado</b><span>GET com HTTP 200 e nenhuma pontuação anônima; POST direto com HTTP 403.</span></div></li>

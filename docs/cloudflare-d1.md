@@ -13,7 +13,7 @@ O site estático é publicado pela **Pages**. As rotas em `functions/api/` são 
 ## Criar o banco
 
 1. Em **Cloudflare Dashboard → Storage & databases → D1 SQL database**, abra o banco `linux-flow-db` mostrado no binding `DB`. Antes de modificar, siga o [diagnóstico da publicação](../guias-cloudflare/11-validacao-publica.html) para ver o que já existe.
-2. Na aba **Console** desse banco, aplique [`sql/d1-schema.sql`](../sql/d1-schema.sql) e as migrações [001](../sql/migrations/001-premium-approval.sql), [002](../sql/migrations/002-educator-access.sql), [003](../sql/migrations/003-financial-retention.sql) e [004](../sql/migrations/004-ranking-synced.sql), nessa ordem, **somente se faltarem**. A 001 não pode ser repetida. Em banco com dados, faça backup antes; a 004 remove pontuações legadas sem perfil e rodada verificada.
+2. Na aba **Console** desse banco, aplique [`sql/d1-schema.sql`](../sql/d1-schema.sql) e as migrações [001](../sql/migrations/001-premium-approval.sql), [002](../sql/migrations/002-educator-access.sql), [003](../sql/migrations/003-financial-retention.sql), [004](../sql/migrations/004-ranking-synced.sql) e [005](../sql/migrations/005-financial-retention-guard.sql), nessa ordem, **somente se faltarem**. A 001 não pode ser repetida. Em banco com dados, faça backup antes; a 004 remove pontuações legadas sem perfil e rodada verificada. A 005 recusa encurtar o prazo financeiro já registrado.
 
 ```powershell
 npx wrangler d1 execute linux-flow-db --remote --file=sql/d1-schema.sql
@@ -21,6 +21,7 @@ npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/001-premium
 npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/002-educator-access.sql
 npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/003-financial-retention.sql
 npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/004-ranking-synced.sql
+npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/005-financial-retention-guard.sql
 ```
 3. Confira que as tabelas de perfil, ranking, sugestões e Premium aparecem, além de `game_rooms`, `game_members`, `game_answers`, `game_events`, `study_groups`, `study_members`, `study_suggestions` e `community_profiles`. Como nenhum dado foi colocado no Aiven, não há importação de dados.
 
@@ -44,7 +45,7 @@ O pequeno `functions/package.json` contém apenas `{"type":"module"}` para delim
 
 ## Verificar no endereço `*.pages.dev`
 
-- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB`, as 20 tabelas e 13 gatilhos necessários. Em 01/10/2026, a URL pública retornou HTTP 503; veja o [passo a passo de diagnóstico](../guias-cloudflare/11-validacao-publica.html). A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui testes funcionais.
+- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB`, as 20 tabelas, os 14 gatilhos necessários e a ausência de pedidos sem arquivo financeiro. Em 03/10/2026, a URL pública retornou HTTP 503; veja o [passo a passo de diagnóstico](../guias-cloudflare/11-validacao-publica.html). A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui testes funcionais.
 - Abra o site no celular e no computador; teste as trilhas, o quiz e o terminal.
 - Acesse `/api/ranking?category=all&level=1&total=10`: antes de publicar resultados, a resposta deve ser `{"ranking":[]}`. Se receber erro 503, verifique o binding `DB`, o esquema e os logs das Functions.
 - Crie um perfil de teste, ative a sincronização, anote o código de acesso e recarregue. Confira se o progresso reaparece. Faça um quiz com publicação opcional e confira o ranking.
