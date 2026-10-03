@@ -4,6 +4,7 @@
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g,
     (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&#39;" })[ch]);
   let activeCode = "", activeKind = "", timer = null, selected = "";
+  let refreshing = false;
   let root, profile, quick;
   const key = () => profile?.syncKey;
   // Todas as ações coletivas enviam a chave do perfil para a mesma origem.
@@ -170,14 +171,24 @@
   }
   async function refresh() {
     // A consulta periódica substitui tempo real enquanto não há canal persistente.
-    if (!root || location.hash !== "#comunidade" || !activeCode) return;
+    if (!root || location.hash !== "#comunidade" || !activeCode ||
+        document.visibilityState === "hidden" || refreshing) return;
+    const kind = activeKind, code = activeCode;
+    refreshing = true;
     try {
       const value = await api("GET", null,
-        `?${activeKind}=${encodeURIComponent(activeCode)}`);
-      if (activeKind === "room") showRoom(value); else showGroup(value);
+        `?${kind}=${encodeURIComponent(code)}`);
+      if (kind !== activeKind || code !== activeCode ||
+          location.hash !== "#comunidade") return;
+      if (kind === "room") showRoom(value); else showGroup(value);
       status("");
-    } catch (error) { status(error.message, true); }
+    } catch (error) {
+      if (kind === activeKind && code === activeCode) status(error.message, true);
+    } finally { refreshing = false; }
   }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") refresh();
+  });
   function mount(target, currentProfile, quickGame) {
     // Ao sair da aba, o intervalo anterior é encerrado para poupar requisições.
     clearInterval(timer);
