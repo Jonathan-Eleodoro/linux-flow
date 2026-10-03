@@ -13,6 +13,14 @@
 
   // Cada linha guarda o texto original e as traduções; apenas pt-BR e es estão ativos.
   const rows = [
+    ["Mostrar minhas pontuações no ranking compartilhado", "Mostrar minhas pontuações no ranking compartilhado", "Mostrar mis puntuaciones en la clasificación compartida"],
+    ["Disponível para perfis sincronizados. Desativar remove as pontuações anteriores após confirmação da nuvem.", "Disponível para perfis sincronizados. Desativar remove as pontuações anteriores após confirmação da nuvem.", "Disponible para perfiles sincronizados. Al desactivarlo, las puntuaciones anteriores se eliminan tras la confirmación en la nube."],
+    ["Remoção do ranking ainda não confirmada na nuvem. Sincronize novamente.", "Remoção do ranking ainda não confirmada na nuvem. Sincronize novamente.", "La eliminación de la clasificación aún no se ha confirmado en la nube. Vuelve a sincronizar."],
+    ["Compartilhamento ativado na nuvem.", "Compartilhamento ativado na nuvem.", "Publicación activada en la nube."],
+    ["Pontuações removidas do ranking compartilhado.", "Pontuações removidas do ranking compartilhado.", "Puntuaciones eliminadas de la clasificación compartida."],
+    ["Não foi possível confirmar o compartilhamento na nuvem.", "Não foi possível confirmar o compartilhamento na nuvem.", "No se pudo confirmar la publicación en la nube."],
+    ["Não foi possível confirmar a remoção. Sincronize novamente.", "Não foi possível confirmar a remoção. Sincronize novamente.", "No se pudo confirmar la eliminación. Vuelve a sincronizar."],
+    ["O ranking compartilhado exige perfil sincronizado e é opcional. Publica apelido, assunto, nível, número de questões, acertos e data. Desativá-lo retira as pontuações anteriores do ranking quando a sincronização for confirmada.", "O ranking compartilhado exige perfil sincronizado e é opcional. Publica apelido, assunto, nível, número de questões, acertos e data. Desativá-lo retira as pontuações anteriores do ranking quando a sincronização for confirmada.", "La clasificación compartida requiere un perfil sincronizado y es opcional. Publica el alias, el tema, el nivel, el número de preguntas, los aciertos y la fecha. Al desactivarla, las puntuaciones anteriores se retiran cuando se confirma la sincronización."],
     ["Comunidade", "Comunidade", "Comunidad"],
     ["JOGAR E APRENDER JUNTO", "JOGAR E APRENDER JUNTO", "JUGAR Y APRENDER JUNTOS"],
     ["Pratique sozinho, dispute um duelo ou reúna a turma.", "Pratique sozinho, dispute um duelo ou reúna a turma.", "Practica a solas, disputa un duelo o reúne al grupo."],

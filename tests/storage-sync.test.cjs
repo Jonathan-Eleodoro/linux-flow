@@ -10,7 +10,10 @@ test("código de acesso válido persiste por perfil e chave inválida é descart
   const saved = JSON.stringify({
     profiles: [
       { id: "a", name: "Ana", shareRanking: true, syncKey: "a".repeat(64) },
-      { id: "b", name: "Bia", shareRanking: false, syncKey: "curta" },
+      { id: "b", name: "Bia", shareRanking: false,
+        shareRankingPending: true, syncKey: "curta" },
+      { id: "c", name: "Cris", shareRanking: false,
+        shareRankingPending: true, syncKey: "c".repeat(64) },
     ],
     current: "a", results: [], labs: [],
   });
@@ -24,6 +27,8 @@ test("código de acesso válido persiste por perfil e chave inválida é descart
   assert.equal(profiles[0].shareRanking, true);
   assert.equal(profiles[1].syncKey, null);
   assert.equal(profiles[1].shareRanking, false);
+  assert.equal(profiles[1].shareRankingPending, false);
+  assert.equal(profiles[2].shareRankingPending, true);
 });
 
 test("sessão livre não entra na cópia persistida", () => {

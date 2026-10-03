@@ -46,6 +46,8 @@
       state.profiles = (Array.isArray(saved.profiles) ? saved.profiles : [])
         .filter((p) => p && safeId(p.id) && safeName(p.name))
         .map((p) => ({ id: p.id, name: p.name, shareRanking: p.shareRanking === true,
+          shareRankingPending: p.shareRanking !== true && p.shareRankingPending === true &&
+            typeof p.syncKey === "string" && /^[0-9a-f]{64}$/.test(p.syncKey),
           pro: p.pro === true,
           syncKey: typeof p.syncKey === "string" && /^[0-9a-f]{64}$/.test(p.syncKey)
             ? p.syncKey : null }))
