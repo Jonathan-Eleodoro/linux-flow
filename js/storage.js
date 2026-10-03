@@ -17,8 +17,11 @@
       sound: false,
     };
   }
+  // Mesma regra da API: rejeite controles que mudam a aparência do apelido.
+  const unsafeNameControl = /[\u0000-\u001f\u007f-\u009f\u200b\u200e\u200f\u202a-\u202e\u2066-\u2069\ufeff]/;
   const safeName = (value) =>
-    typeof value === "string" && value.trim().length >= 2 && value.length <= 32;
+    typeof value === "string" && value.trim().length >= 2 &&
+    value.length <= 32 && !unsafeNameControl.test(value);
   const safeId = (value) =>
     typeof value === "string" && /^[a-zA-Z0-9_-]{1,80}$/.test(value);
   function validRecord(r, ids) {

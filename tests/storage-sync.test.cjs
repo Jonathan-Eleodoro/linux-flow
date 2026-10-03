@@ -6,6 +6,17 @@ const fs = require("node:fs");
 const path = require("node:path");
 const source = fs.readFileSync(path.join(__dirname, "../js/storage.js"), "utf8");
 
+test("navegador e API aplicam a mesma regra de apelido", () => {
+  const context = { window: {}, FlowData: { categories: [] },
+    localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} } };
+  vm.runInNewContext(source, context);
+  const browserRule = context.window.FlowStore.safeName;
+  const serverRule = require("../server/profile-core.cjs").safeName;
+  for (const name of ["João Pérez", "Aluna", "João\nPérez", "Professor\u202Eadmin",
+    "Ana\u200BMaria", "x", "a".repeat(33)])
+    assert.equal(browserRule(name), serverRule(name), name);
+});
+
 test("código de acesso válido persiste por perfil e chave inválida é descartada", () => {
   const saved = JSON.stringify({
     profiles: [
