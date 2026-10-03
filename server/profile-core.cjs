@@ -4,8 +4,10 @@ const { FlowData } = require("../js/data.js");
 const categories = new Set(["all", ...FlowData.categories.map((category) => category.id)]);
 const safeId = (value) => typeof value === "string" && /^[a-zA-Z0-9_-]{1,80}$/.test(value);
 const safeKey = (value) => typeof value === "string" && /^[0-9a-f]{64}$/.test(value);
+// Controles e marcas de direção podem quebrar ou disfarçar apelidos exibidos a outras pessoas.
+const unsafeNameControl = /[\u0000-\u001f\u007f-\u009f\u200b\u200e\u200f\u202a-\u202e\u2066-\u2069\ufeff]/;
 const safeName = (value) => typeof value === "string" &&
-  value.trim().length >= 2 && value.length <= 32;
+  value.trim().length >= 2 && value.length <= 32 && !unsafeNameControl.test(value);
 
 function validateResults(results) {
   // IDs repetidos e notas impossíveis não entram no histórico compartilhado.

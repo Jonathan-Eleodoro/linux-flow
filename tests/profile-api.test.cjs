@@ -1,7 +1,14 @@
 // Confere os limites de dados importados para um perfil sincronizado.
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { validateResults, validateLabs, safeKey } = require("../server/profile-core.cjs");
+const { validateResults, validateLabs, safeKey, safeName } = require("../server/profile-core.cjs");
+
+test("apelidos mantêm acentos e rejeitam quebras ou inversão visual", () => {
+  assert.equal(safeName("João Pérez"), true);
+  assert.equal(safeName("João\nPérez"), false);
+  assert.equal(safeName("Professor\u202Eadmin"), false);
+  assert.equal(safeName("Ana\u200BMaria"), false);
+});
 
 test("perfil aceita chave forte e histórico local válido", () => {
   assert.equal(safeKey("a".repeat(64)), true);
