@@ -1,5 +1,5 @@
 -- Cloudflare D1 / SQLite. Aplique uma vez antes de ativar as Pages Functions.
-PRAGMA foreign_keys = ON;
+-- O D1 já aplica chaves estrangeiras; seu executor não permite alternar esta PRAGMA.
 
 -- Perfis usam hash de chave; o código original nunca é persistido aqui.
 CREATE TABLE IF NOT EXISTS synced_profiles (

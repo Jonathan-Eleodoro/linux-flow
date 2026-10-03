@@ -12,8 +12,9 @@ O site estático é publicado pela **Pages**. As rotas em `functions/api/` são 
 
 ## Criar o banco
 
-1. Em **Cloudflare Dashboard → Storage & databases → D1 SQL database**, abra o banco `linux-flow-db` mostrado no binding `DB`. Antes de modificar, siga o [diagnóstico da publicação](../guias-cloudflare/11-validacao-publica.html) para ver o que já existe.
-2. Na aba **Console** desse banco, aplique [`sql/d1-schema.sql`](../sql/d1-schema.sql) e as migrações [001](../sql/migrations/001-premium-approval.sql), [002](../sql/migrations/002-educator-access.sql), [003](../sql/migrations/003-financial-retention.sql), [004](../sql/migrations/004-ranking-synced.sql) e [005](../sql/migrations/005-financial-retention-guard.sql), nessa ordem, **somente se faltarem**. A 001 não pode ser repetida. Em banco com dados, faça backup antes; a 004 remove pontuações legadas sem perfil e rodada verificada. A 005 recusa encurtar o prazo financeiro já registrado.
+1. Em **Cloudflare Dashboard → Storage & databases → D1 SQL database**, abra `linux-flow-db`, vinculado à variável `DB`. A consulta de 03/10/2026 mostrou somente `_cf_KV`, estrutura interna da Cloudflare; não há tabelas da aplicação nesse banco. O [guia visual](../guias-cloudflare/11-validacao-publica.html) registra a evidência e os próximos testes.
+2. Na raiz do clone, use PowerShell para autenticar o Wrangler com `npx wrangler login --device`; conclua o 2FA no navegador sem compartilhar credenciais. Confirme a conta com `npx wrangler whoami` e verifique com `npx wrangler d1 info linux-flow-db` que o ID é `3d0512f2-340d-44ca-8774-597d8b611f96`. Se for diferente, pare.
+3. Execute [`sql/d1-schema.sql`](../sql/d1-schema.sql) e as migrações [001](../sql/migrations/001-premium-approval.sql), [002](../sql/migrations/002-educator-access.sql), [003](../sql/migrations/003-financial-retention.sql), [004](../sql/migrations/004-ranking-synced.sql) e [005](../sql/migrations/005-financial-retention-guard.sql), **uma linha por vez**, na ordem abaixo, aguardando sucesso antes da próxima. Pare no primeiro erro; a 001 não pode ser repetida após sucesso. Se aparecerem dados ou estruturas novos antes da aplicação, reavalie e faça backup. A 004 removeria pontuações antigas sem perfil verificado.
 
 ```powershell
 npx wrangler d1 execute linux-flow-db --remote --file=sql/d1-schema.sql
@@ -23,7 +24,7 @@ npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/003-financi
 npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/004-ranking-synced.sql
 npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/005-financial-retention-guard.sql
 ```
-3. Confira que as tabelas de perfil, ranking, sugestões e Premium aparecem, além de `game_rooms`, `game_members`, `game_answers`, `game_events`, `study_groups`, `study_members`, `study_suggestions` e `community_profiles`. Como nenhum dado foi colocado no Aiven, não há importação de dados.
+4. Confira que as tabelas de perfil, ranking, sugestões e Premium aparecem, além de `game_rooms`, `game_members`, `game_answers`, `game_events`, `study_groups`, `study_members`, `study_suggestions` e `community_profiles`. Como nenhum dado foi colocado no Aiven, não há importação de dados.
 
 ## Conectar GitHub e publicar
 

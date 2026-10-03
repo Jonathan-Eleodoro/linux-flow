@@ -8,8 +8,15 @@ let DatabaseSync;
 try { ({ DatabaseSync } = require("node:sqlite")); } catch { /* Node 20 não inclui SQLite nativo. */ }
 const { FlowData } = require("../js/data.js");
 
-function d1() {
+function sqliteMemory() {
   const sqlite = new DatabaseSync(":memory:");
+  // O D1 impõe chaves estrangeiras; o SQLite local precisa desta configuração.
+  sqlite.exec("PRAGMA foreign_keys = ON");
+  return sqlite;
+}
+
+function d1() {
+  const sqlite = sqliteMemory();
   sqlite.exec(fs.readFileSync(path.join(__dirname, "../sql/d1-schema.sql"), "utf8"));
   sqlite.exec(fs.readFileSync(path.join(__dirname,
     "../sql/migrations/001-premium-approval.sql"), "utf8"));
@@ -121,7 +128,7 @@ test("aprovação Premium é atômica e exige referência bancária única",
 
 test("migração Premium preserva pedidos já criados e exige data de aprovação",
   { skip: !DatabaseSync }, () => {
-    const sql = new DatabaseSync(":memory:");
+    const sql = sqliteMemory();
     sql.exec(fs.readFileSync(path.join(__dirname, "../sql/d1-schema.sql"), "utf8"));
     sql.prepare("INSERT INTO synced_profiles (id, access_key_hash, nickname) VALUES (?, ?, ?)")
       .run("legacy", "d".repeat(64), "Teste legado");
@@ -163,7 +170,7 @@ test("ranking rejeita envio sem perfil e remove pontuações legadas anônimas",
     assert.deepEqual(await publicResult.json(), { ranking: [] });
     db.sqlite.close();
 
-    const legacy = new DatabaseSync(":memory:");
+    const legacy = sqliteMemory();
     legacy.exec(fs.readFileSync(path.join(__dirname, "../sql/d1-schema.sql"), "utf8"));
     legacy.exec(`INSERT INTO ranking_attempts
       (id, participant_id, nickname, category, level, total, correct)
@@ -176,7 +183,7 @@ test("ranking rejeita envio sem perfil e remove pontuações legadas anônimas",
 
 test("migração financeira guarda pedidos preexistentes sem duplicar o histórico",
   { skip: !DatabaseSync }, () => {
-    const sql = new DatabaseSync(":memory:");
+    const sql = sqliteMemory();
     sql.exec(fs.readFileSync(path.join(__dirname, "../sql/d1-schema.sql"), "utf8"));
     sql.exec(fs.readFileSync(path.join(__dirname,
       "../sql/migrations/001-premium-approval.sql"), "utf8"));

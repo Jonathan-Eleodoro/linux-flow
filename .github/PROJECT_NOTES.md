@@ -8,7 +8,7 @@ O plano visual, os donos e o roteiro de teste estão em [`guias-cloudflare/08-pl
 
 | Marco | Dono | Evidência necessária | Situação em 03/10/2026 |
 |---|---|---|---|
-| Infraestrutura Pages + D1 | Jonathan + Codex | URL pública, deploy bem-sucedido, `/api/health` 200 em Production e Preview | Frontend publicado; API 503, esquema D1 a conferir |
+| Infraestrutura Pages + D1 | Jonathan + Codex | URL pública, deploy bem-sucedido, `/api/health` 200 em Production e Preview | Frontend publicado; D1 sem tabelas da aplicação, inicialização pendente |
 | Fluxo de dados fictícios | Jonathan + Codex | Perfil, quiz, ranking, exclusão e sala com duas identidades de teste | Aguardando infraestrutura |
 | Produto pedagógico | Professor/escola + Codex | Questões revisadas, direitos de uso esclarecidos e piloto supervisionado | Inventário visual pronto; aprovação pendente |
 | Privacidade e papel docente | Responsável institucional | Regras para menores, retenção, moderação e concessão/revogação de acesso | Decisão institucional pendente |
@@ -18,7 +18,7 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 
 ## Caminho atual — 03/10/2026
 
-- `npm run smoke:live` confirmou em 03/10/2026: site HTTP 200 e commit `9d9710a` publicado; `/api/health` e `/api/ranking` continuam HTTP 503. A captura mostra binding `DB` para `linux-flow-db` e a tela de métricas registra consultas da API, mas não revela seus resultados nem prova esquema íntegro. O Console D1 está acessível; aguardar o inventário somente de leitura de `sqlite_master` antes de aplicar qualquer SQL. O guia `guias-cloudflare/11-validacao-publica.html` orienta o diagnóstico.
+- `npm run smoke:live` confirmou em 03/10/2026: site HTTP 200 e deploy publicado; `/api/health` e `/api/ranking` retornam HTTP 503. A captura mostra binding `DB` para `linux-flow-db`. O Console D1 retornou apenas `_cf_KV` ao consultar tabelas e índices em `sqlite_schema`: nenhuma tabela da aplicação existe nesse banco. O responsável informou que não há dados reais. O próximo passo é autenticar o Wrangler na conta correta, confirmar o ID do banco e aplicar `d1-schema.sql` + migrações 001–005, uma por vez; depois conferir inventário, saúde e fluxos fictícios. O guia `guias-cloudflare/11-validacao-publica.html` traz os comandos copiáveis.
 - Ranking compartilhado agora exige perfil sincronizado e rodada verificada; a migração 004 remove entradas anônimas legadas. A migração 003 guarda pedidos e eventos financeiros por pelo menos um ano após o último evento, independentemente da exclusão do perfil. Ambos passaram em SQLite local; Pix e exclusão com pedido agora falham se o arquivo financeiro estiver incompleto. A nuvem ainda precisa de migração e teste.
 
 - A migração `sql/migrations/002-educator-access.sql` cria concessões docentes revogáveis. O criador comum ainda controla a sala, mas só um criador com concessão ativa lê logs nominativos ou resultados individuais do grupo. Testes locais cobrem concessão, isolamento e revogação; a escola ainda precisa definir e executar aprovação de pessoas reais. O roteiro está em `guias-cloudflare/10-acesso-docente.html`.
