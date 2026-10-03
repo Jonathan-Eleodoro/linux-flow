@@ -15,3 +15,11 @@ export async function financialReady(db) {
   ...financialTriggers);
   return Number(result?.total) === financialTriggers.length + 2;
 }
+
+// Um esquema completo não garante que pedidos criados antes da migração foram arquivados.
+export async function financialProfileReady(db, profileId) {
+  const missing = await first(db, `SELECT r.id FROM pro_requests r
+    LEFT JOIN financial_records f ON f.request_id = r.id
+    WHERE r.profile_id = ? AND f.request_id IS NULL LIMIT 1`, profileId);
+  return !missing;
+}

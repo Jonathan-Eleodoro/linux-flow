@@ -267,6 +267,37 @@ test("Pix e exclusão com pedido falham se o arquivo financeiro está incompleto
     db.sqlite.close();
   });
 
+test("Pix fica suspenso para perfil com pedido sem arquivo financeiro",
+  { skip: !DatabaseSync }, async () => {
+    const db = d1();
+    const profile = await import("../functions/api/profile.js");
+    const pro = await import("../functions/api/pro.js");
+    const health = await import("../functions/api/health.js");
+    const key = "8".repeat(64);
+    let response = await profile.onRequestPost(context(db, "POST", "/api/profile", {
+      action: "create", id: "buyer-legacy-gap", key, name: "Comprador Teste",
+      shareRanking: false,
+    }));
+    assert.equal(response.status, 201);
+    const trigger = db.sqlite.prepare(`SELECT sql FROM sqlite_master
+      WHERE type = 'trigger' AND name = 'financial_request_created'`).get().sql;
+    db.sqlite.exec("DROP TRIGGER financial_request_created");
+    db.sqlite.exec(`INSERT INTO pro_requests (id, profile_id, txid, amount_cents)
+      VALUES ('missing-archive', 'buyer-legacy-gap', 'TXID-MISSING', 990)`);
+    db.sqlite.exec(trigger);
+    response = await health.onRequestGet(context(db, "GET", "/api/health"));
+    assert.equal(response.status, 503);
+    response = await pro.onRequestGet(context(db, "GET", "/api/pro", null, key));
+    assert.equal(response.status, 503);
+    response = await pro.onRequestPost(context(db, "POST", "/api/pro", {
+      action: "create", amountCents: 990,
+    }, key));
+    assert.equal(response.status, 503);
+    response = await profile.onRequestDelete(context(db, "DELETE", "/api/profile", null, key));
+    assert.equal(response.status, 503);
+    db.sqlite.close();
+  });
+
 test("Pages Functions persistem perfil, tentativa verificada, ranking, sugestão e Pix no D1",
   { skip: !DatabaseSync }, async () => {
   const db = d1();

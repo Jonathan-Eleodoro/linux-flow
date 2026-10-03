@@ -26,8 +26,12 @@ export async function onRequestGet(context) {
     const approval = await first(db,
       `SELECT COUNT(*) AS total FROM sqlite_master WHERE type = 'trigger'
        AND name IN (${requiredTriggers.map(() => "?").join(", ")})`, ...requiredTriggers);
+    // Gatilhos presentes não corrigem pedidos antigos que ficaram sem arquivo.
+    const unarchived = await first(db, `SELECT r.id FROM pro_requests r
+      LEFT JOIN financial_records f ON f.request_id = r.id
+      WHERE f.request_id IS NULL LIMIT 1`);
     if (Number(result?.total) === requiredTables.length &&
-        Number(approval?.total) === requiredTriggers.length)
+        Number(approval?.total) === requiredTriggers.length && !unarchived)
       return json({ status: "ready" });
   } catch {
     // Sem binding, com erro de conexão ou sem esquema, o serviço não está pronto.
