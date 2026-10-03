@@ -6,7 +6,7 @@ Este arquivo concentra decisões, mudanças de plano e trabalho pendente. Ele é
 
 O plano visual, os donos e o roteiro de teste estão em [`guias-cloudflare/08-plano-testes.html`](../guias-cloudflare/08-plano-testes.html). As datas são alvos de trabalho; nenhum deploy, aprovação escolar ou pagamento ocorre automaticamente.
 
-| Marco | Dono | Evidência necessária | Situação em 01/10/2026 |
+| Marco | Dono | Evidência necessária | Situação em 03/10/2026 |
 |---|---|---|---|
 | Infraestrutura Pages + D1 | Jonathan + Codex | URL pública, deploy bem-sucedido, `/api/health` 200 em Production e Preview | Frontend publicado; API 503, esquema D1 a conferir |
 | Fluxo de dados fictícios | Jonathan + Codex | Perfil, quiz, ranking, exclusão e sala com duas identidades de teste | Aguardando infraestrutura |
@@ -16,9 +16,9 @@ O plano visual, os donos e o roteiro de teste estão em [`guias-cloudflare/08-pl
 
 No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar falhas concretas e corrigir antes de avançar; não inferir sucesso a partir de testes locais.
 
-## Caminho atual — 01/10/2026
+## Caminho atual — 03/10/2026
 
-- `npm run smoke:live` confirmou em 03/10/2026: site HTTP 200, `/api/health` e `/api/ranking` HTTP 503. A captura mostra binding `DB` para `linux-flow-db`; ainda falta inventariar o esquema remoto e aplicar apenas as migrações ausentes. O guia `guias-cloudflare/11-validacao-publica.html` orienta o diagnóstico.
+- `npm run smoke:live` confirmou em 03/10/2026: site HTTP 200 e commit `9d9710a` publicado; `/api/health` e `/api/ranking` continuam HTTP 503. A captura mostra binding `DB` para `linux-flow-db` e a tela de métricas registra consultas da API, mas não revela seus resultados nem prova esquema íntegro. O Console D1 está acessível; aguardar o inventário somente de leitura de `sqlite_master` antes de aplicar qualquer SQL. O guia `guias-cloudflare/11-validacao-publica.html` orienta o diagnóstico.
 - Ranking compartilhado agora exige perfil sincronizado e rodada verificada; a migração 004 remove entradas anônimas legadas. A migração 003 guarda pedidos e eventos financeiros por pelo menos um ano após o último evento, independentemente da exclusão do perfil. Ambos passaram em SQLite local; Pix e exclusão com pedido agora falham se o arquivo financeiro estiver incompleto. A nuvem ainda precisa de migração e teste.
 
 - A migração `sql/migrations/002-educator-access.sql` cria concessões docentes revogáveis. O criador comum ainda controla a sala, mas só um criador com concessão ativa lê logs nominativos ou resultados individuais do grupo. Testes locais cobrem concessão, isolamento e revogação; a escola ainda precisa definir e executar aprovação de pessoas reais. O roteiro está em `guias-cloudflare/10-acesso-docente.html`.
@@ -39,7 +39,7 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 - O GitHub pessoal de Jonathan contém o código na raiz. A conta Cloudflare deve pertencer ao projeto e receber membros individuais; nunca compartilhar senha ou 2FA.
 - Nada foi cadastrado no Aiven. A alternativa Vercel/MySQL foi retirada dos arquivos ativos; seu histórico permanece nos commits anteriores.
 - O contato público é `linuxflow2026@gmail.com`. Credenciais Pix, binding D1 e códigos de acesso não pertencem ao Git.
-- A conta Cloudflare e o 2FA constam da conversa salva; a configuração Pages/D1 e a publicação real ainda não foram validadas. Consulte `docs/cloudflare-d1.md`.
+- A conta Cloudflare e o 2FA constam da conversa salva. O commit publicado e o binding D1 foram observados; ainda falta validar o esquema remoto e o funcionamento das APIs. Consulte `docs/cloudflare-d1.md`.
 
 ## Entregue no código
 
