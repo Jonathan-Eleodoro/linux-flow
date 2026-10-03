@@ -19,10 +19,10 @@
     <main id="conteudo">
       <div class="eyebrow">O endereço já existe</div>
       <h1>Faça a API responder antes de cadastrar pessoas.</h1>
-      <p class="lead">A captura mostra o projeto Pages com build <code>npm run build</code>, saída <code>dist</code> e binding <code>DB</code> para <code>linux-flow-db</code>. A checagem pública de 03/10/2026 confirmou site HTTP 200, mas <code>/api/health</code> e <code>/api/ranking</code> retornaram HTTP 503. A captura não mostra se o esquema e as migrações existem no D1.</p>
+      <p class="lead">A captura mostra o projeto Pages com build <code>npm run build</code>, saída <code>dist</code> e binding <code>DB</code> para <code>linux-flow-db</code>. Em 03/10/2026, o domínio publicou o commit <code>e8925fc</code> e serviu o site com HTTP 200, mas <code>/api/health</code> e <code>/api/ranking</code> continuaram em HTTP 503. Ainda falta conferir o esquema do D1 e os logs das Functions.</p>
       <div class="table-wrap"><table><thead><tr><th>Endereço</th><th>Observado</th><th>Para aceitar</th></tr></thead><tbody>
         <tr><th><code>/#inicio</code></th><td><span class="tag">Site abre</span></td><td>Landing e navegação utilizáveis</td></tr>
-        <tr><th><code>/deployment.json</code></th><td><span class="tag warn">A verificar</span></td><td>SHA do commit publicado</td></tr>
+        <tr><th><code>/deployment.json</code></th><td><span class="tag">e8925fc</span></td><td>SHA do commit publicado</td></tr>
         <tr><th><code>/api/health</code></th><td><span class="tag danger">503 · unavailable</span></td><td>200 · <code>{"status":"ready"}</code></td></tr>
         <tr><th><code>/api/ranking?category=all&amp;level=1&amp;total=10</code></th><td><span class="tag danger">503</span></td><td>200 · JSON com <code>ranking</code></td></tr>
       </tbody></table></div>
