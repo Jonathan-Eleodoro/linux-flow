@@ -17,24 +17,34 @@ const requiredTriggers = [
 ];
 
 export async function onRequestGet(context) {
+  let stage = "binding";
   try {
     const db = database(context);
+    stage = "tables";
     const names = requiredTables.map(() => "?").join(", ");
     const result = await first(db,
       `SELECT COUNT(*) AS total FROM sqlite_master
        WHERE type = 'table' AND name IN (${names})`, ...requiredTables);
+    stage = "triggers";
     const approval = await first(db,
       `SELECT COUNT(*) AS total FROM sqlite_master WHERE type = 'trigger'
        AND name IN (${requiredTriggers.map(() => "?").join(", ")})`, ...requiredTriggers);
     // Gatilhos presentes não corrigem pedidos antigos que ficaram sem arquivo.
+    stage = "financial_archive";
     const unarchived = await first(db, `SELECT r.id FROM pro_requests r
       LEFT JOIN financial_records f ON f.request_id = r.id
       WHERE f.request_id IS NULL LIMIT 1`);
     if (Number(result?.total) === requiredTables.length &&
         Number(approval?.total) === requiredTriggers.length && !unarchived)
       return json({ status: "ready" });
-  } catch {
-    // Sem binding, com erro de conexão ou sem esquema, o serviço não está pronto.
+    // Os totais ajudam a identificar migrações ausentes sem registrar dados pessoais.
+    console.error("Health unavailable", {
+      tables: Number(result?.total), triggers: Number(approval?.total),
+      financialArchiveGap: Boolean(unarchived),
+    });
+  } catch (error) {
+    // O estágio é suficiente para orientar o diagnóstico sem expor SQL ou perfis.
+    console.error("Health query failed", { stage, errorType: error?.name || "Error" });
   }
   return json({ status: "unavailable" }, 503);
 }
