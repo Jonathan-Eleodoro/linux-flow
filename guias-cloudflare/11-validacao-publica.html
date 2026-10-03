@@ -31,25 +31,7 @@
       <h2>1. Descubra o estado do banco sem alterar dados</h2>
       <ol class="test-steps">
         <li><strong>Confira a publicação</strong><p>Entre na sua conta Cloudflare. Abra <b>Workers &amp; Pages → linux-flow → Deployments</b>. Selecione a publicação de <b>Production</b> e confira o commit, a situação “Success” e o endereço <code>linux-flow.pages.dev</code>. Em <b>Settings → Bindings</b>, confirme <code>DB → linux-flow-db</code> em Production. Se alterou o binding após o último deploy, faça redeploy.</p><div class="test-result"><b>Esperado</b><span>O commit da branch <code>main</code> foi publicado, e o binding aparece no ambiente Production.</span></div></li>
-        <li><strong>Abra o Console do D1</strong><p>No painel, abra <b>Storage &amp; databases → D1 → linux-flow-db → Console</b>. Cole e execute a consulta abaixo. Ela lê apenas os nomes das estruturas; não mostra perfis, pagamentos ou segredos.</p><div class="copy-block"><button class="copy" data-copy="inventory">Copiar</button><pre><code id="inventory">SELECT type, name FROM sqlite_master
-WHERE name IN (
-  'synced_profiles', 'ranking_attempts', 'profile_results', 'profile_labs',
-  'profile_attempt_answers', 'profile_question_stats', 'pro_requests',
-  'pro_entitlements', 'feedback_comments', 'community_profiles',
-  'game_rooms', 'game_members', 'game_answers', 'game_events',
-  'study_groups', 'study_members', 'study_suggestions', 'educator_grants',
-  'financial_records', 'financial_events',
-  'pro_requests_grant_after_approval', 'pro_requests_keep_approved',
-  'financial_records_keep_one_year', 'financial_events_keep_one_year',
-  'financial_events_append_only', 'financial_records_keep_identity',
-  'financial_records_keep_retention',
-  'financial_request_created', 'financial_request_changed',
-  'financial_request_removed', 'financial_entitlement_granted',
-  'financial_entitlement_removed', 'ranking_requires_verified_profile',
-  'ranking_keep_verified_profile', 'pro_requests_confirmed_payment',
-  'educator_grants_one_active'
-)
-ORDER BY type, name;</code></pre></div><div class="test-result"><b>Esperado</b><span>36 nomes: 20 tabelas, 14 gatilhos e 2 índices. O endpoint de saúde confere as tabelas e gatilhos; os índices ajudam a detectar migrações parciais. Qualquer nome ausente exige diagnóstico antes de executar SQL.</span></div></li>
+        <li><strong>Abra o Console do D1</strong><p>No painel, abra <b>Storage &amp; databases → D1 → linux-flow-db → Console</b>. Clique no campo escuro inferior, use <b>Copiar</b> abaixo, cole a linha inteira e clique em <b>Execute</b>. <code>sqlite_master</code> sozinho é apenas um nome e gera erro de sintaxe. Esta consulta lê nomes de estruturas; não mostra perfis, pagamentos ou segredos.</p><div class="copy-block"><button class="copy" data-copy="inventory">Copiar</button><pre><code id="inventory">SELECT type, name FROM sqlite_master WHERE type IN ('table', 'trigger', 'index') AND name NOT LIKE 'sqlite_%' ORDER BY type, name;</code></pre></div><div class="test-result"><b>Esperado</b><span>Uma lista com as colunas <code>type</code> e <code>name</code>. Envie todas as linhas, inclusive em várias capturas se necessário. O projeto espera pelo menos 20 tabelas e 14 gatilhos específicos; outras estruturas podem aparecer. Não execute migrações antes de comparar os nomes.</span></div></li>
         <li><strong>Confira as colunas alteradas</strong><p>No mesmo Console, execute <code>PRAGMA table_info(pro_requests);</code> e <code>PRAGMA table_info(profile_results);</code>. Procure <code>confirmed_payment_reference</code> na primeira tabela e <code>verified</code> na segunda. Compartilhe apenas os nomes das colunas. A 001 acrescenta <code>confirmed_payment_reference</code> e <b>não deve ser repetida</b> se a coluna já existe. Se a coluna, o índice e os gatilhos não concordarem, pare e registre a inconsistência antes de alterar o banco.</p><div class="test-result"><b>Esperado</b><span>Estruturas da mesma migração presentes juntas, ou todas ausentes. O banco parcialmente migrado precisa de reparo específico.</span></div></li>
         <li><strong>Se ainda houver 503, leia o diagnóstico privado</strong><p>Após o próximo deploy, abra <b>Workers &amp; Pages → linux-flow → Deployments → Production → View details → Functions</b> e inicie os logs. Em outra aba, recarregue <code>https://linux-flow.pages.dev/api/health</code>. Procure <code>Health unavailable</code> com os totais de tabelas e gatilhos ou <code>Health query failed</code> com o estágio da falha. Os logs são transmitidos ao vivo; <a href="https://developers.cloudflare.com/pages/functions/debugging-and-logging/" target="_blank" rel="noopener noreferrer">a documentação da Cloudflare</a> informa que eles não são armazenados. Compartilhe somente essa mensagem resumida, sem URLs de requisições, IPs ou cabeçalhos.</p><div class="test-result"><b>Esperado</b><span><code>tables: 20</code>, <code>triggers: 14</code> e <code>financialArchiveGap: false</code>. Qualquer outro valor orienta uma correção específica.</span></div></li>
       </ol>
