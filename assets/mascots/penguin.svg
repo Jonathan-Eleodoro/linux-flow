@@ -9,5 +9,8 @@
   <circle cx="68" cy="45" r="3" fill="#102633"/>
   <path d="m54 54 6 5 6-5-6-3Z" fill="#f6ad58"/>
   <path d="M43 96c4-6 10-6 15-1M62 95c5-5 11-5 15 1" fill="none" stroke="#f6ad58" stroke-width="5" stroke-linecap="round"/>
+  <path d="M77 73c6 2 9 7 10 16" fill="none" stroke="#d4b978" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="88" cy="91" r="9" fill="#f5e6b6" stroke="#aa7b49" stroke-width="2"/>
+  <path d="m88 84 3 7-6 3 3-10Z" fill="#2f7284"/>
   <path d="m88 22 2 5 5 2-5 2-2 5-2-5-5-2 5-2Z" fill="#c5f27c"/>
 </svg>

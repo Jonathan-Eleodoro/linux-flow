@@ -8,8 +8,13 @@
   <circle cx="72" cy="54" r="9" fill="#fff"/>
   <circle cx="49" cy="54" r="4" fill="#172941"/>
   <circle cx="71" cy="54" r="4" fill="#172941"/>
+  <circle cx="48" cy="54" r="12" fill="none" stroke="#bcd7db" stroke-width="2"/>
+  <circle cx="72" cy="54" r="12" fill="none" stroke="#bcd7db" stroke-width="2"/>
+  <path d="M60 52h0" stroke="#bcd7db" stroke-width="3" stroke-linecap="round"/>
   <path d="m54 70 6 8 6-8-6-4Z" fill="#e8a651"/>
   <path d="M43 82c9 7 25 7 34 0" fill="none" stroke="#657ca2" stroke-width="4" stroke-linecap="round"/>
   <path d="M43 97h12m10 0h12" stroke="#e8a651" stroke-width="4" stroke-linecap="round"/>
+  <path d="M42 84q9-3 18 2 9-5 18-2v13q-9-4-18 1-9-5-18-1Z" fill="#d9e8bd" stroke="#8aa87e" stroke-width="2"/>
+  <path d="M60 86v12" stroke="#8aa87e" stroke-width="2"/>
   <circle cx="94" cy="25" r="5" fill="#c5f27c"/>
 </svg>
