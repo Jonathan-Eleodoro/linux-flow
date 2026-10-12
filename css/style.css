@@ -277,6 +277,12 @@ html[data-theme="light"] #theme .icon-moon { display: none; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.sign-out-button { display: inline-flex; align-items: center; gap: .35rem; white-space: nowrap; transition: border-color .18s ease, transform .18s ease; }
+.sign-out-button:hover { border-color: var(--good); transform: translateY(-2px); }
+.sign-out-button[hidden], #sign-out-round-note[hidden] { display: none !important; }
+#sign-out-dialog[open] { animation: sign-out-appear .18s ease-out; }
+@keyframes sign-out-appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { #sign-out-dialog[open] { animation: none; } }
 /* No celular, a navegação passa para a base; no desktop, expande ao focar. */
 .sidebar {
   padding: 0.6rem 1rem;

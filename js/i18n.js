@@ -13,6 +13,14 @@
 
   // Cada linha guarda o texto original e as traduções; apenas pt-BR e es estão ativos.
   const rows = [
+    ["Sair deste dispositivo", "Sair deste dispositivo", "Salir de este dispositivo"],
+    ["Sair deste dispositivo?", "Sair deste dispositivo?", "¿Salir de este dispositivo?"],
+    ["O código de acesso e os dados locais deste perfil serão removidos deste navegador. O perfil e o progresso na nuvem permanecem disponíveis pelo seu código.", "O código de acesso e os dados locais deste perfil serão removidos deste navegador. O perfil e o progresso na nuvem permanecem disponíveis pelo seu código.", "El código de acceso y los datos locales de este perfil se eliminarán de este navegador. El perfil y el progreso en la nube seguirán disponibles con tu código."],
+    ["Guarde seu código de acesso antes de sair. Sem ele, você não poderá recuperar o perfil em outro dispositivo. Se houver progresso pendente, sincronize-o primeiro na aba Sobre.", "Guarde seu código de acesso antes de sair. Sem ele, você não poderá recuperar o perfil em outro dispositivo. Se houver progresso pendente, sincronize-o primeiro na aba Sobre.", "Guarda tu código de acceso antes de salir. Sin él, no podrás recuperar el perfil en otro dispositivo. Si hay progreso pendiente, sincronízalo primero en la sección Acerca de."],
+    ["A rodada atual será encerrada sem publicar resultado.", "A rodada atual será encerrada sem publicar resultado.", "La partida actual terminará sin publicar el resultado."],
+    ["Continuar estudando", "Continuar estudando", "Seguir estudiando"],
+    ["Você saiu deste dispositivo. Seu perfil continua na nuvem.", "Você saiu deste dispositivo. Seu perfil continua na nuvem.", "Has salido de este dispositivo. Tu perfil sigue en la nube."],
+    ["Não foi possível remover o acesso deste navegador. Tente novamente.", "Não foi possível remover o acesso deste navegador. Tente novamente.", "No se pudo quitar el acceso de este navegador. Inténtalo de nuevo."],
     ["Mostrar minhas pontuações no ranking compartilhado", "Mostrar minhas pontuações no ranking compartilhado", "Mostrar mis puntuaciones en la clasificación compartida"],
     ["Disponível para perfis sincronizados. Desativar remove as pontuações anteriores após confirmação da nuvem.", "Disponível para perfis sincronizados. Desativar remove as pontuações anteriores após confirmação da nuvem.", "Disponible para perfiles sincronizados. Al desactivarlo, las puntuaciones anteriores se eliminan tras la confirmación en la nube."],
     ["Remoção do ranking ainda não confirmada na nuvem. Sincronize novamente.", "Remoção do ranking ainda não confirmada na nuvem. Sincronize novamente.", "La eliminación de la clasificación aún no se ha confirmado en la nube. Vuelve a sincronizar."],

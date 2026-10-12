@@ -203,5 +203,10 @@
           !root.querySelector("#room-answer:not(:disabled)")) refresh();
     }, 3000);
   }
-  window.FlowCommunity = Object.freeze({ mount });
+  function unmount() {
+    clearInterval(timer);
+    root = null; profile = null; quick = null;
+    activeCode = ""; activeKind = ""; selected = "";
+  }
+  window.FlowCommunity = Object.freeze({ mount, unmount });
 })();

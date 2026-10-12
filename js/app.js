@@ -203,6 +203,7 @@
     try {
       const progress = localProgress(profile);
       const snapshot = await sync.sync(profile, progress.results, progress.labs);
+      if (!store.state.profiles.includes(profile)) return;
       profile.shareRankingPending = false;
       mergeProgress(profile, snapshot);
       if (user()?.id === profile.id) updateSyncStatus("ready");
@@ -338,6 +339,7 @@
     soundButton.setAttribute("aria-label", store.state.sound ? "Desativar som" : "Ativar som");
     soundButton.title = store.state.sound ? "Desativar som" : "Ativar som";
     $("#profile").textContent = user()?.name || "Entrar";
+    $("#sign-out").hidden = !user()?.syncKey;
     updateSyncStatus(user()?.syncKey ? "cloud" : "local");
   }
   /** O áudio só é criado após um gesto explícito e respeita a preferência.
@@ -421,6 +423,29 @@
     setAccessMode("choice");
   }
   $("#profile").addEventListener("click", openProfile);
+  $("#sign-out").addEventListener("click", () => {
+    if (!user()?.syncKey) return;
+    $("#sign-out-round-note").hidden = !round;
+    $("#sign-out-dialog").showModal();
+  });
+  $("#close-sign-out").onclick = () => $("#sign-out-dialog").close();
+  $("#cancel-sign-out").onclick = () => $("#sign-out-dialog").close();
+  $("#confirm-sign-out").onclick = () => {
+    if (!user()?.syncKey) { $("#sign-out-dialog").close(); return; }
+    if (!store.signOutCurrent()) {
+      toast("Não foi possível remover o acesso deste navegador. Tente novamente.");
+      return;
+    }
+    // Descarta referências em memória para não reabrir dados de outra pessoa.
+    FlowCommunity.unmount();
+    proQuestionCache.clear();
+    previousQuizSessions.clear();
+    round = null; lastResult = null; terminal = null; labCompleted = false;
+    $("#sign-out-dialog").close();
+    applyPreferences();
+    navigate("inicio");
+    toast("Você saiu deste dispositivo. Seu perfil continua na nuvem.");
+  };
   document.querySelectorAll("[data-access-mode]").forEach((button) => {
     button.addEventListener("click", () => setAccessMode(button.dataset.accessMode));
   });
@@ -705,7 +730,7 @@
     // A renderização pode ocorrer várias vezes sem recontar respostas confirmadas.
     if (!round) return quizSetup();
     const q = round.questions[round.index];
-    main.innerHTML = `<div class="quiz-shell"><div class="page-head"><div><p class="eyebrow">${esc(tr(categoryName(q.category)))} / ${esc(tr(levels[round.settings.level]))}</p><h1>${esc(tr("Leia. Pense. Experimente."))}</h1></div><button id="quit">${esc(tr("Encerrar"))}</button></div><div class="quiz-meta"><span>${esc(tr("Pergunta {index} de {total}", { index: round.index + 1, total: round.questions.length }))}</span><span>${esc(tr("{count} acertos", { count: round.answers.filter((a) => a.selected === a.question.answer).length }))}</span></div><progress value="${round.index}" max="${round.questions.length}" aria-label="${esc(tr("Progresso do quiz"))}"></progress><section class="panel question-panel"><h2 id="question-title" tabindex="-1">${esc(tr(q.prompt))}</h2>${q.code ? `<div class="code-block"><code>$ ${esc(q.code)}</code></div>` : ""}<div class="answers" role="group" aria-labelledby="question-title">${q.options.map((o, i) => `<button class="answer" data-answer="${i}" aria-pressed="false"><span class="letter" aria-hidden="true">${"ABCD"[i]}</span><span>${esc(tr(o))}</span></button>`).join("")}</div><div id="feedback" aria-live="polite"></div><button id="confirm-answer" class="primary" disabled>${esc(tr("Confirmar resposta"))}</button></section></div>`;
+    main.innerHTML = `<div class="quiz-shell"><div class="page-head"><div><p class="eyebrow">${esc(tr(categoryName(q.category)))} / ${esc(tr(levels[round.settings.level]))}</p><h1>${esc(tr("Leia. Pense. Experimente."))}</h1></div><button id="quit">${esc(tr("Encerrar"))}</button></div><div class="quiz-meta"><span>${esc(tr("Pergunta {index} de {total}", { index: round.index + 1, total: round.questions.length }))}</span><span>${esc(tr("{count} acertos", { count: round.answers.filter((a) => a.selected === a.question.answer).length }))}</span></div><progress value="${round.index}" max="${round.questions.length}" aria-label="${esc(tr("Progresso do quiz"))}"></progress><section class="panel question-panel"><h2 id="question-title" tabindex="-1">${esc(tr(q.prompt))}</h2>${q.code ? `<div class="code-block"><code>$ ${esc(q.code)}</code></div>` : ""}<div class="answers" role="group" aria-labelledby="question-title">${q.options.map((o, i) => `<button class="answer" data-answer="${i}" aria-pressed="false"><span class="letter" translate="no" data-no-translate aria-hidden="true">${"ABCD"[i]}</span><span>${esc(tr(o))}</span></button>`).join("")}</div><div id="feedback" aria-live="polite"></div><button id="confirm-answer" class="primary" disabled>${esc(tr("Confirmar resposta"))}</button></section></div>`;
     $("#quit").onclick = () => {
       if (
         confirm(

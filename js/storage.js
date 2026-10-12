@@ -83,25 +83,47 @@
   } catch {
     /* Um registro corrompido não deve impedir o carregamento da página. */
   }
+  function persistedSnapshot(source) {
+    const kept = source.profiles.filter((profile) => !profile.temporary);
+    const ids = new Set(kept.map((profile) => profile.id));
+    return {
+      ...source,
+      profiles: kept,
+      current: ids.has(source.current) ? source.current : null,
+      results: source.results.filter((record) => ids.has(record.userId)),
+      labs: source.labs.filter((lab) => ids.has(lab.userId)),
+      questionProgress: source.questionProgress.filter((item) => ids.has(item.userId)),
+    };
+  }
   function save() {
     // Sem permissão, o estado permanece apenas na sessão atual.
     if (!persistent) return true;
     try {
-      const kept = state.profiles.filter((profile) => !profile.temporary);
-      const ids = new Set(kept.map((profile) => profile.id));
-      localStorage.setItem(KEY, JSON.stringify({
-        ...state,
-        profiles: kept,
-        current: ids.has(state.current) ? state.current : null,
-        results: state.results.filter((record) => ids.has(record.userId)),
-        labs: state.labs.filter((lab) => ids.has(lab.userId)),
-        questionProgress: state.questionProgress.filter((item) => ids.has(item.userId)),
-      }));
+      localStorage.setItem(KEY, JSON.stringify(persistedSnapshot(state)));
       return true;
     } catch {
       persistent = false;
       return false;
     }
+  }
+  function signOutCurrent() {
+    const id = state.current;
+    if (!id) return true;
+    const next = {
+      ...state,
+      current: null,
+      profiles: state.profiles.filter((profile) => profile.id !== id),
+      results: state.results.filter((record) => record.userId !== id),
+      labs: state.labs.filter((lab) => lab.userId !== id),
+      questionProgress: state.questionProgress.filter((item) => item.userId !== id),
+    };
+    // Só encerra a sessão após retirar a chave da cópia persistente.
+    if (persistent) {
+      try { localStorage.setItem(KEY, JSON.stringify(persistedSnapshot(next))); }
+      catch { return false; }
+    }
+    state = next;
+    return true;
   }
   function permission(value) {
     // Desligar a persistência apaga a cópia local, sem apagar a nuvem.
@@ -131,6 +153,7 @@
       return persistent;
     },
     save,
+    signOutCurrent,
     permission,
     clear,
     safeName,

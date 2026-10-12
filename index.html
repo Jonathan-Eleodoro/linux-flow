@@ -64,7 +64,7 @@
         <button id="guide-settings" class="settings-action" type="button"><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.2 1.8c-1.2.9-1.8 1.4-1.8 2.7M12 17h.01"/></svg><span>Ajuda</span></button>
         <label class="settings-language" for="language"><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V3m0 1c4-2 8 2 14 0v11c-6 2-10-2-14 0"/></svg><span>Idioma</span></label>
         <select id="language" aria-label="Idioma da interface"><option value="pt-BR">🇧🇷 Português (Brasil)</option><option value="es">🇪🇸 Español</option></select>
-        <p class="settings-language-note">Aulas e questões ainda estão em português do Brasil.</p></div></details><button id="profile" class="profile-button">Entrar</button>
+        <p class="settings-language-note">Aulas e questões ainda estão em português do Brasil.</p></div></details><button id="profile" class="profile-button">Entrar</button><button id="sign-out" class="sign-out-button" type="button" aria-label="Sair deste dispositivo" title="Sair deste dispositivo" hidden><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5M14 16l4-4-4-4M8 12h10"/></svg><span>Sair</span></button>
       </div>
     </header>
     <aside id="cookie-banner" class="cookie-banner" aria-label="Aviso sobre armazenamento" hidden>
@@ -161,6 +161,13 @@
         <p id="profile-error" role="alert"></p>
       </form>
       <button id="access-back" type="button" class="text-button" hidden>← Voltar às opções</button>
+    </dialog>
+    <dialog id="sign-out-dialog" aria-labelledby="sign-out-title" aria-describedby="sign-out-description">
+      <div class="dialog-head"><h2 id="sign-out-title">Sair deste dispositivo?</h2><button id="close-sign-out" type="button" aria-label="Fechar">×</button></div>
+      <p id="sign-out-description">O código de acesso e os dados locais deste perfil serão removidos deste navegador. O perfil e o progresso na nuvem permanecem disponíveis pelo seu código.</p>
+      <p>Guarde seu código de acesso antes de sair. Sem ele, você não poderá recuperar o perfil em outro dispositivo. Se houver progresso pendente, sincronize-o primeiro na aba Sobre.</p>
+      <p id="sign-out-round-note" hidden>A rodada atual será encerrada sem publicar resultado.</p>
+      <div class="actions"><button id="cancel-sign-out" type="button">Continuar estudando</button><button id="confirm-sign-out" type="button" class="primary">Sair deste dispositivo</button></div>
     </dialog>
     <noscript
       >Ative JavaScript para executar o quiz e o terminal simulado. Os manuais

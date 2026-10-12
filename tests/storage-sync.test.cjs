@@ -59,3 +59,51 @@ test("sessão livre não entra na cópia persistida", () => {
   assert.equal(written.current, null);
   assert.equal(written.results.length, 0);
 });
+
+test("sair remove a chave e o progresso local do perfil ativo sem apagar outro perfil", () => {
+  let saved;
+  const context = {
+    window: {}, FlowData: { categories: [], questions: [] },
+    localStorage: { getItem: () => saved || null,
+      setItem: (_key, value) => { saved = value; }, removeItem: () => {} },
+  };
+  vm.runInNewContext(source, context);
+  const store = context.window.FlowStore;
+  store.state.profiles.push(
+    { id: "adm", name: "Adm01", syncKey: "a".repeat(64) },
+    { id: "aluno", name: "Aluno01", syncKey: "b".repeat(64) },
+  );
+  store.state.current = "adm";
+  store.state.results.push({ id: "r1", userId: "adm" }, { id: "r2", userId: "aluno" });
+  store.state.labs.push({ userId: "adm", mission: 1 });
+  store.state.questionProgress.push({ userId: "adm", questionId: "q1" });
+  store.permission(true);
+
+  assert.equal(store.signOutCurrent(), true);
+  const disk = JSON.parse(saved);
+  assert.equal(store.state.current, null);
+  assert.deepEqual(disk.profiles.map((profile) => profile.id), ["aluno"]);
+  assert.deepEqual(disk.results.map((record) => record.id), ["r2"]);
+  assert.equal(disk.labs.length, 0);
+  assert.equal(disk.questionProgress.length, 0);
+  assert.equal(saved.includes("a".repeat(64)), false);
+});
+
+test("falha ao salvar impede sair e mantém o perfil recuperável na sessão", () => {
+  let fail = false;
+  const context = {
+    window: {}, FlowData: { categories: [], questions: [] },
+    localStorage: { getItem: () => null,
+      setItem: () => { if (fail) throw new Error("Armazenamento indisponível"); },
+      removeItem: () => {} },
+  };
+  vm.runInNewContext(source, context);
+  const store = context.window.FlowStore;
+  store.state.profiles.push({ id: "adm", name: "Adm01", syncKey: "a".repeat(64) });
+  store.state.current = "adm";
+  store.permission(true);
+  fail = true;
+  assert.equal(store.signOutCurrent(), false);
+  assert.equal(store.state.current, "adm");
+  assert.equal(store.state.profiles[0].syncKey, "a".repeat(64));
+});
