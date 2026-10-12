@@ -74,6 +74,7 @@
       ? "Neste dispositivo" : ({ syncing: "Sincronizando", ready: "Nuvem atualizada",
         error: "Nuvem indisponível" })[current] || "Na nuvem";
     status.setAttribute("aria-label", `${status.textContent}. Abrir ajustes do perfil`);
+    $("#account-state").textContent = status.textContent;
   }
   $("#institution-address").textContent = cfg.institutionAddress;
   $("#project-contact").textContent = cfg.email;
@@ -225,7 +226,7 @@
   function landing() {
     main.innerHTML = `<section class="landing-hero"><div class="landing-copy"><span class="eyebrow">APRENDA LINUX · ${cfg.year}</span><h1>Aprenda Linux com prática, contexto e progresso visível.</h1><p>Explore trilhas, resolva quizzes com explicações e experimente comandos em um terminal simulado. Comece gratuitamente, no seu ritmo.</p><div class="actions"><button id="landing-start" class="primary">Explorar trilhas →</button><button id="landing-quiz">Experimentar o quiz</button></div><div class="landing-metrics"><span><strong>3</strong> etapas Free</span><span><strong>12</strong> missões</span><span><strong>5</strong> mascotes</span></div></div><div class="landing-art" aria-hidden="true"><span class="landing-orbit orbit-one">${mascotArt(1)}</span><span class="landing-orbit orbit-two">${mascotArt(2)}</span><span class="landing-orbit orbit-three">${mascotArt(3)}</span><div class="landing-terminal"><span>aluno@linux-flow:~$</span><code>pwd</code><em>/home/aluno</em><code>_</code></div></div></section>
     <section class="landing-section"><div class="section-heading"><div><span class="eyebrow">SEU CAMINHO</span><h2>Escolha como começar</h2></div></div><div class="access-grid"><article class="panel access-card"><span class="access-number">01 / TEMPORÁRIO</span><h3>Estude nesta sessão</h3><p>Crie um apelido sem marcar o salvamento. Seu perfil e resultados ficam na memória e desaparecem ao fechar ou recarregar a página.</p><strong>Gratuito · sem conta</strong></article><article class="panel access-card"><span class="access-number">02 / SALVO</span><h3>Continue neste dispositivo</h3><p>Autorize o salvamento local para manter perfil, resultados e preferências neste navegador. Se quiser usar outro aparelho, ative a sincronização e guarde seu código de acesso.</p><strong>Gratuito · escolha opcional</strong></article><article class="panel access-card access-pro"><span class="access-number">03 / Premium</span><h3>Amplie a jornada</h3><p>Acesse Automação e Arquitetura com um perfil sincronizado e contribuição Pix a partir de R$ 9,90, após conferência e ativação manual.</p><strong>Ativação manual · sem assinatura automática</strong></article></div><div class="actions"><button id="landing-profile">Entrar</button><button id="landing-pro">Conhecer o Premium →</button></div></section>
-    <section class="panel landing-bottom"><div><span class="eyebrow">COMO FUNCIONA</span><h2>Do conceito ao comando.</h2><p>Uma trilha apresenta o tema, o quiz explica cada resposta e o laboratório permite praticar em um cenário isolado. Acompanhe conquistas sem confundir certificados didáticos com credenciais oficiais.</p></div><div class="landing-links"><button id="landing-lab">Abrir terminal →</button><button id="landing-mascots">Conhecer mascotes →</button><button id="landing-suggestions">Enviar sugestão →</button><button id="landing-policy">Privacidade e LGPD →</button></div></section>`;
+    <section class="panel landing-bottom"><div><span class="eyebrow">COMO FUNCIONA</span><h2>Do conceito ao comando.</h2><p>Avance no seu ritmo, com explicações em cada desafio.</p><ol class="learning-loop"><li><span>01</span><strong>Descubra</strong><small>Escolha uma trilha.</small></li><li><span>02</span><strong>Experimente</strong><small>Responda ou use o terminal.</small></li><li><span>03</span><strong>Evolua</strong><small>Revise e veja seu progresso.</small></li></ol></div><div class="landing-links"><button id="landing-lab">Abrir terminal →</button><button id="landing-mascots">Conhecer mascotes →</button><button id="landing-suggestions">Enviar sugestão →</button><button id="landing-policy">Privacidade e LGPD →</button></div></section>`;
     $("#landing-start").onclick = () => navigate("trilhas");
     $("#landing-quiz").onclick = () => navigate("quiz");
     $("#landing-profile").onclick = openProfile;
@@ -339,7 +340,9 @@
     soundButton.setAttribute("aria-label", store.state.sound ? "Desativar som" : "Ativar som");
     soundButton.title = store.state.sound ? "Desativar som" : "Ativar som";
     $("#profile").textContent = user()?.name || "Entrar";
-    $("#sign-out").hidden = !user()?.syncKey;
+    $("#account-menu").hidden = !user()?.syncKey;
+    $("#account-name").textContent = user()?.name || "";
+    if (!user()?.syncKey) $("#account-menu").open = false;
     updateSyncStatus(user()?.syncKey ? "cloud" : "local");
   }
   /** O áudio só é criado após um gesto explícito e respeita a preferência.
@@ -423,8 +426,38 @@
     setAccessMode("choice");
   }
   $("#profile").addEventListener("click", openProfile);
+  const accountMenu = $("#account-menu");
+  // Hover no desktop; o summary nativo preserva toque, Enter e Espaço.
+  accountMenu.addEventListener("pointerenter", () => {
+    if (matchMedia("(hover: hover)").matches) accountMenu.open = true;
+  });
+  accountMenu.querySelector("summary").addEventListener("click", (event) => {
+    // O clique de mouse não deve fechar o painel que o hover acabou de abrir.
+    if (event.detail && matchMedia("(hover: hover)").matches) {
+      event.preventDefault();
+      accountMenu.open = true;
+    }
+  });
+  accountMenu.addEventListener("pointerleave", () => {
+    if (!accountMenu.contains(document.activeElement)) accountMenu.open = false;
+  });
+  accountMenu.addEventListener("focusout", () => queueMicrotask(() => {
+    if (!accountMenu.contains(document.activeElement) && !accountMenu.matches(":hover"))
+      accountMenu.open = false;
+  }));
+  $("#account-profile").onclick = () => { accountMenu.open = false; navigate("sobre"); };
+  $("#account-sync").onclick = async () => {
+    const profile = user();
+    accountMenu.open = false;
+    if (!profile?.syncKey) return;
+    try {
+      await syncProfile(profile);
+      if (user()?.id === profile.id) toast("Progresso sincronizado.");
+    } catch { toast("Nuvem indisponível. Seu progresso local continua salvo."); }
+  };
   $("#sign-out").addEventListener("click", () => {
     if (!user()?.syncKey) return;
+    accountMenu.open = false;
     $("#sign-out-round-note").hidden = !round;
     $("#sign-out-dialog").showModal();
   });
@@ -554,9 +587,10 @@
   });
   document.addEventListener("pointerdown", (event) => {
     if (!$("#settings").contains(event.target)) $("#settings").open = false;
+    if (!accountMenu.contains(event.target)) accountMenu.open = false;
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") { $("#settings").open = false; stopTour(); }
+    if (event.key === "Escape") { $("#settings").open = false; accountMenu.open = false; stopTour(); }
   });
   function bestLevel() {
     return myResults()
@@ -567,6 +601,22 @@
     const results = myResults();
     const total = results.reduce((n, r) => n + r.total, 0);
     const correct = results.reduce((n, r) => n + r.correct, 0);
+    const completedLabs = store.state.labs.filter((item) => item.userId === user()?.id)
+      .map((item) => item.mission);
+    const topicCategories = categories.filter((item) => !learningModules[item.id]);
+    const journey = FlowJourney.plan(results, completedLabs, categories,
+      FlowTerminal.missions.length, user()?.pro ? 5 : 3, core.qualifies);
+    const focus = journey.focus;
+    const focusCategory = categories.find((item) => item.id === focus.category);
+    const focusCopy = focus.kind === "learning"
+      ? [tr("Comece pela origem do Linux"), tr("Percorra escolhas curtas sobre Unix, GNU, kernel e distribuições."), tr("Iniciar jornada")]
+      : focus.kind === "review"
+        ? [tr("Revise {category}", { category: tr(focusCategory?.name || "este assunto") }), tr("Uma nova rodada ajuda a entender o que ainda precisa de prática."), tr("Revisar no quiz")]
+        : focus.kind === "certificate"
+          ? [tr("Busque o certificado de {level}", { level: tr(levels[focus.level]) }), tr("Faça um quiz geral com 10 ou mais questões e pelo menos 80% de acertos."), tr("Preparar rodada")]
+          : focus.kind === "explore"
+            ? [tr("Explore {category}", { category: tr(focusCategory?.name || "uma nova trilha") }), tr("Um assunto novo amplia seu mapa de habilidades."), tr("Explorar trilha")]
+            : [tr("Retome o laboratório"), tr("Use o terminal simulado para resolver a próxima missão."), tr("Abrir missão")];
     main.innerHTML =
       heading(
         "Trilhas de estudo",
@@ -576,9 +626,10 @@
       `
     <div class="dashboard"><section class="panel welcome"><div class="welcome-top"><div><span class="badge green">${user() ? "Olá, " + esc(user().name) : "Comece por aqui"}</span><h2 class="welcome-title">Aprenda. Pratique.<br>Evolua.</h2></div><span class="penguin" aria-hidden="true">${mascotArt(bestLevel() || 1)}</span></div><p>Escolha um assunto ou pratique livremente.</p><div class="actions"><button id="start-home" class="primary">Abrir quiz ↗</button><button id="open-lab">Abrir terminal</button></div><div class="stats"><div class="stat"><strong>${results.length}</strong><span>Quizzes concluídos</span></div><div class="stat"><strong>${total ? Math.round((correct * 100) / total) : 0}%</strong><span>Acerto acumulado</span></div><div class="stat"><strong>${new Set(results.filter(core.qualifies).map((r) => r.level)).size}/${user()?.pro ? 5 : 3}</strong><span>Níveis certificados</span></div></div></section>
     <section class="panel"><div class="label-row"><h3>Seu mapa de evolução</h3><span class="badge">${esc(tr("{count} níveis", { count: user()?.pro ? 5 : 3 }))}</span></div><p class="small muted">Aproveitamento de 80% em um quiz geral com pelo menos 10 questões libera o certificado do nível.</p><div class="level-map">${[1, 2, 3, ...(user()?.pro ? [4, 5] : [])].map((l) => `<div class="level-step"><span class="animal" aria-hidden="true">${mascotArt(l)}</span><div><strong>${esc(tr(levels[l]))}</strong><p>${esc(tr(core.mascot(l).name))}</p></div><span class="tag">${esc(tr(results.some((r) => r.level === l && core.qualifies(r)) ? "Conquistado" : "Disponível"))}</span></div>`).join("")}</div><button id="view-achievements" class="text-button">Ver minhas conquistas →</button></section></div>
+    <section class="panel journey-spotlight" aria-labelledby="journey-title"><div class="journey-copy"><span class="eyebrow">${esc(tr("PRÓXIMO PASSO"))}</span><h2 id="journey-title">${esc(focusCopy[0])}</h2><p>${esc(focusCopy[1])}</p><div class="actions"><button id="journey-continue" class="primary">${esc(focusCopy[2])} →</button><button id="journey-lab">${esc(journey.nextMission === undefined ? tr("Revisitar laboratório") : tr("Missão {number} no terminal", { number: journey.nextMission + 1 }))} →</button></div></div><div class="journey-checkpoints" aria-label="${esc(tr("Seu mapa de progresso"))}"><div><strong>${journey.explored}/${categories.length}</strong><span>${esc(tr("trilhas praticadas"))}</span></div><div><strong>${journey.completedMissions}/${FlowTerminal.missions.length}</strong><span>${esc(tr("missões concluídas"))}</span></div><div><strong>${journey.certified}/${user()?.pro ? 5 : 3}</strong><span>${esc(tr("níveis certificados"))}</span></div></div></section>
     <section class="panel cloud-card"><div class="cloud-symbol" aria-hidden="true">↗</div><div><span class="eyebrow">Seu progresso</span><h2>${user()?.syncKey ? "Continue de onde parou, em qualquer aparelho." : user() ? "Leve seu progresso com você." : "Crie seu espaço de estudo."}</h2><p>${user()?.syncKey ? "Resultados e missões deste perfil podem ser recuperados com seu código de acesso." : user() ? "Ative a sincronização para guardar resultados e missões na nuvem e continuar em outro aparelho." : "Use um apelido para acompanhar quizzes, missões e conquistas."}</p></div><button id="cloud-action" class="cloud-action">${user()?.syncKey ? "Ver sincronização" : user() ? "Ativar sincronização" : "Entrar"} →</button></section>
     <section class="panel learning-feature"><div><span class="eyebrow">NOVAS JORNADAS · Free</span><h2>Entenda a origem. Planeje a instalação.</h2><p>Descubra como o sistema se formou e ensaie decisões de instalação em segurança. Cada marco traz uma escolha, uma explicação e uma nova chance.</p></div><div class="actions"><button id="feature-history" class="primary">Explorar a história →</button><button id="feature-install">Simular instalação →</button></div></section>
-    <div class="section-heading"><h2>${esc(tr("Escolha seu próximo passo"))}</h2><span>${esc(tr("{tracks} trilhas · {questions} questões", { tracks: categories.length, questions: questions.length }))}</span></div><div class="cards">${categories
+    <div class="section-heading"><h2>${esc(tr("Pratique por tema"))}</h2><span>${esc(tr("{tracks} trilhas · {questions} questões", { tracks: topicCategories.length, questions: questions.filter((item) => topicCategories.some((category) => category.id === item.category)).length }))}</span></div><div class="cards">${topicCategories
       .map((c) => {
         const attempts = results.filter((r) => r.category === c.id);
         const best = attempts.length
@@ -593,6 +644,23 @@
       setup.category = "all";
       lastResult = null;
       navigate("quiz");
+    };
+    $("#journey-continue").onclick = () => {
+      if (focus.kind === "learning") return navigate("aprender-historia");
+      if (focus.kind === "terminal") {
+        missionIndex = journey.nextMission ?? 0;
+        return navigate("terminal");
+      }
+      setup.category = focus.kind === "certificate" ? "all" : focus.category;
+      setup.level = focus.kind === "certificate" || focus.kind === "review" ? focus.level : 1;
+      setup.count = 10;
+      lastResult = null;
+      navigate(focus.kind === "explore" && learningModules[focus.category]
+        ? `aprender-${focus.category}` : "quiz");
+    };
+    $("#journey-lab").onclick = () => {
+      missionIndex = journey.nextMission ?? 0;
+      navigate("terminal");
     };
     $("#open-lab").onclick = () => navigate("terminal");
     $("#feature-history").onclick = () => navigate("aprender-historia");
@@ -620,7 +688,7 @@
       const step = module.steps[stepIndex];
       const done = stepIndex === module.steps.length;
       main.innerHTML = heading(module.label, categories.find((item) => item.id === id).name, module.intro) +
-        `<section class="panel learning-panel"><div class="learning-top"><strong>${done ? "Jornada concluída" : `Marco ${stepIndex + 1} de ${module.steps.length}`}</strong><span>${mistakes} ${mistakes === 1 ? "revisão" : "revisões"}</span></div><progress value="${stepIndex}" max="${module.steps.length}" aria-label="Progresso da trilha"></progress>${done
+        `<section class="panel learning-panel"><div class="learning-top"><strong>${done ? "Jornada concluída" : `Marco ${stepIndex + 1} de ${module.steps.length}`}</strong><span>${mistakes} ${mistakes === 1 ? "revisão" : "revisões"}</span></div><progress value="${stepIndex}" max="${module.steps.length}" aria-label="Progresso da trilha"></progress><ol class="journey-marks" aria-label="Marcos da jornada">${module.steps.map((item, index) => `<li class="${index < stepIndex ? "is-done" : index === stepIndex ? "is-current" : ""}" ${index === stepIndex && !done ? 'aria-current="step"' : ""}><span aria-hidden="true">${index < stepIndex ? "✓" : index + 1}</span><span class="sr-text">${esc(item.title)}</span></li>`).join("")}</ol>${done
           ? `<div class="learning-finish"><h2>Agora aplique o que aprendeu.</h2><p>Você percorreu ${module.steps.length} decisões e revisou ${mistakes} ${mistakes === 1 ? "resposta" : "respostas"}. Faça o quiz da trilha para registrar um resultado no seu perfil.</p><div class="actions"><button id="learning-quiz" class="primary">Praticar no quiz →</button><button id="learning-restart">Recomeçar a jornada</button></div></div>`
           : `<div class="learning-content"><span class="eyebrow">${esc(step.title)}</span><p>${esc(step.context)}</p><h2>${esc(step.prompt)}</h2><div class="learning-choices">${step.choices.map((choice, index) => `<button type="button" data-choice="${index}">${esc(choice)}</button>`).join("")}</div><p id="learning-feedback" class="learning-feedback" role="status" aria-live="polite">Escolha uma alternativa para avançar.</p><button id="learning-next" class="primary" disabled>${stepIndex + 1 === module.steps.length ? "Concluir jornada →" : "Próximo marco →"}</button></div>`}</section><div class="learning-sources"><a href="${module.sourceUrl}" target="_blank" rel="noopener noreferrer">Fonte principal ↗</a><a href="${module.extraUrl}" target="_blank" rel="noopener noreferrer">Leitura complementar ↗</a><button id="learning-back" class="text-button">Voltar às trilhas</button></div>`;
       $("#learning-back").onclick = () => navigate("trilhas");
@@ -1008,6 +1076,8 @@
     terminal = FlowTerminal.create(missionIndex);
     labCompleted = false;
     const mission = terminal.mission;
+    const completedMissions = new Set(store.state.labs
+      .filter((item) => item.userId === user()?.id).map((item) => item.mission));
     main.innerHTML =
       heading(
         "Prática / terminal simulado",
@@ -1015,7 +1085,7 @@
         `${FlowTerminal.missions.length} missões guiadas em um cenário fictício. Seus arquivos e sua rede não são acessados.`,
       ) +
       `
-    <div class="terminal-layout"><section class="panel"><h2>Missões do laboratório</h2><div class="mission-list">${FlowTerminal.missions.map((m, i) => `<button class="mission-button ${i === missionIndex ? "active" : ""}" data-mission="${i}"><span>${store.state.labs.some((l) => l.userId === user()?.id && l.mission === i) ? "✓" : String(i + 1).padStart(2, "0")}</span>${esc(m.title)}</button>`).join("")}</div></section><section><div class="mission-info"><span class="eyebrow">MISSÃO ${String(missionIndex + 1).padStart(2, "0")} / ${FlowTerminal.missions.length}</span><h2>${esc(mission.title)}</h2><p>${esc(mission.story)}</p><p><strong>Objetivo verificável:</strong> ${esc(mission.goal)}</p></div><div class="terminal-window"><div class="terminal-bar">aluno@linux-flow · cenário isolado em memória</div><div class="terminal-output" id="terminal-output" role="log" aria-live="polite" aria-label="Saída do terminal"><div class="entry">Bem-vindo ao laboratório. Digite help para ver os comandos disponíveis.</div></div><form class="terminal-form" id="terminal-form"><label for="command">$ <span class="sr-text">Comando</span></label><input id="command" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="180" placeholder="Digite um comando" required><button type="submit" class="primary">Executar</button></form></div><div class="command-options"><strong>Comandos para explorar</strong><p class="small muted">Algumas opções são distrações. Selecione uma para preencher o terminal; depois execute e confira a saída.</p><div class="actions">${mission.choices.map((choice) => `<button type="button" class="command-choice" data-command="${esc(choice)}"><code>${esc(choice)}</code></button>`).join("")}</div></div><div id="mission-result" aria-live="polite"></div><details class="terminal-hint"><summary>Pista 1 · como pensar</summary><p>${esc(mission.hints[0])}</p></details><details class="terminal-hint"><summary>Pista 2 · sequência de execução</summary><p>${esc(mission.hints[1])}</p></details><button id="restart-lab" class="text-button">Reiniciar esta missão</button></section></div>`;
+    <div class="terminal-layout"><section class="panel"><h2>Missões do laboratório</h2><p id="lab-progress-label" class="small muted">${completedMissions.size} de ${FlowTerminal.missions.length} concluídas</p><progress id="lab-progress" value="${completedMissions.size}" max="${FlowTerminal.missions.length}" aria-label="Progresso das missões"></progress><div class="mission-list">${FlowTerminal.missions.map((m, i) => `<button class="mission-button ${i === missionIndex ? "active" : ""}" data-mission="${i}"><span>${completedMissions.has(i) ? "✓" : String(i + 1).padStart(2, "0")}</span>${esc(m.title)}</button>`).join("")}</div></section><section><div class="mission-info"><span class="eyebrow">MISSÃO ${String(missionIndex + 1).padStart(2, "0")} / ${FlowTerminal.missions.length}</span><h2>${esc(mission.title)}</h2><p>${esc(mission.story)}</p><p><strong>Objetivo verificável:</strong> ${esc(mission.goal)}</p></div><div class="terminal-window"><div class="terminal-bar">aluno@linux-flow · cenário isolado em memória</div><div class="terminal-output" id="terminal-output" role="log" aria-live="polite" aria-label="Saída do terminal"><div class="entry">Bem-vindo ao laboratório. Digite help para ver os comandos disponíveis.</div></div><form class="terminal-form" id="terminal-form"><label for="command">$ <span class="sr-text">Comando</span></label><input id="command" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="180" placeholder="Digite um comando" required><button type="submit" class="primary">Executar</button></form></div><div class="command-options"><strong>Comandos para explorar</strong><p class="small muted">Algumas opções são distrações. Selecione uma para preencher o terminal; depois execute e confira a saída.</p><div class="actions">${mission.choices.map((choice) => `<button type="button" class="command-choice" data-command="${esc(choice)}"><code>${esc(choice)}</code></button>`).join("")}</div></div><div id="mission-result" aria-live="polite"></div><details class="terminal-hint"><summary>Pista 1 · como pensar</summary><p>${esc(mission.hints[0])}</p></details><details class="terminal-hint"><summary>Pista 2 · sequência de execução</summary><p>${esc(mission.hints[1])}</p></details><button id="restart-lab" class="text-button">Reiniciar esta missão</button></section></div>`;
     $("#restart-lab").insertAdjacentHTML("beforebegin",
       `<aside class="terminal-references" aria-label="Referências técnicas da missão"><h3>Documentação técnica</h3><p>Os comandos seguem estas referências. As saídas do laboratório são simuladas e podem diferir de um sistema Linux real.</p><ul>${mission.references.map((reference) => `<li><a href="${esc(reference.url)}" target="_blank" rel="noopener noreferrer">${esc(reference.label)} ↗</a></li>`).join("")}</ul></aside>`);
     main.querySelectorAll("[data-command]").forEach((choice) => {
@@ -1080,6 +1150,10 @@
           store.state.labs.push({ userId: user().id, mission: missionIndex });
           save();
           syncProfile(user()).catch(() => toast("Missão salva localmente; sincronização indisponível."));
+          completedMissions.add(missionIndex);
+          $("#lab-progress").value = completedMissions.size;
+          $("#lab-progress-label").textContent = `${completedMissions.size} de ${FlowTerminal.missions.length} concluídas`;
+          main.querySelector(`[data-mission="${missionIndex}"] span`).textContent = "✓";
         }
         $("#mission-result").innerHTML =
           '<div class="callout"><strong>Missão cumprida!</strong><br>Você aplicou o comando ao cenário. Continue para a próxima missão.</div>';

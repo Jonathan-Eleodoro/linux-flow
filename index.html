@@ -23,6 +23,7 @@
     <script defer src="js/config.js"></script>
     <script defer src="js/data.js"></script>
     <script defer src="js/core.js"></script>
+    <script defer src="js/journey.js"></script>
     <script defer src="js/storage.js"></script>
     <script defer src="js/sync.js"></script>
     <script defer src="js/terminal.js"></script>
@@ -64,7 +65,7 @@
         <button id="guide-settings" class="settings-action" type="button"><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.2 1.8c-1.2.9-1.8 1.4-1.8 2.7M12 17h.01"/></svg><span>Ajuda</span></button>
         <label class="settings-language" for="language"><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V3m0 1c4-2 8 2 14 0v11c-6 2-10-2-14 0"/></svg><span>Idioma</span></label>
         <select id="language" aria-label="Idioma da interface"><option value="pt-BR">🇧🇷 Português (Brasil)</option><option value="es">🇪🇸 Español</option></select>
-        <p class="settings-language-note">Aulas e questões ainda estão em português do Brasil.</p></div></details><button id="profile" class="profile-button">Entrar</button><button id="sign-out" class="sign-out-button" type="button" aria-label="Sair deste dispositivo" title="Sair deste dispositivo" hidden><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5M14 16l4-4-4-4M8 12h10"/></svg><span>Sair</span></button>
+        <p class="settings-language-note">Aulas e questões ainda estão em português do Brasil.</p></div></details><button id="profile" class="profile-button">Entrar</button><details id="account-menu" class="account-menu" hidden><summary aria-label="Opções da conta" title="Opções da conta"><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5M14 16l4-4-4-4M8 12h10"/></svg></summary><div class="account-panel"><strong id="account-name"></strong><span id="account-state" class="small muted"></span><button id="account-profile" type="button">Perfil e dados</button><button id="account-sync" type="button">Sincronizar agora</button><button id="sign-out" type="button">Sair deste dispositivo</button></div></details>
       </div>
     </header>
     <aside id="cookie-banner" class="cookie-banner" aria-label="Aviso sobre armazenamento" hidden>
