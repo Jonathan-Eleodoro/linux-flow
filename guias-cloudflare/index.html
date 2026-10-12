@@ -10,7 +10,7 @@
 </head>
 <body>
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
-  <header class="top"><div class="shell"><a class="brand" href="index.html">Linux<span>_Flow</span> / Guia</a><small>Retrato do projeto · 01/10/2026</small></div></header>
+  <header class="top"><div class="shell"><a class="brand" href="index.html">Linux<span>_Flow</span> / Guia</a><small>Retrato do projeto · 12/10/2026</small></div></header>
   <div class="shell layout">
     <nav class="nav" aria-label="Guia">
       <p>Etapas</p>
@@ -26,20 +26,20 @@
     </nav>
     <main id="conteudo">
       <div class="eyebrow">Estado confirmado no código</div>
-      <h1>O site está no ar.<br>A API pede correção no D1.</h1>
-      <p class="lead">O frontend abre em linux-flow.pages.dev. Em 01/10/2026, /api/health e /api/ranking responderam HTTP 503; o binding DB aparece no painel, mas o esquema do banco ainda precisa ser conferido.</p>
+      <h1>Site e banco no ar.<br>Agora valide a experiência.</h1>
+      <p class="lead">Em 12/10/2026, o D1 recebeu o esquema e as cinco migrações. O site, a API de saúde e o ranking passaram no teste público; os fluxos com perfis fictícios ainda precisam de aceite.</p>
       <div class="metric-grid" aria-label="Indicadores do repositório">
         <div class="metric"><strong>14</strong><span>trilhas no código</span></div>
         <div class="metric"><strong>135</strong><span>questões no acervo Free</span></div>
         <div class="metric"><strong>20</strong><span>questões Premium no servidor</span></div>
-        <div class="metric"><strong>38/38</strong><span>testes locais · 01/10</span></div>
+        <div class="metric"><strong>43/43</strong><span>testes locais · 12/10</span></div>
       </div>
       <p class="tiny muted">Os números descrevem o repositório. Não representam usuários ativos nem funcionamento já comprovado na Cloudflare.</p>
       <h2>Mapa de implantação</h2>
       <ol class="pipeline" aria-label="Etapas da implantação">
         <li class="done"><span>01</span><strong>Código e guias</strong><small>Entregues no GitHub</small></li>
         <li class="done"><span>02</span><strong>Build e Functions</strong><small>Compilam localmente</small></li>
-        <li class="pending"><span>03</span><strong>Pages + D1</strong><small>Frontend abre; API 503</small></li>
+        <li class="done"><span>03</span><strong>Pages + D1</strong><small>Saúde e ranking 200</small></li>
         <li class="blocked"><span>04</span><strong>Turmas reais</strong><small>Depende da escola</small></li>
       </ol>
       <div class="legend"><span><i class="dot done"></i> Verificado</span><span><i class="dot pending"></i> A validar</span><span><i class="dot blocked"></i> Depende de decisão</span></div>
@@ -47,11 +47,11 @@
       <div class="table-wrap"><table class="status-table"><thead><tr><th>Frente</th><th>Feito</th><th>Falta provar ou definir</th><th>Próximo guia</th></tr></thead><tbody>
         <tr><th>Conta</th><td>2FA e GitHub conectados, conforme conversa</td><td>Permissões e recuperação revisadas</td><td><a href="02-conta.html">Acesso</a></td></tr>
         <tr><th>Interface</th><td>Trilhas, quiz, terminal e perfis locais</td><td>Mobile, teclado e espanhol no domínio</td><td><a href="04-validacao.html">Aceite</a></td></tr>
-        <tr><th>Backend</th><td>Functions compiladas; diagnóstico <code>/api/health</code> testado localmente</td><td>Corrigir API 503 e provar rotas no Pages</td><td><a href="06-diagnostico.html">Diagnóstico</a></td></tr>
-        <tr><th>Dados</th><td>Esquema D1 e testes locais</td><td>Esquema e migrações no banco vinculado</td><td><a href="03-publicacao.html">Publicar</a></td></tr>
+        <tr><th>Backend</th><td>Functions publicadas; <code>/api/health</code> e ranking passaram</td><td>Testar escrita, recuperação e exclusão com dados fictícios</td><td><a href="04-validacao.html">Aceite</a></td></tr>
+        <tr><th>Dados</th><td>D1 com 20 tabelas e 14 gatilhos</td><td>Validar fluxos e plano de backup</td><td><a href="05-manutencao.html">Operar</a></td></tr>
         <tr><th>Ensino coletivo</th><td>Duelo, salas, grupos e logs no código</td><td>Docente verificado e regras para menores</td><td><a href="07-prioridades.html">Priorizar</a></td></tr>
       </tbody></table></div>
-      <div class="spotlight"><span class="tag danger">P0 · Próximo passo</span><strong>Inventariar <code>linux-flow-db</code>, aplicar migrações ausentes e obter HTTP 200 em <code>/api/health</code>.</strong><a href="08-plano-testes.html">Abrir teste guiado →</a></div>
+      <div class="spotlight"><span class="tag warn">P0 · Próximo passo</span><strong>Executar o aceite com perfis fictícios: quiz, ranking, recuperação, exclusão e sala.</strong><a href="08-plano-testes.html">Abrir teste guiado →</a></div>
       <h2>Explore por objetivo</h2>
       <div class="grid quick-links">
         <a class="card" href="01-revisao.html"><span class="tag">Segurança</span><strong>O que bloquear antes de turmas</strong></a>
@@ -61,7 +61,7 @@
         <a class="card" href="08-plano-testes.html"><span class="tag warn">Próximo teste</span><strong>Passo a passo até a oferta comercial</strong></a>
         <a class="card" href="09-revisao-conteudo.html"><span class="tag warn">Professor</span><strong>Revisar perguntas, objetivos e direitos de uso</strong></a>
         <a class="card" href="10-acesso-docente.html"><span class="tag warn">Escola</span><strong>Testar acesso a registros e relatórios</strong></a>
-        <a class="card" href="11-validacao-publica.html"><span class="tag danger">Produção</span><strong>Resolver HTTP 503 com um diagnóstico guiado</strong></a>
+        <a class="card" href="11-validacao-publica.html"><span class="tag">Produção</span><strong>Conferir D1 e APIs sem alterar dados</strong></a>
       </div>
       <p class="note">Esta pasta é pública no GitHub, mas o build não a copia para <code>dist/</code>. Não preencha guias com chaves, comprovantes ou dados de alunos.</p>
     </main>

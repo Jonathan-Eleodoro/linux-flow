@@ -4,27 +4,21 @@ Para seguir a configuração em telas curtas, com comandos copiáveis e uma revi
 
 O site estático é publicado pela **Pages**. As rotas em `functions/api/` são **Pages Functions** e usam o banco **D1**, que oferece SQL compatível com SQLite. Não se trata de colocar um arquivo `.sqlite` dentro de `dist/`: o banco fica no serviço D1 e a função o acessa por um binding. O plano anterior com Vercel/MySQL está documentado apenas no histórico Git e nas [notas de manutenção](../.github/PROJECT_NOTES.md).
 
+## Ferramentas de manutenção
+
+O [plugin oficial Cloudflare Skills](https://github.com/cloudflare/skills) foi instalado no Codex em 12/10/2026. Em outro computador, use `codex plugin marketplace add cloudflare/skills` e depois `codex plugin add cloudflare@cloudflare`; abra uma nova sessão do Codex para carregar as skills e o MCP. A instalação do plugin não autentica a conta Cloudflare. O Wrangler está fixado no `package-lock.json` como dependência de desenvolvimento; após `npm ci`, rode `npx wrangler whoami` para verificar a conta e `npx wrangler d1 info linux-flow-db` antes de qualquer operação no banco. Não envie tokens, códigos de 2FA ou arquivos de credenciais ao repositório.
+
 ## Antes de publicar
 
 1. A conversa salva indica que a conta Cloudflare, o 2FA e a conexão com GitHub foram configurados. Confirme no painel as permissões e os códigos de recuperação; não coloque credenciais no código nem as compartilhe.
 2. Confirme que o repositório `Jonathan-Eleodoro/linux-flow` contém a **versão local mais recente na raiz**. Ela deve incluir `functions/`, `cloudflare/`, `server/`, `sql/d1-schema.sql`, `package.json`, `package-lock.json`, `scripts/`, `index.html`, `css/`, `js/` e `assets/`. Inclua também `.gitignore`. Não envie `node_modules/`, `dist/`, `.env`, chaves de acesso de perfis ou credenciais.
 3. Na raiz do clone, execute `npm ci`, `npm test` e `npm run build`. O build só publica os arquivos permitidos em `dist/`; as Functions são descobertas separadamente pela Pages.
 
-## Criar o banco
+## Banco de produção: criado em 12/10/2026
 
-1. Em **Cloudflare Dashboard → Storage & databases → D1 SQL database**, abra `linux-flow-db`, vinculado à variável `DB`. A consulta de 03/10/2026 mostrou somente `_cf_KV`, estrutura interna da Cloudflare; não há tabelas da aplicação nesse banco. O [guia visual](../guias-cloudflare/11-validacao-publica.html) registra a evidência e os próximos testes.
-2. Na raiz do clone, use PowerShell para autenticar o Wrangler com `npx wrangler login --device`; conclua o 2FA no navegador sem compartilhar credenciais. Confirme a conta com `npx wrangler whoami` e verifique com `npx wrangler d1 info linux-flow-db` que o ID é `3d0512f2-340d-44ca-8774-597d8b611f96`. Se for diferente, pare.
-3. Execute [`sql/d1-schema.sql`](../sql/d1-schema.sql) e as migrações [001](../sql/migrations/001-premium-approval.sql), [002](../sql/migrations/002-educator-access.sql), [003](../sql/migrations/003-financial-retention.sql), [004](../sql/migrations/004-ranking-synced.sql) e [005](../sql/migrations/005-financial-retention-guard.sql), **uma linha por vez**, na ordem abaixo, aguardando sucesso antes da próxima. Pare no primeiro erro; a 001 não pode ser repetida após sucesso. Se aparecerem dados ou estruturas novos antes da aplicação, reavalie e faça backup. A 004 removeria pontuações antigas sem perfil verificado.
+O banco `linux-flow-db`, ID `3d0512f2-340d-44ca-8774-597d8b611f96`, estava vazio na consulta remota de 12/10/2026. O Wrangler 4.149.0 aplicou [`sql/d1-schema.sql`](../sql/d1-schema.sql) e as migrações [001](../sql/migrations/001-premium-approval.sql), [002](../sql/migrations/002-educator-access.sql), [003](../sql/migrations/003-financial-retention.sql), [004](../sql/migrations/004-ranking-synced.sql) e [005](../sql/migrations/005-financial-retention-guard.sql), nessa ordem. A conferência remota encontrou 20 tabelas e 14 gatilhos. `npm run smoke:live` confirmou site, API de saúde e ranking com HTTP 200, sem posições publicadas.
 
-```powershell
-npx wrangler d1 execute linux-flow-db --remote --file=sql/d1-schema.sql
-npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/001-premium-approval.sql
-npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/002-educator-access.sql
-npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/003-financial-retention.sql
-npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/004-ranking-synced.sql
-npx wrangler d1 execute linux-flow-db --remote --file=sql/migrations/005-financial-retention-guard.sql
-```
-4. Confira que as tabelas de perfil, ranking, sugestões e Premium aparecem, além de `game_rooms`, `game_members`, `game_answers`, `game_events`, `study_groups`, `study_members`, `study_suggestions` e `community_profiles`. Como nenhum dado foi colocado no Aiven, não há importação de dados.
+**Não repita esses arquivos em Production.** A migração 001 contém `ALTER TABLE`; novas mudanças precisam de migrações numeradas e teste em Preview. Para conferir o estado sem escrever, use `npx wrangler whoami`, `npx wrangler d1 info linux-flow-db` e o [guia visual de validação](../guias-cloudflare/11-validacao-publica.html). O Wrangler está fixado como dependência de desenvolvimento; `npx` usa a versão local. Nenhum dado foi colocado no Aiven, portanto não houve importação.
 
 ## Conectar GitHub e publicar
 
@@ -47,7 +41,7 @@ O pequeno `functions/package.json` contém apenas `{"type":"module"}` para delim
 ## Verificar no endereço `*.pages.dev`
 
 - Rode `npm run smoke:live` na raiz do clone. A checagem usa somente GET, não cria perfis nem imprime apelidos; ela informa o SHA público do deploy e falha enquanto site, commit, saúde da API ou leitura do ranking não passarem. Compare o SHA com `git rev-parse --short HEAD`. O [guia público](../guias-cloudflare/11-validacao-publica.html) detalha o diagnóstico.
-- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB`, as 20 tabelas, os 14 gatilhos necessários e a ausência de pedidos sem arquivo financeiro. Em 03/10/2026, a URL pública retornou HTTP 503; veja o [passo a passo de diagnóstico](../guias-cloudflare/11-validacao-publica.html). A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui testes funcionais.
+- Acesse `/api/health`: `{"status":"ready"}` com HTTP 200 confirma a Function, o binding `DB`, as 20 tabelas, os 14 gatilhos necessários e a ausência de pedidos sem arquivo financeiro. Em 12/10/2026, a URL pública passou. Veja o [passo a passo de validação](../guias-cloudflare/11-validacao-publica.html). A rota não mostra nomes de tabelas nem dados pessoais; ela não substitui testes funcionais.
 - Abra o site no celular e no computador; teste as trilhas, o quiz e o terminal.
 - Acesse `/api/ranking?category=all&level=1&total=10`: antes de publicar resultados, a resposta deve ser `{"ranking":[]}`. Se receber erro 503, verifique o binding `DB`, o esquema e os logs das Functions.
 - Crie um perfil de teste, ative a sincronização, anote o código de acesso e recarregue. Confira se o progresso reaparece. Faça um quiz com publicação opcional e confira o ranking.

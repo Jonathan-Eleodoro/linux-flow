@@ -14,5 +14,8 @@
   },
   "dependencies": {
     "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "wrangler": "^4.149.0"
   }
 }
