@@ -13,6 +13,16 @@
 
   // Cada linha guarda o texto original e as traduções; apenas pt-BR e es estão ativos.
   const rows = [
+    ["Chat orientador", "Chat orientador", "Chat de orientación"],
+    ["Abrir chat orientador", "Abrir chat orientador", "Abrir chat de orientación"],
+    ["Fechar chat orientador", "Fechar chat orientador", "Cerrar chat de orientación"],
+    ["Orientador Linux Flow", "Orientador Linux Flow", "Orientador Linux Flow"],
+    ["GUIA INTERATIVO", "GUIA INTERATIVO", "GUÍA INTERACTIVA"],
+    ["Assuntos sugeridos", "Assuntos sugeridos", "Temas sugeridos"],
+    ["Escreva sua dúvida sobre a plataforma", "Escreva sua dúvida sobre a plataforma", "Escribe tu duda sobre la plataforma"],
+    ["Como posso usar esta função?", "Como posso usar esta função?", "¿Cómo puedo usar esta función?"],
+    ["Enviar", "Enviar", "Enviar"],
+    ["Guia automático. As perguntas ficam somente nesta aba.", "Guia automático. As perguntas ficam somente nesta aba.", "Guía automática. Las preguntas permanecen solo en esta pestaña."],
     ["Opções da conta", "Opções da conta", "Opciones de la cuenta"],
     ["Perfil e dados", "Perfil e dados", "Perfil y datos"],
     ["Sincronizar agora", "Sincronizar agora", "Sincronizar ahora"],

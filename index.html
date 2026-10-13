@@ -12,7 +12,7 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
-    <title>Linux_Flow — Laboratório de aprendizagem</title>
+    <title>Linux_Flow - Laboratório de aprendizagem</title>
     <link
       rel="icon"
       type="image/svg+xml"
@@ -29,6 +29,7 @@
     <script defer src="js/terminal.js"></script>
     <script defer src="js/i18n.js"></script>
     <script defer src="js/motion.js"></script>
+    <script defer src="js/assistant.js"></script>
     <script defer src="js/community.js"></script>
     <script defer src="js/app.js"></script>
   </head>
@@ -62,6 +63,7 @@
           <span class="control-label">Tema</span>
         </button>
         <button id="guide-settings" class="settings-action" type="button"><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.2 1.8c-1.2.9-1.8 1.4-1.8 2.7M12 17h.01"/></svg><span>Ajuda</span></button>
+        <button id="open-orientador" class="settings-action" type="button"><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v12H9l-5 4V5Z"/><path d="M8 9h8M8 13h5"/></svg><span>Chat orientador</span></button>
         <label class="settings-language" for="language"><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V3m0 1c4-2 8 2 14 0v11c-6 2-10-2-14 0"/></svg><span>Idioma</span></label>
         <select id="language" aria-label="Idioma da interface"><option value="pt-BR">🇧🇷 Português (Brasil)</option><option value="es">🇪🇸 Español</option></select>
         <p class="settings-language-note">Aulas e questões ainda estão em português do Brasil.</p></div></details><button id="profile" class="profile-button">Entrar</button><details id="account-menu" class="account-menu" hidden><summary aria-label="Opções da conta" title="Opções da conta"><svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5M14 16l4-4-4-4M8 12h10"/></svg></summary><div class="account-panel"><strong id="account-name"></strong><span id="account-state" class="small muted"></span><button id="account-profile" type="button">Perfil e dados</button><button id="account-sync" type="button">Sincronizar agora</button><button id="sign-out" type="button">Sair deste dispositivo</button></div></details>
@@ -95,6 +97,14 @@
       <div class="footer-links"><a href="#sobre">Sobre</a><a href="#privacidade">Privacidade</a><button id="cookie-settings" type="button" class="footer-button">Dados</button></div>
     </footer>
     <aside id="feature-guide" class="feature-guide" aria-label="Guia de funcionalidades" hidden></aside>
+    <button id="orientador-launch" class="orientador-launch" type="button" aria-label="Abrir chat orientador" aria-expanded="false" aria-controls="orientador-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v12H9l-5 4V5Z"/><path d="M8 9h8M8 13h5"/></svg></button>
+    <aside id="orientador-panel" class="orientador-panel" aria-label="Chat orientador" hidden>
+      <div class="orientador-head"><div><span class="eyebrow">GUIA INTERATIVO</span><strong>Orientador Linux Flow</strong></div><button id="orientador-close" type="button" aria-label="Fechar chat orientador">×</button></div>
+      <div id="orientador-messages" class="orientador-messages" role="log" aria-live="polite" aria-relevant="additions" data-no-translate></div>
+      <div id="orientador-topics" class="orientador-topics" aria-label="Assuntos sugeridos" data-no-translate></div>
+      <form id="orientador-form" class="orientador-form"><label class="sr-text" for="orientador-input">Escreva sua dúvida sobre a plataforma</label><input id="orientador-input" type="text" maxlength="160" autocomplete="off" placeholder="Como posso usar esta função?" required><button type="submit" class="primary">Enviar</button></form>
+      <p class="orientador-note">Guia automático. As perguntas ficam somente nesta aba.</p>
+    </aside>
     <div id="toast" role="status" aria-live="polite"></div>
     <dialog id="cookie-dialog" aria-labelledby="cookie-title">
       <div class="dialog-head"><h2 id="cookie-title">Armazenamento e privacidade</h2><button id="close-cookie" type="button" aria-label="Fechar">×</button></div>

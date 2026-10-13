@@ -18,6 +18,7 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 
 ## Caminho atual — 12/10/2026
 
+- Os títulos de todas as páginas HTML e rotas do aplicativo usam ` - ` na aba do navegador. O novo chat orientador funciona localmente, com respostas em português brasileiro e espanhol, assuntos sugeridos conforme a tela, links para as funções e sem envio ou retenção de mensagens. É um guia de navegação, não uma IA generativa nem suporte humano. Validar o fluxo por teclado, celular e leitor de tela antes do piloto.
 - O cabeçalho não exibe mais o estado "Na nuvem/Local"; essa informação permanece no menu da conta. A vitrine inicial agora mostra seis recursos em uma faixa rolável, com avanço automático apenas enquanto está visível e sem interação. Setas, toque e teclado continuam disponíveis. O movimento pausa durante a interação e respeita movimento reduzido. Cartões e mascotes têm tratamento visual para os temas claro e escuro; resta inspeção visual em aparelhos reais.
 - Os cinco mascotes SVG ganharam acessórios ligados aos seus papéis. Entradas de tela, cartões em rolagem, estados de carregamento e ações têm movimento respeitando `prefers-reduced-motion`; o conteúdo permanece visível sem animação.
 - A sala agora mostra desafio, escolhas por forma/letra/cor, cronômetro e classificação de forma mais legível. A consulta periódica mantém o placar atualizado sem descartar a alternativa selecionada; a nota continua calculada pelo servidor. A experiência usa atualização por consulta a cada três segundos, sem prometer simultaneidade instantânea. Antes de ampliar o piloto, conferir visualmente em celulares e desktops reais, inclusive zoom e espanhol.
@@ -57,6 +58,8 @@ No próximo retorno, continuar pelo primeiro marco não comprovado. Registrar fa
 - Testes de regras e fluxos D1 com SQLite local; build estático por lista de arquivos.
 
 ## Próximas decisões de produto
+
+Sequência para o próximo piloto: (1) testar com `Adm01` e `Aluno01` em dois navegadores a criação, entrada, resposta e avanço de sala sem usar dados de pagamento; (2) obter a revisão pedagógica e de direitos de uso do professor; (3) formalizar pela escola quem pode receber acesso docente, como revogar e como tratar dados de menores; (4) validar Preview, retenção e o procedimento Premium sem pagamento real; (5) revisar acessibilidade, espanhol e desempenho em aparelhos reais. Registre o resultado de cada etapa antes de avançar à seguinte.
 
 | Prioridade | Decisão ou trabalho | Critério para concluir |
 |---|---|---|

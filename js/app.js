@@ -1559,7 +1559,7 @@
     (views[view] || dashboard)();
     if (view !== lastRenderedView) FlowMotion.enter(main);
     FlowMotion.reveal(main);
-    document.title = `Linux_Flow — ${tr({ inicio: "Início", pesquisa: "Pesquisa", sugestoes: "Sugestões", trilhas: "Trilhas", "aprender-historia": "História do Linux", "aprender-instalacao": "Instalação consciente", quiz: "Quiz", terminal: "Terminal", ranking: "Ranking", comunidade: "Comunidade", manual: "Manual", conquistas: "Conquistas", mascotes: "Mascotes", objetivos: "Objetivos LPI", pro: "Premium", sobre: "Sobre", privacidade: "Privacidade" }[view] || "Início")}`;
+    document.title = `Linux_Flow - ${tr({ inicio: "Início", pesquisa: "Pesquisa", sugestoes: "Sugestões", trilhas: "Trilhas", "aprender-historia": "História do Linux", "aprender-instalacao": "Instalação consciente", quiz: "Quiz", terminal: "Terminal", ranking: "Ranking", comunidade: "Comunidade", manual: "Manual", conquistas: "Conquistas", mascotes: "Mascotes", objetivos: "Objetivos LPI", pro: "Premium", sobre: "Sobre", privacidade: "Privacidade" }[view] || "Início")}`;
     window.FlowI18n?.translate(document.body);
     if (view !== lastRenderedView) window.scrollTo(0, 0);
     lastRenderedView = view;
