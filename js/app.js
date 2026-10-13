@@ -65,16 +65,11 @@
   }
   function updateSyncStatus(state = syncState) {
     syncState = state;
-    const status = $("#sync-status");
     const active = user();
-    status.hidden = !active;
     const current = active?.syncKey ? state : "local";
-    status.dataset.state = current;
-    status.textContent = !active ? "" : active.temporary ? "Sessão livre" : !active.syncKey
+    $("#account-state").textContent = !active ? "" : active.temporary ? "Sessão livre" : !active.syncKey
       ? "Neste dispositivo" : ({ syncing: "Sincronizando", ready: "Nuvem atualizada",
         error: "Nuvem indisponível" })[current] || "Na nuvem";
-    status.setAttribute("aria-label", `${status.textContent}. Abrir ajustes do perfil`);
-    $("#account-state").textContent = status.textContent;
   }
   $("#institution-address").textContent = cfg.institutionAddress;
   $("#project-contact").textContent = cfg.email;
@@ -224,7 +219,15 @@
     return `<div class="page-head"><div><p class="eyebrow">${esc(tr(label))}</p><h1>${esc(tr(title))}</h1>${description ? `<p>${esc(tr(description))}</p>` : ""}</div></div>`;
   }
   function landing() {
-    main.innerHTML = `<section class="landing-hero"><div class="landing-copy"><span class="eyebrow">APRENDA LINUX · ${cfg.year}</span><h1>Aprenda Linux com prática, contexto e progresso visível.</h1><p>Explore trilhas, resolva quizzes com explicações e experimente comandos em um terminal simulado. Comece gratuitamente, no seu ritmo.</p><div class="actions"><button id="landing-start" class="primary">Explorar trilhas →</button><button id="landing-quiz">Experimentar o quiz</button></div><div class="landing-metrics"><span><strong>3</strong> etapas Free</span><span><strong>12</strong> missões</span><span><strong>5</strong> mascotes</span></div></div><div class="landing-art"><span class="landing-orbit orbit-one" aria-hidden="true">${mascotArt(1)}</span><span class="landing-orbit orbit-two" aria-hidden="true">${mascotArt(2)}</span><span class="landing-orbit orbit-three" aria-hidden="true">${mascotArt(3)}</span><div class="landing-showcase" aria-label="Vitrine das atividades"><div class="landing-scene"><div class="landing-terminal"><span>aluno@linux-flow:~$</span><code>pwd</code><em>/home/aluno</em><code>_</code></div></div><div class="landing-scene" hidden><div class="landing-preview"><span class="eyebrow">QUIZ</span><strong>Qual comando mostra o diretório atual?</strong><span class="landing-preview-choice">◆ &nbsp; pwd</span><span class="landing-preview-choice">● &nbsp; ls</span></div></div><div class="landing-scene" hidden><div class="landing-preview"><span class="eyebrow">PARTIDA COLETIVA</span><strong>Aprenda com a turma.</strong><span class="landing-preview-player">${mascotArt(2)} <span>Coruja · 8 pontos</span></span><span class="landing-preview-player">${mascotArt(1)} <span>Pinguim · 6 pontos</span></span></div></div></div><div class="landing-scene-controls" role="group" aria-label="Visualizar atividades"><button type="button" data-scene="0" aria-label="Ver terminal">1</button><button type="button" data-scene="1" aria-label="Ver quiz">2</button><button type="button" data-scene="2" aria-label="Ver partida coletiva">3</button></div></div></section>
+    main.innerHTML = `<section class="landing-hero"><div class="landing-copy"><span class="eyebrow">APRENDA LINUX · ${cfg.year}</span><h1>Aprenda Linux com prática, contexto e progresso visível.</h1><p>Explore trilhas, resolva quizzes com explicações e experimente comandos em um terminal simulado. Comece gratuitamente, no seu ritmo.</p><div class="actions"><button id="landing-start" class="primary">Explorar trilhas →</button><button id="landing-quiz">Experimentar o quiz</button></div><div class="landing-metrics"><span><strong>3</strong> etapas Free</span><span><strong>12</strong> missões</span><span><strong>5</strong> mascotes</span></div></div><div class="landing-art" aria-hidden="true"><span class="landing-orbit orbit-one">${mascotArt(1)}</span><span class="landing-orbit orbit-two">${mascotArt(2)}</span><span class="landing-orbit orbit-three">${mascotArt(3)}</span><div class="landing-terminal"><span>aluno@linux-flow:~$</span><code>pwd</code><em>/home/aluno</em><code>_</code></div></div></section>
+    <section class="feature-section" aria-label="Conheça o Linux Flow"><div class="section-heading feature-heading"><div><span class="eyebrow">DESCUBRA A PLATAFORMA</span><h2>Um universo para aprender Linux.</h2><p>Deslize pelas atividades e escolha seu próximo desafio.</p></div><div class="feature-controls"><button id="feature-prev" type="button" aria-label="Voltar na vitrine">←</button><button id="feature-next" type="button" aria-label="Avançar na vitrine">→</button></div></div><div class="feature-rail" tabindex="0" aria-label="Atividades do Linux Flow">
+      <article class="feature-card feature-trails"><img src="assets/mascots/penguin.svg" alt="" loading="lazy"><span class="eyebrow">01 / TRILHAS</span><h3>Aprenda por etapas</h3><p>Comece pela história do Linux, explore comandos e planeje uma instalação segura.</p><button type="button" data-feature-link="trilhas">Explorar trilhas →</button></article>
+      <article class="feature-card feature-quiz"><img src="assets/mascots/owl.svg" alt="" loading="lazy"><span class="eyebrow">02 / QUIZ</span><h3>Teste e entenda</h3><p>Responda perguntas variadas e veja a explicação de cada escolha.</p><button type="button" data-feature-link="quiz">Abrir quiz →</button></article>
+      <article class="feature-card feature-terminal"><img src="assets/mascots/beaver.svg" alt="" loading="lazy"><span class="eyebrow">03 / TERMINAL</span><h3>Pratique comandos</h3><p>Resolva missões em um laboratório simulado, com pistas e retorno imediato.</p><button type="button" data-feature-link="terminal">Abrir terminal →</button></article>
+      <article class="feature-card feature-arena"><img src="assets/mascots/fox.svg" alt="" loading="lazy"><span class="eyebrow">04 / COMUNIDADE</span><h3>Jogue com a turma</h3><p>Entre em duelos, salas coletivas e grupos de estudo com acompanhamento do mestre.</p><button type="button" data-feature-link="comunidade">Conhecer comunidade →</button></article>
+      <article class="feature-card feature-progress"><img src="assets/mascots/lynx.svg" alt="" loading="lazy"><span class="eyebrow">05 / PROGRESSO</span><h3>Veja sua evolução</h3><p>Revise resultados, conquistas e mascotes enquanto avança.</p><button type="button" data-feature-link="ranking">Ver resultados →</button></article>
+      <article class="feature-card feature-premium"><img src="assets/mascots/owl.svg" alt="" loading="lazy"><span class="eyebrow">06 / PREMIUM</span><h3>Amplie sua jornada</h3><p>Desbloqueie etapas adicionais por contribuição Pix com ativação manual.</p><button type="button" data-feature-link="pro">Conhecer o Premium →</button></article>
+    </div></section>
     <section class="landing-section"><div class="section-heading"><div><span class="eyebrow">SEU CAMINHO</span><h2>Escolha como começar</h2></div></div><div class="access-grid"><article class="panel access-card"><span class="access-number">01 / TEMPORÁRIO</span><h3>Estude nesta sessão</h3><p>Crie um apelido sem marcar o salvamento. Seu perfil e resultados ficam na memória e desaparecem ao fechar ou recarregar a página.</p><strong>Gratuito · sem conta</strong></article><article class="panel access-card"><span class="access-number">02 / SALVO</span><h3>Continue neste dispositivo</h3><p>Autorize o salvamento local para manter perfil, resultados e preferências neste navegador. Se quiser usar outro aparelho, ative a sincronização e guarde seu código de acesso.</p><strong>Gratuito · escolha opcional</strong></article><article class="panel access-card access-pro"><span class="access-number">03 / Premium</span><h3>Amplie a jornada</h3><p>Acesse Automação e Arquitetura com um perfil sincronizado e contribuição Pix a partir de R$ 9,90, após conferência e ativação manual.</p><strong>Ativação manual · sem assinatura automática</strong></article></div><div class="actions"><button id="landing-profile">Entrar</button><button id="landing-pro">Conhecer o Premium →</button></div></section>
     <section class="panel landing-bottom"><div><span class="eyebrow">COMO FUNCIONA</span><h2>Do conceito ao comando.</h2><p>Avance no seu ritmo, com explicações em cada desafio.</p><ol class="learning-loop"><li><span>01</span><strong>Descubra</strong><small>Escolha uma trilha.</small></li><li><span>02</span><strong>Experimente</strong><small>Responda ou use o terminal.</small></li><li><span>03</span><strong>Evolua</strong><small>Revise e veja seu progresso.</small></li></ol></div><div class="landing-links"><button id="landing-lab">Abrir terminal →</button><button id="landing-mascots">Conhecer mascotes →</button><button id="landing-suggestions">Enviar sugestão →</button><button id="landing-policy">Privacidade e LGPD →</button></div></section>`;
     $("#landing-start").onclick = () => navigate("trilhas");
@@ -235,7 +238,10 @@
     $("#landing-mascots").onclick = () => navigate("mascotes");
     $("#landing-suggestions").onclick = () => navigate("sugestoes");
     $("#landing-policy").onclick = () => navigate("privacidade");
-    FlowMotion.showcase(main.querySelector(".landing-art"));
+    main.querySelectorAll("[data-feature-link]").forEach((item) => {
+      item.onclick = () => navigate(item.dataset.featureLink);
+    });
+    FlowMotion.showcase(main.querySelector(".feature-section"));
   }
   function privacyView() {
     // Este texto descreve exatamente os dados enviados pelas rotas atuais.
@@ -499,7 +505,6 @@
     render();
     toast("Sessão livre iniciada. O progresso do visitante não será salvo ao sair.");
   };
-  $("#sync-status").addEventListener("click", () => navigate("sobre"));
   $("#close-profile").addEventListener("click", () =>
     $("#profile-dialog").close(),
   );

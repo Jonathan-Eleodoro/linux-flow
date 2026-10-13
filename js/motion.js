@@ -31,25 +31,38 @@
   function showcase(container) {
     clearInterval(showcaseTimer);
     if (!container) return;
-    const scenes = [...container.querySelectorAll(".landing-scene")];
-    const controls = [...container.querySelectorAll("[data-scene]")];
+    const rail = container.querySelector(".feature-rail");
+    const cards = [...rail.querySelectorAll(".feature-card")];
     let index = 0;
-    const select = (next) => {
-      index = next;
-      scenes.forEach((scene, number) => { scene.hidden = number !== index; });
-      controls.forEach((control, number) => {
-        control.setAttribute("aria-pressed", String(number === index));
-      });
+    let direction = 1;
+    let pauseUntil = 0;
+    const pause = () => { pauseUntil = Date.now() + 15000; };
+    const move = (next) => {
+      index = Math.max(0, Math.min(cards.length - 1, next));
+      rail.scrollTo({ left: cards[index].offsetLeft - cards[0].offsetLeft,
+        behavior: reduced() ? "auto" : "smooth" });
     };
-    controls.forEach((control, number) => control.addEventListener("click", () => {
-      clearInterval(showcaseTimer);
-      select(number);
-    }));
-    select(index);
-    if (!reduced() && scenes.length > 1) showcaseTimer = setInterval(() => {
-      if (document.visibilityState === "visible" && container.isConnected) select((index + 1) % scenes.length);
+    container.querySelector("#feature-prev").addEventListener("click", () => { pause(); move(index - 1); });
+    container.querySelector("#feature-next").addEventListener("click", () => { pause(); move(index + 1); });
+    rail.addEventListener("pointerdown", pause);
+    rail.addEventListener("focusin", pause);
+    rail.addEventListener("scroll", () => {
+      const left = rail.scrollLeft;
+      index = cards.reduce((nearest, card, number) =>
+        Math.abs(card.offsetLeft - cards[0].offsetLeft - left) <
+        Math.abs(cards[nearest].offsetLeft - cards[0].offsetLeft - left) ? number : nearest, 0);
+    }, { passive: true });
+    if (!reduced() && cards.length > 1) showcaseTimer = setInterval(() => {
       if (!container.isConnected) clearInterval(showcaseTimer);
-    }, 7000);
+      else if (document.visibilityState === "visible" && Date.now() > pauseUntil &&
+        !container.matches(":hover, :focus-within") &&
+        container.getBoundingClientRect().top < root.innerHeight &&
+        container.getBoundingClientRect().bottom > 0) {
+        if (index === cards.length - 1 || rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 4) direction = -1;
+        if (rail.scrollLeft <= 4) direction = 1;
+        move(index + direction);
+      }
+    }, 5000);
   }
   root.FlowMotion = Object.freeze({ enter, reveal, showcase });
 })(window);
